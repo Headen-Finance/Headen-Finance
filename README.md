@@ -1,1 +1,2 @@
-# lending-protocol
+# Headen-Finance
+Credit based lending protocol
