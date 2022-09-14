@@ -1,3 +1,5 @@
+import { MantineProvider } from '@mantine/core';
+import { NotificationsProvider } from '@mantine/notifications';
 import { AppProps } from 'next/app';
 
 import '@/styles/globals.css';
@@ -10,7 +12,19 @@ import '@/styles/colors.css';
  */
 
 function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
+  return (
+    <MantineProvider
+      withGlobalStyles
+      withNormalizeCSS
+      theme={{
+        colorScheme: 'dark',
+      }}
+    >
+      <NotificationsProvider position='top-right'>
+        <Component {...pageProps} />
+      </NotificationsProvider>
+    </MantineProvider>
+  );
 }
 
 export default MyApp;

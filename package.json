@@ -18,6 +18,13 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.4",
+    "@emotion/server": "^11.10.0",
+    "@mantine/core": "^5.3.1",
+    "@mantine/hooks": "^5.3.1",
+    "@mantine/modals": "^5.3.1",
+    "@mantine/next": "^5.3.1",
+    "@mantine/notifications": "^5.3.1",
     "clsx": "^1.2.1",
     "next": "^12.3.0",
     "react": "^18.2.0",
@@ -36,7 +43,7 @@
     "@typescript-eslint/eslint-plugin": "^5.36.2",
     "@typescript-eslint/parser": "^5.36.2",
     "autoprefixer": "^10.4.8",
-    "eslint": "^8.23.0",
+    "eslint": "8.22.0",
     "eslint-config-next": "^12.3.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",

@@ -1,3 +1,4 @@
+import { createStylesServer, ServerStyles } from '@mantine/ssr';
 import Document, {
   DocumentContext,
   Head,
@@ -6,10 +7,23 @@ import Document, {
   NextScript,
 } from 'next/document';
 
+// optional: you can provide your cache as a fist argument in createStylesServer function
+const stylesServer = createStylesServer();
+
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const initialProps = await Document.getInitialProps(ctx);
-    return { ...initialProps };
+    return {
+      ...initialProps,
+      styles: [
+        initialProps.styles,
+        <ServerStyles
+          html={initialProps.html}
+          server={stylesServer}
+          key='styles'
+        />,
+      ],
+    };
   }
 
   render() {
@@ -24,7 +38,7 @@ class MyDocument extends Document {
             crossOrigin='anonymous'
           />
         </Head>
-        <body>
+        <body className='bg-black'>
           <Main />
           <NextScript />
         </body>
