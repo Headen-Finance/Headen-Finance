@@ -1,4 +1,3 @@
-// !STARTERCONF You can delete this page
 import clsx from 'clsx';
 import * as React from 'react';
 
@@ -12,7 +11,6 @@ import UnstyledLink from '@/components/links/UnstyledLink';
 import NextImage from '@/components/NextImage';
 import Seo from '@/components/Seo';
 import Skeleton from '@/components/Skeleton';
-
 type Color = typeof colorList[number];
 
 export default function ComponentsPage() {
@@ -35,6 +33,9 @@ export default function ComponentsPage() {
         <section
           className={clsx(mode === 'dark' ? 'bg-dark' : 'bg-gray-50', color)}
         >
+          <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
+            See the repository
+          </ArrowLink>
           <div
             className={clsx(
               'layout min-h-screen py-20',
