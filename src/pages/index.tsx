@@ -1,10 +1,10 @@
+import { Divider } from '@mantine/core';
+import { Button, Input } from '@mantine/core';
 import * as React from 'react';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { IoIosAdd } from 'react-icons/io';
 
 import Layout from '@/components/layout/Layout';
-import ArrowLink from '@/components/links/ArrowLink';
-import ButtonLink from '@/components/links/ButtonLink';
-import UnderlineLink from '@/components/links/UnderlineLink';
-import UnstyledLink from '@/components/links/UnstyledLink';
 import Seo from '@/components/Seo';
 
 /**
@@ -14,11 +14,55 @@ import Seo from '@/components/Seo';
  * You can override the next-env if the type is important to you
  * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
  */
-import Vercel from '~/svg/Vercel.svg';
+import IndicatorArrow from '~/svg/indicator-arrow.svg';
 
 // !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
 // Before you begin editing, follow all comments with `STARTERCONF`,
 // to customize the default configuration.
+type HomeInfoProps = {
+  title: string;
+  value: string;
+};
+
+function HomeInfo({ title, value }: HomeInfoProps) {
+  return (
+    <div
+      style={{ height: '100px' }}
+      className='flex grow basis-1 flex-col items-center justify-around'
+    >
+      <span className='text-md font-semibold'>{title}</span>
+      <span className='text-lg font-bold'>{value}</span>
+    </div>
+  );
+}
+
+type IndicatorPropType = {
+  value: number;
+};
+
+function Indicator({ value }: IndicatorPropType) {
+  return (
+    <div
+      style={{ height: '200px', width: '200px' }}
+      className='border-6 flex flex-col items-center justify-center rounded-full border-white'
+    >
+      <span className='font-semibold'>Your risk level</span>
+      <span className='m-2 text-2xl font-bold'>0</span>
+      <div className='relative h-1.5 w-3/5 bg-gradient-to-r from-yellow-300 via-orange-500 to-red-700'>
+        <IndicatorArrow
+          style={{
+            left: value * 100 + '%',
+            bottom: '3px',
+            height: '10px',
+            width: '10px',
+            marginLeft: '-10px',
+          }}
+          className='absolute'
+        ></IndicatorArrow>
+      </div>
+    </div>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -26,49 +70,54 @@ export default function HomePage() {
       {/* <Seo templateTitle='Home' /> */}
       <Seo />
 
-      <main>
-        <section className='bg-white'>
-          <div className='layout flex min-h-screen flex-col items-center justify-center text-center'>
-            <Vercel className='text-5xl' />
-            <h1 className='mt-4'>
-              Next.js + Tailwind CSS + TypeScript Starter
-            </h1>
-            <p className='mt-2 text-sm text-gray-800'>
-              A starter for Next.js, Tailwind CSS, and TypeScript with Absolute
-              Import, Seo, Link component, pre-configured with Husky{' '}
-            </p>
-            <p className='mt-2 text-sm text-gray-700'>
-              <ArrowLink href='https://github.com/theodorusclarence/ts-nextjs-tailwind-starter'>
-                See the repository
-              </ArrowLink>
-            </p>
-
-            <ButtonLink className='mt-6' href='/components' variant='light'>
-              See all components
-            </ButtonLink>
-
-            <UnstyledLink
-              href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Ftheodorusclarence%2Fts-nextjs-tailwind-starter'
-              className='mt-4'
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                width='92'
-                height='32'
-                src='https://vercel.com/button'
-                alt='Deploy with Vercel'
-              />
-            </UnstyledLink>
-
-            <footer className='absolute bottom-2 text-gray-700'>
-              © {new Date().getFullYear()} By{' '}
-              <UnderlineLink href='https://theodorusclarence.com?ref=tsnextstarter'>
-                Theodorus Clarence
-              </UnderlineLink>
-            </footer>
-          </div>
+      <main className='flex justify-center  text-white'>
+        <section className='mt-6 flex w-full max-w-screen-lg items-center justify-around bg-black'>
+          <HomeInfo title='Total borrowed' value='$130k' />
+          <Indicator value={0.4} />
+          <HomeInfo title='Total supply' value='$300k' />
         </section>
       </main>
+      <div className='flex items-center'>
+        <div className='mx-2 max-w-screen-lg  flex-1 rounded-lg bg-white p-10 text-black'>
+          <div className='flex justify-between'>
+            <span> All pools</span>
+            <div className='flex gap-2'>
+              <Button
+                variant='outline'
+                leftIcon={<IoIosAdd size={24} />}
+                radius='xl'
+                sx={{ height: '32px' }}
+                compact
+                className='font-light'
+              >
+                Create pool
+              </Button>
+              <Input
+                icon={<AiOutlineSearch />}
+                placeholder='Search Market'
+                variant='unstyled'
+                className='rounded-full border border-black'
+                size='xs'
+                radius='xl'
+              />
+            </div>
+          </div>
+          <Divider />
+          <div>asdadas</div>
+          <div>asdadas</div>
+          sd as das d
+        </div>
+      </div>
+      {/*<Button*/}
+      {/*    onClick={() =>*/}
+      {/*        showNotification({*/}
+      {/*            title: 'Default notification',*/}
+      {/*            message: 'Hey there, your code is awesome! 🤥',*/}
+      {/*        })*/}
+      {/*    }*/}
+      {/*>*/}
+      {/*    Show notification*/}
+      {/*</Button>*/}
     </Layout>
   );
 }
