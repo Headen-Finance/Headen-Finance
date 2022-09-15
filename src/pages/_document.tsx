@@ -26,6 +26,10 @@ class MyDocument extends Document {
             type='font/woff2'
             crossOrigin='anonymous'
           />
+          <link
+            href='https://fonts.googleapis.com/css2?family=Poppins&display=swap'
+            rel='stylesheet'
+          />
         </Head>
         <body className='bg-black'>
           <Main />
