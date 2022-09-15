@@ -1,5 +1,9 @@
 import * as React from 'react';
+import { AiOutlineSearch } from 'react-icons/ai';
+import { IoIosAdd } from 'react-icons/io';
 
+import Button from '@/components/buttons/Button';
+import Input from '@/components/inputs/Input';
 import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
 
@@ -67,47 +71,86 @@ export default function HomePage() {
       <Seo />
 
       <main className='flex justify-center  text-white'>
-        <section className='mt-6 flex w-full max-w-screen-lg items-center justify-around bg-black'>
+        <section className='mt-14 flex w-full max-w-screen-xl items-center justify-around bg-black'>
           <HomeInfo title='Total borrowed' value='$130k' />
           <Indicator value={0.4} />
           <HomeInfo title='Total supply' value='$300k' />
         </section>
       </main>
-      <div className='mt-6 flex justify-center'>
-        <div className='mx-2 max-w-screen-lg  flex-1 rounded-lg bg-white p-10 text-black'>
-          <div className='flex justify-between border-b pb-2'>
-            <span className='font-bold'> All pools</span>
+      <div className='mt-[150px] flex justify-center bg-gray-100 pb-24 '>
+        <div className='mx-2 mt-[-100px]  max-w-screen-xl flex-1 rounded-lg bg-white p-10 text-black'>
+          <div className='mb-3 flex justify-between border-b'>
+            <span className='font-semibold'> ALL POOLS</span>
             <div className='flex gap-2'>
-              {/*<Button*/}
-              {/*  variant='outline'*/}
-              {/*  color="dark"*/}
-              {/*  leftIcon={<IoIosAdd size={24} />}*/}
-              {/*  radius='xl'*/}
-              {/*  sx={{ height: '32px' }}*/}
-              {/*  compact*/}
-              {/*  className='font-light'*/}
-              {/*>*/}
-              {/*  Create pool*/}
-              {/*</Button>*/}
-              {/*<Input*/}
-              {/*  icon={<AiOutlineSearch color="black"/>}*/}
-              {/*  placeholder='Search Market'*/}
-              {/*  variant='unstyled'*/}
-              {/*  styles={theme => ({*/}
-              {/*    input: {*/}
-              {/*      height: '30px',*/}
-              {/*      lineHeight: '20px',*/}
-              {/*      fontSize: '15px'*/}
-              {/*    }*/}
-              {/*  })}*/}
-              {/*  className='rounded-full border border-black'*/}
-              {/*  radius='xl'*/}
-              {/*/>*/}
+              <Button
+                variant='outline'
+                leftIcon={<IoIosAdd size={24} />}
+                className='h-8 rounded-full border-black text-xs font-light text-black'
+              >
+                Create pool
+              </Button>
+              <Input
+                leftIcon={<AiOutlineSearch color='black' />}
+                placeholder='Search Market'
+                variant='outline'
+                className='rounded-full border-black py-[7px] text-black'
+              />
             </div>
           </div>
-          <div>asdadas</div>
-          <div>asdadas</div>
-          sd as das d
+          <div className='relative overflow-x-auto'>
+            <table className='w-full text-left text-sm text-xs'>
+              <thead className='text-xs uppercase text-black'>
+                <tr className='bg-gray-300'>
+                  <th scope='col' className='w-1/3 py-3 px-6'>
+                    Asset
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    Detail
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    Available liquidity
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    Deposit rate
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    Borrow rate
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    Collateral
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    APY
+                  </th>
+                  <th scope='col' className='py-3 px-6'>
+                    Wallet
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...Array(5)].map((value: undefined, index: number) => (
+                  <tr
+                    key={index}
+                    className='border-b bg-white text-black hover:bg-gray-200'
+                  >
+                    <th
+                      scope='row'
+                      className='whitespace-nowrap py-4 px-6 font-medium'
+                    >
+                      Aave token
+                    </th>
+                    <td className='py-4 px-6'>Aave detail</td>
+                    <td className='py-4 px-6'>4.9k</td>
+                    <td className='py-4 px-6'>0.2%</td>
+                    <td className='py-4 px-6'>0.23%</td>
+                    <td className='py-4 px-6'>-</td>
+                    <td className='py-4 px-6'>0.08%</td>
+                    <td className='py-4 px-6'>0 AAVE</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </Layout>

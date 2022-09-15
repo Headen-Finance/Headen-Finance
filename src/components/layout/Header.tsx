@@ -7,19 +7,26 @@ export default function Header() {
   return (
     <header className='sticky top-0 z-50 bg-black text-white'>
       <div className='layout flex h-14 items-center justify-between'>
-        <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
-          Headen Finance
-        </UnstyledLink>
-        <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
-          Dashboard
-        </UnstyledLink>
-        <UnstyledLink
-          onClick={() => toast.success('Welcome!')}
-          href='/'
-          className='font-bold hover:text-gray-600'
-        >
-          User Account
-        </UnstyledLink>
+        <div className='grow basis-0'>
+          <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
+            Headen Finance
+          </UnstyledLink>
+        </div>
+        <div>
+          <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
+            Dashboard
+          </UnstyledLink>
+        </div>
+        <div className='flex grow basis-0 justify-end'>
+          <UnstyledLink
+            onClick={() => toast.success('Welcome!')}
+            href='/'
+            className='font-bold hover:text-gray-600'
+          >
+            User Account
+          </UnstyledLink>
+        </div>
+
         {/*<nav>*/}
         {/*  <ul className='flex items-center justify-between space-x-4'>*/}
         {/*    {links.map(({ href, label }) => (*/}

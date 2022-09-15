@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ReactElement } from 'react';
 import { ImSpinner2 } from 'react-icons/im';
 
 import clsxm from '@/lib/clsxm';
@@ -15,9 +16,10 @@ type ButtonProps = {
   isLoading?: boolean;
   isDarkBg?: boolean;
   variant?: keyof typeof ButtonVariant;
+  leftIcon?: ReactElement;
 } & React.ComponentPropsWithRef<'button'>;
 
-const CustomButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       children,
@@ -26,6 +28,7 @@ const CustomButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
       isLoading,
       variant = 'primary',
       isDarkBg = false,
+      leftIcon,
       ...rest
     },
     ref
@@ -99,10 +102,11 @@ const CustomButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
             <ImSpinner2 className='animate-spin' />
           </div>
         )}
+        {leftIcon}
         {children}
       </button>
     );
   }
 );
 
-export default CustomButton;
+export default Button;
