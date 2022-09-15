@@ -1,4 +1,5 @@
 import * as React from 'react';
+import toast from 'react-hot-toast';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
 
@@ -12,7 +13,11 @@ export default function Header() {
         <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
           Dashboard
         </UnstyledLink>
-        <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
+        <UnstyledLink
+          onClick={() => toast.custom('Here is your toast.')}
+          href='/'
+          className='font-bold hover:text-gray-600'
+        >
           User Account
         </UnstyledLink>
         {/*<nav>*/}
