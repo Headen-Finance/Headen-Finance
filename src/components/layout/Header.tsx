@@ -14,7 +14,7 @@ export default function Header() {
           Dashboard
         </UnstyledLink>
         <UnstyledLink
-          onClick={() => toast.custom('Here is your toast.')}
+          onClick={() => toast.success('Welcome!')}
           href='/'
           className='font-bold hover:text-gray-600'
         >
