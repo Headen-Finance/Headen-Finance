@@ -1,4 +1,3 @@
-import { showNotification } from '@mantine/notifications';
 import * as React from 'react';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
@@ -13,18 +12,7 @@ export default function Header() {
         <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
           Dashboard
         </UnstyledLink>
-        <UnstyledLink
-          onClick={() =>
-            showNotification({
-              title: 'Oops',
-              message: 'Hey there!',
-              color: 'green',
-              loading: true,
-            })
-          }
-          href='/'
-          className='font-bold hover:text-gray-600'
-        >
+        <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
           User Account
         </UnstyledLink>
         {/*<nav>*/}

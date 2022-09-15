@@ -18,13 +18,6 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.4",
-    "@emotion/server": "^11.10.0",
-    "@mantine/core": "^5.3.1",
-    "@mantine/hooks": "^5.3.1",
-    "@mantine/modals": "^5.3.1",
-    "@mantine/next": "^5.3.1",
-    "@mantine/notifications": "^5.3.1",
     "clsx": "^1.2.1",
     "next": "^12.3.0",
     "react": "^18.2.0",

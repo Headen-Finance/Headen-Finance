@@ -1,8 +1,4 @@
-import { Divider } from '@mantine/core';
-import { Button, Input } from '@mantine/core';
 import * as React from 'react';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { IoIosAdd } from 'react-icons/io';
 
 import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
@@ -77,47 +73,43 @@ export default function HomePage() {
           <HomeInfo title='Total supply' value='$300k' />
         </section>
       </main>
-      <div className='flex items-center'>
+      <div className='mt-6 flex justify-center'>
         <div className='mx-2 max-w-screen-lg  flex-1 rounded-lg bg-white p-10 text-black'>
-          <div className='flex justify-between'>
-            <span> All pools</span>
+          <div className='flex justify-between border-b pb-2'>
+            <span className='font-bold'> All pools</span>
             <div className='flex gap-2'>
-              <Button
-                variant='outline'
-                leftIcon={<IoIosAdd size={24} />}
-                radius='xl'
-                sx={{ height: '32px' }}
-                compact
-                className='font-light'
-              >
-                Create pool
-              </Button>
-              <Input
-                icon={<AiOutlineSearch />}
-                placeholder='Search Market'
-                variant='unstyled'
-                className='rounded-full border border-black'
-                size='xs'
-                radius='xl'
-              />
+              {/*<Button*/}
+              {/*  variant='outline'*/}
+              {/*  color="dark"*/}
+              {/*  leftIcon={<IoIosAdd size={24} />}*/}
+              {/*  radius='xl'*/}
+              {/*  sx={{ height: '32px' }}*/}
+              {/*  compact*/}
+              {/*  className='font-light'*/}
+              {/*>*/}
+              {/*  Create pool*/}
+              {/*</Button>*/}
+              {/*<Input*/}
+              {/*  icon={<AiOutlineSearch color="black"/>}*/}
+              {/*  placeholder='Search Market'*/}
+              {/*  variant='unstyled'*/}
+              {/*  styles={theme => ({*/}
+              {/*    input: {*/}
+              {/*      height: '30px',*/}
+              {/*      lineHeight: '20px',*/}
+              {/*      fontSize: '15px'*/}
+              {/*    }*/}
+              {/*  })}*/}
+              {/*  className='rounded-full border border-black'*/}
+              {/*  radius='xl'*/}
+              {/*/>*/}
             </div>
           </div>
-          <Divider />
           <div>asdadas</div>
           <div>asdadas</div>
           sd as das d
         </div>
       </div>
-      {/*<Button*/}
-      {/*    onClick={() =>*/}
-      {/*        showNotification({*/}
-      {/*            title: 'Default notification',*/}
-      {/*            message: 'Hey there, your code is awesome! 🤥',*/}
-      {/*        })*/}
-      {/*    }*/}
-      {/*>*/}
-      {/*    Show notification*/}
-      {/*</Button>*/}
     </Layout>
   );
 }
