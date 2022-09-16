@@ -43,7 +43,7 @@ type IndicatorPropType = {
 function Indicator({ value }: IndicatorPropType) {
   return (
     <div
-      style={{ height: '200px', width: '200px' }}
+      style={{ height: '250px', width: '250px' }}
       className='border-6 flex flex-col items-center justify-center rounded-full border-white'
     >
       <span className='font-semibold'>Your risk level</span>
@@ -101,7 +101,7 @@ export default function HomePage() {
             <table className='w-full text-left text-sm text-xs'>
               <thead className='text-xs uppercase text-black'>
                 <tr className='bg-gray-300'>
-                  <th scope='col' className='w-1/3 py-3 px-6'>
+                  <th scope='col' className='w-1/4 py-3 px-6'>
                     Asset
                   </th>
                   <th scope='col' className='py-3 px-6'>
