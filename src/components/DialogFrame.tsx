@@ -23,7 +23,7 @@ export const DialogFrame = ({
     <Transition appear show={show} as={Fragment}>
       <Dialog
         as='div'
-        className='relative z-10'
+        className='relative z-50'
         onClose={disableClose ? () => null : onClose}
       >
         <Transition.Child
@@ -43,7 +43,7 @@ export const DialogFrame = ({
           />
         </Transition.Child>
 
-        <div className='fixed inset-0 overflow-y-auto'>
+        <div className='fixed inset-0'>
           <div className='flex min-h-full w-full items-center justify-center p-4 text-center'>
             <Transition.Child
               as={Fragment}
@@ -54,10 +54,14 @@ export const DialogFrame = ({
               leaveFrom='opacity-100 scale-100'
               leaveTo='opacity-0 scale-95'
             >
-              <Dialog.Panel as='div' className='flex justify-center'>
+              <Dialog.Panel
+                as='div'
+                className='relative flex max-h-[90vh] justify-center overflow-y-auto'
+              >
                 <div
                   className={clsxm(
-                    'w-fullmax-w-xs transform  overflow-hidden rounded-2xl bg-gray-700 p-6 align-middle text-white shadow-xl transition-all sm:max-w-sm md:max-w-md lg:max-w-xl',
+                    ' transform overflow-hidden overflow-y-auto rounded-2xl bg-neutral-800 p-6 align-middle text-white shadow-xl transition-all ' +
+                      'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl',
                     className
                   )}
                 >

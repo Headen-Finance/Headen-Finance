@@ -65,7 +65,7 @@ export const AssetDialog = () => {
   return (
     <div className='w-full px-2 sm:px-0'>
       <Tab.Group>
-        <Tab.List className='flex space-x-1 p-1'>
+        <Tab.List className='sticky -top-6 z-10 flex space-x-1 bg-neutral-800 p-1'>
           {Object.keys(categories).map((category) => (
             <Tab
               key={category}
