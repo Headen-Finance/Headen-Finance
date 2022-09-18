@@ -6,6 +6,7 @@ import { IoChevronDown } from 'react-icons/io5';
 import clsxm from '@/lib/clsxm';
 
 import Button from '@/components/buttons/Button';
+import { CustomConnectWallet } from '@/components/web3/ConnectWallet';
 
 export const AssetDialog = () => {
   const [categories] = useState({
@@ -48,9 +49,9 @@ export const AssetDialog = () => {
         <Button isDarkBg className='mt-4 mb-2 sm:mt-8' variant='ghost'>
           More parameters <IoChevronDown />
         </Button>
-        <Button variant='light' className='w-full justify-center py-5'>
-          Connect Wallet
-        </Button>
+        <CustomConnectWallet className='w-full justify-center py-5'>
+          Add supply
+        </CustomConnectWallet>
         <div className='mt-5 flex justify-between'>
           <span>0 SOL in waller</span>
           <span>0 SOL supplied</span>

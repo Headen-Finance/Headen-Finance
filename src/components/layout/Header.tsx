@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
-import ConnectWallet from '@/components/web3/ConnectWallet';
+import { ConnectWallet } from '@/components/web3/ConnectWallet';
 
 export default function Header() {
   return (

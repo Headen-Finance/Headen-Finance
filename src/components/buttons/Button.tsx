@@ -12,7 +12,7 @@ enum ButtonVariant {
   'dark',
 }
 
-type ButtonProps = {
+export type ButtonProps = {
   isLoading?: boolean;
   isDarkBg?: boolean;
   variant?: keyof typeof ButtonVariant;
