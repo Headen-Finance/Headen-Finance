@@ -8,6 +8,7 @@ type DialogProps = {
   show: boolean;
   onClose: () => void;
   backdropClassName?: string | undefined;
+  disableClose?: boolean;
 } & React.ComponentPropsWithRef<'div'>;
 
 export const DialogFrame = ({
@@ -16,10 +17,15 @@ export const DialogFrame = ({
   children,
   backdropClassName,
   className,
+  disableClose,
 }: DialogProps) => {
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as='div' className='relative z-10' onClose={onClose}>
+      <Dialog
+        as='div'
+        className='relative z-10'
+        onClose={disableClose ? () => null : onClose}
+      >
         <Transition.Child
           as={Fragment}
           enter='ease-out duration-300'
