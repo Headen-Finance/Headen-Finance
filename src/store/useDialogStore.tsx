@@ -22,7 +22,7 @@ const useDialogStoreBase = create<DialogStoreType>((set) => ({
   state: {
     title: 'Title',
     description: 'Description',
-    submitText: 'Yes',
+    submitText: null,
     variant: 'warning',
     catchOnCancel: false,
   },

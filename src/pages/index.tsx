@@ -4,9 +4,11 @@ import toast from 'react-hot-toast';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoIosAdd } from 'react-icons/io';
 
+import useDialog from '@/hooks/useDialog';
+
 import { AssetDialog } from '@/components/AssetDialog';
 import Button from '@/components/buttons/Button';
-import { DialogFrame } from '@/components/DialogFrame';
+import { DialogFrame } from '@/components/dialog/DialogFrame';
 import HomeInfo from '@/components/home/HomeInfo';
 import Indicator from '@/components/home/Indicator';
 import Input from '@/components/inputs/Input';
@@ -105,6 +107,16 @@ export default function HomePage() {
     setIsOpen(false);
   }
 
+  const openDialog = useDialog();
+  function openTestDialog() {
+    openDialog({
+      title: 'hello1',
+      description: 'oooops',
+      variant: 'danger',
+      // submitText: 'submit'
+    });
+  }
+
   const dialog = (
     <DialogFrame show={isOpen} onClose={closeModal} className='w-[100vw]'>
       <AssetDialog />
@@ -139,7 +151,11 @@ export default function HomePage() {
       <main className='flex justify-center  text-white'>
         <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around bg-black sm:grid-cols-3 sm:grid-rows-1'>
           <div className=' order-1 col-span-2 sm:order-3 sm:col-span-1 '>
-            <Indicator value={0.4} className='m-auto' />
+            <Indicator
+              onClick={() => openTestDialog()}
+              value={0.4}
+              className='m-auto'
+            />
           </div>
           <HomeInfo title='Total borrowed' value='$130k ' className='order-1' />
           <HomeInfo title='Total supply' value='$300k' className='order-4' />
