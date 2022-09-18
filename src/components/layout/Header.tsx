@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
+import ConnectWallet from '@/components/web3/ConnectWallet';
 
 export default function Header() {
   return (
@@ -17,9 +18,10 @@ export default function Header() {
           </UnstyledLink>
         </div>
         <div className='flex grow basis-0 justify-end'>
-          <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
-            User Account
-          </UnstyledLink>
+          {/*<UnstyledLink href='/' className='font-bold hover:text-gray-600'>*/}
+          {/*  User Account*/}
+          {/*</UnstyledLink>*/}
+          <ConnectWallet />
         </div>
 
         {/*<nav>*/}
