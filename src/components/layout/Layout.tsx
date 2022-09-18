@@ -14,7 +14,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   //#endregion  //*======== Store ===========
 
   return (
-    <div>
+    <div className=''>
       <Header />
       {children}
       <BaseDialog

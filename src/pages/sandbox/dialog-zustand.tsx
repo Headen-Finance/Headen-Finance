@@ -4,6 +4,7 @@ import * as React from 'react';
 import useDialog from '@/hooks/useDialog';
 
 import Button from '@/components/buttons/Button';
+import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
 
 export default function UseDialogPage() {
@@ -44,7 +45,7 @@ export default function UseDialogPage() {
   };
 
   return (
-    <>
+    <Layout>
       <Seo templateTitle='useDialog' />
 
       <section className='bg-gray-100'>
@@ -54,6 +55,6 @@ export default function UseDialogPage() {
           <Button onClick={openDanger}>Danger Alert</Button>
         </div>
       </section>
-    </>
+    </Layout>
   );
 }

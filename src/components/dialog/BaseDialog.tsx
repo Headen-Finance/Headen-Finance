@@ -64,7 +64,7 @@ export default function BaseDialog({
       <div className='sm:flex sm:items-start'>
         <div
           className={clsx(
-            'flex flex-shrink-0 items-center justify-center rounded-full',
+            'items flex flex-shrink-0 items-center justify-center rounded-full',
             'mx-auto h-12 w-12 sm:mx-0 sm:h-10 sm:w-10',
             current.bg.light
           )}
@@ -74,7 +74,7 @@ export default function BaseDialog({
             aria-hidden='true'
           />
         </div>
-        <div className='mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left'>
+        <div className='mt-3 mr-4 text-center sm:mt-0 sm:ml-4 sm:text-left'>
           <Dialog.Title
             as='h3'
             className='text-lg font-medium leading-6 text-white'

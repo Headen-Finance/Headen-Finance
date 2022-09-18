@@ -60,8 +60,8 @@ export const DialogFrame = ({
               >
                 <div
                   className={clsxm(
-                    ' transform overflow-hidden overflow-y-auto rounded-2xl bg-neutral-800 p-6 align-middle text-white shadow-xl transition-all ' +
-                      'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl',
+                    ' transform overflow-hidden overflow-y-auto rounded-2xl bg-zinc-800 p-6 align-middle text-white shadow-xl transition-all ',
+                    'w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl',
                     className
                   )}
                 >
