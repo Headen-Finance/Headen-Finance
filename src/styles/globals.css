@@ -65,8 +65,8 @@
   .p {
     @apply font-primary text-sm md:text-base;
   }
-  /* #endregion  /**======== Typography =========== */
 
+  /* #endregion  /**======== Typography =========== */
   .layout {
     /* 1100px */
     max-width: 68.75rem;
@@ -95,6 +95,7 @@
     background-position: 100% 100%, 0 100%;
     background-repeat: no-repeat;
   }
+
   @media (prefers-reduced-motion: no-preference) {
     .animated-underline {
       transition: 0.3s ease;

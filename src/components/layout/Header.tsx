@@ -1,5 +1,4 @@
 import * as React from 'react';
-import toast from 'react-hot-toast';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
 
@@ -18,11 +17,7 @@ export default function Header() {
           </UnstyledLink>
         </div>
         <div className='flex grow basis-0 justify-end'>
-          <UnstyledLink
-            onClick={() => toast.success('Welcome!')}
-            href='/'
-            className='font-bold hover:text-gray-600'
-          >
+          <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
             User Account
           </UnstyledLink>
         </div>
