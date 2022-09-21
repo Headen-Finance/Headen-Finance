@@ -1,0 +1,10 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "chainLinkFeedUSDC",
+  "sourceName": "contracts/headenFInanceParent.sol",
+  "abi": [],
+  "bytecode": "0x6080604052738fffffd4afb6115b954bd326cbe7b4ba576818f66000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550348015606357600080fd5b50603f8060716000396000f3fe6080604052600080fdfea26469706673582212203071d3634e8e670cf86b43435ee7afffa6f62b4f5f1bf91a92335870c9eae2c064736f6c63430008040033",
+  "deployedBytecode": "0x6080604052600080fdfea26469706673582212203071d3634e8e670cf86b43435ee7afffa6f62b4f5f1bf91a92335870c9eae2c064736f6c63430008040033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
