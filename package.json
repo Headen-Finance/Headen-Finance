@@ -20,7 +20,9 @@
   "dependencies": {
     "@chainlink/contracts": "^0.4.1",
     "@headlessui/react": "^1.7.2",
+    "@headlessui/tailwindcss": "^0.1.1",
     "@openzeppelin/contracts": "^4.7.3",
+    "@rainbow-me/rainbowkit": "^0.6.1",
     "@uniswap/v2-core": "^1.0.1",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "auto-zustand-selectors-hook": "^2.0.0",

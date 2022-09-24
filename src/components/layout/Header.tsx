@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import UnstyledLink from '@/components/links/UnstyledLink';
+import ChainSelector from '@/components/web3/ChainSelector';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
 
 export default function Header() {
@@ -21,6 +22,7 @@ export default function Header() {
           {/*<UnstyledLink href='/' className='font-bold hover:text-gray-600'>*/}
           {/*  User Account*/}
           {/*</UnstyledLink>*/}
+          <ChainSelector />
           <ConnectWallet />
         </div>
 
