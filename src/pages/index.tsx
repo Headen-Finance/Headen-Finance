@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoIosAdd } from 'react-icons/io';
 import { erc20ABI, useAccount, useBalance, useContractRead } from 'wagmi';
@@ -12,6 +12,7 @@ import {
 import { AssetDialog } from '@/components/AssetDialog';
 import Button from '@/components/buttons/Button';
 import { DialogFrame } from '@/components/dialog/DialogFrame';
+import { CreateMarketDialog } from '@/components/headen/CreateMarketDialog';
 import HomeInfo from '@/components/home/HomeInfo';
 import Indicator from '@/components/home/Indicator';
 import Input from '@/components/inputs/Input';
@@ -133,7 +134,7 @@ export default function HomePage() {
   const tokenAddress = useAssetDialogStore.useTokenAddress();
 
   const closeModal = useAssetDialogStore.useHandleClose();
-
+  const [showCreateMarketDialog, setShowCreateMarketDialog] = useState(false);
   const dialog = useMemo(
     () => (
       <DialogFrame
@@ -152,12 +153,25 @@ export default function HomePage() {
     ),
     [tokenAddress, disableClose, closeModal]
   );
+  const createMarketDialog = useMemo(
+    () => (
+      <DialogFrame
+        show={showCreateMarketDialog}
+        onClose={() => setShowCreateMarketDialog(false)}
+        className='w-[100vw]'
+      >
+        <CreateMarketDialog />
+      </DialogFrame>
+    ),
+    [showCreateMarketDialog]
+  );
 
   const createPoolButton = (
     <Button
       variant='outline'
       leftIcon={<IoIosAdd size={24} />}
       className='h-8 rounded-full border-black text-xs font-light text-black'
+      onClick={() => setShowCreateMarketDialog(true)}
     >
       Create pool
     </Button>
@@ -177,6 +191,7 @@ export default function HomePage() {
       {/* <Seo templateTitle='Home' /> */}
       <Seo />
       {dialog}
+      {createMarketDialog}
       <main className='flex justify-center  text-white'>
         <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around bg-black sm:grid-cols-3 sm:grid-rows-1'>
           <div className=' order-1 col-span-2 sm:order-3 sm:col-span-1 '>

@@ -3,7 +3,6 @@ import { useState } from 'react';
 import * as React from 'react';
 
 import clsxm from '@/lib/clsxm';
-import { useChainlinkFeed } from '@/hooks/useChainlinkFeed';
 
 import { Stake } from '@/components/headen/Stake';
 
@@ -12,7 +11,7 @@ type AssetDialogProp = {
 };
 export const AssetDialog = ({ tokenAddress }: AssetDialogProp) => {
   // const tokenAddress = '0x326C977E6efc84E512bB9C30f76E30c160eD06FB'; //LINK on goerli
-  useChainlinkFeed();
+  // useChainlinkFeed();
   const [categories] = useState({
     Supply: () => <Stake tokenAddress={tokenAddress} />,
     Borrow: () => <div> borrow...</div>,
