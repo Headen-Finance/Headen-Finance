@@ -1,66 +1,20 @@
 import { Tab } from '@headlessui/react';
 import { useState } from 'react';
 import * as React from 'react';
-import { IoChevronDown } from 'react-icons/io5';
 
 import clsxm from '@/lib/clsxm';
+import { useChainlinkFeed } from '@/hooks/useChainlinkFeed';
 
-import Button from '@/components/buttons/Button';
-import { CustomConnectWallet } from '@/components/web3/ConnectWallet';
+import { Stake } from '@/components/headen/Stake';
 
 export const AssetDialog = () => {
+  const tokenAddress = '0x326C977E6efc84E512bB9C30f76E30c160eD06FB';
+  useChainlinkFeed();
   const [categories] = useState({
-    Supply: (
-      <div className='p-0 sm:p-5 md:p-10'>
-        <div className='md:py-10'>
-          <div className='relative'>
-            <span className='text-2xl sm:text-5xl'>SOL</span>
-            <Button
-              variant='outline'
-              isDarkBg
-              className='absolute left-0 top-0 aspect-square rounded-full border-white p-0.5 text-xs text-white sm:text-lg'
-            >
-              Max
-            </Button>
-          </div>
-          <h6>=$0</h6>
-        </div>
-        <div className='relative py-5 sm:py-10 '>
-          <input
-            type='range'
-            className='range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100'
-            id='customRange1'
-          />
-        </div>
-        <div className='flex flex-col gap-1'>
-          <div className='flex justify-between'>
-            <span>User Borrow Limit</span>
-            <span>$0.00</span>
-          </div>
-          <div className='flex justify-between'>
-            <span>Utilization</span>
-            <span>0%</span>
-          </div>
-          <div className='flex justify-between'>
-            <span>Supply APR</span>
-            <span>0.99%</span>
-          </div>
-        </div>
-        <Button isDarkBg className='mt-4 mb-2 sm:mt-8' variant='ghost'>
-          More parameters <IoChevronDown />
-        </Button>
-        <CustomConnectWallet className='w-full justify-center py-5'>
-          Add supply
-        </CustomConnectWallet>
-        <div className='mt-5 flex justify-between'>
-          <span>0 SOL in waller</span>
-          <span>0 SOL supplied</span>
-        </div>
-      </div>
-    ),
-    Borrow: <div> borrow...</div>,
-    Withdraw: <div> withdraw...</div>,
-    Repay: <div> repay...</div>,
+    Supply: () => <Stake tokenAddress={tokenAddress} />,
+    Borrow: () => <div> borrow...</div>,
+    Withdraw: () => <div> withdraw...</div>,
+    Repay: () => <div> repay...</div>,
   });
 
   return (
@@ -86,7 +40,7 @@ export const AssetDialog = () => {
         </Tab.List>
         <Tab.Panels className='mt-2 w-full'>
           {Object.values(categories).map((element, idx) => (
-            <Tab.Panel key={idx}>{element}</Tab.Panel>
+            <Tab.Panel key={idx}>{element()}</Tab.Panel>
           ))}
         </Tab.Panels>
       </Tab.Group>
