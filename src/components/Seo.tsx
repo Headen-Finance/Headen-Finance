@@ -6,8 +6,7 @@ const defaultMeta = {
   title: 'Headen Finance',
   siteName: 'Headen Finance',
   description: 'Crypto lending protocol',
-  /** Without additional '/' on the end, e.g. https://theodorusclarence.com */
-  url: 'https://tsnext-tw.thcl.dev',
+  url: 'https://headen-finance-w8hk.vercel.app/',
   type: 'website',
   robots: 'follow, index',
   /**

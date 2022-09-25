@@ -75,15 +75,16 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
               {balance.data?.symbol}
             </span>
             {/*<span className='text-2xl sm:text-5xl'>{(balance.data?.value?.div(10**balance.data?.decimals )?.toNumber() ?? 0) * percent/100}{balance.data?.symbol}</span>*/}
-            <Button
-              variant='outline'
-              isDarkBg
-              className='absolute left-0 top-12 aspect-square rounded-full border-white p-0.5 text-xs text-white sm:text-lg'
-            >
-              Max
-            </Button>
+            {/*<Button*/}
+            {/*  variant='outline'*/}
+            {/*  isDarkBg*/}
+            {/*  className='absolute left-0 top-12 aspect-square rounded-full border-white p-0.5 text-xs text-white sm:text-lg'*/}
+            {/*  onClick={()=>setPercent(100)}*/}
+            {/*>*/}
+            {/*  Max*/}
+            {/*</Button>*/}
           </div>
-          <h6>=$0</h6>
+          {/*<h6>=$0</h6>*/}
         </div>
         {/*<> allowance: {allowance}</>*/}
         {/*{allowance === ApprovalState.NOT_APPROVED && (*/}
@@ -93,15 +94,22 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
           <input
             type='range'
             className='range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100'
-            min={0}
+            min={1}
             max={100}
             step={1}
-            // value={percent}
+            value={percent}
             onChange={(event) => setPercent(parseInt(event.target.value))}
             id='customRange1'
           />
+          <div className='flex justify-between'>
+            <span> 0</span>
+            <span> {balance.data?.formatted}</span>
+          </div>
         </div>
         <div className='flex flex-col gap-1'>
+          <div className='flex justify-center text-[0.6em]'>
+            <span>{tokenAddress}</span>
+          </div>
           <div className='flex justify-between'>
             <span>User Borrow Limit</span>
             <span>$0.00</span>

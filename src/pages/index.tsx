@@ -67,20 +67,7 @@ function PoolsRow({ item }: PoolsRowData) {
     <tr
       // key={index}
       className='cursor-pointer border-b bg-white text-black hover:bg-gray-200'
-      onClick={
-        () => openDialog(item.tokenAddress)
-        // toast.promise(
-        //   new Promise<void>((resolve, reject) => {
-        //     const fail = Math.random() < 0.5;
-        //     setTimeout(() => (fail ? reject() : resolve()), 2000);
-        //   }),
-        //   {
-        //     success: 'wohooo',
-        //     error: 'Ooops, something went wrong',
-        //     loading: 'Loading',
-        //   }
-        // )
-      }
+      onClick={() => openDialog(item.tokenAddress)}
     >
       <th scope='row' className='whitespace-nowrap py-4 px-6 font-medium'>
         <span>{tokenSymbol} token</span>
@@ -90,7 +77,7 @@ function PoolsRow({ item }: PoolsRowData) {
       <td className='py-4 px-6'>{item.supplyRate}%</td>
       <td className='py-4 px-6'>{item.borrowRate}%</td>
       <td className='py-4 px-6'>{item.amountStaked}</td>
-      <td className='py-4 px-6'>0.08%</td>
+      <td className='py-4 px-6'>4.08%</td>
       <td className='py-4 px-6'>
         {balance?.formatted}
         {balance?.symbol}
