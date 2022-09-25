@@ -3,6 +3,7 @@ import { ConnectKitProvider } from 'connectkit';
 import React from 'react';
 import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc'
 
 import '@rainbow-me/rainbowkit/styles.css';
 
@@ -13,8 +14,16 @@ const { chains, provider } = configureChains(
   [
     // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
 
+  [
     publicProvider(),
-  ]
+    jsonRpcProvider({
+      priority: 0,
+      rpc: () => ({
+        http:process.env.NEXT_PUBLIC_QUICKNODE_RPC as string,
+      }),
+    }),
+    //alchemyProvider({ priority: 1 }),
+  ],
 );
 
 const { connectors } = getDefaultWallets({
