@@ -15,7 +15,7 @@ export const CONTRACT_ADDRESS = {
   [chain.arbitrum.id]: '0x0',
   //testnets
   [chain.arbitrumGoerli.id]: '0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6',
-  [chain.polygonMumbai.id]: '0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6',
+  [chain.polygonMumbai.id]: '0x76A1ee1738818566D6663db22b0061ae0A57C9fd',
   [chain.goerli.id]: '0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6',
 };
 
