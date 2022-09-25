@@ -1,13 +1,18 @@
 /* eslint-disable */
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ConnectKitButton } from 'connectkit';
-import { FC, ReactNode } from 'react';
 import * as React from 'react';
+import { FC, ReactNode } from 'react';
 import { useAccount } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
 
 import Button, { ButtonProps } from '@/components/buttons/Button';
+import {
+  ApprovalState,
+  useERC20ApproveCallback,
+} from '@/hooks/useERC20ApproveCallback';
+import { MaxUint256 } from '@ethersproject/constants';
 
 type Visibility = 'always' | 'connected' | 'not_connected';
 
@@ -22,7 +27,7 @@ export const ConnectWallet: FC<{ show?: Visibility }> = ({
   )
     return null;
 
-  return <ConnectButton />;
+  return <ConnectButton showBalance={false} />;
 };
 
 //https://docs.family.co/connectkit/connect-button#connect-button
@@ -48,9 +53,13 @@ export const CustomConnectWallet: FC<
   );
 };
 
-export const CustomConnectWallet2: FC<
-  { children?: ReactNode; onClick?: () => void } & ButtonProps
-> = ({ children, onClick, className, ...rest }) => {
+export const ConnectApproveAction: FC<
+  {
+    tokenAddress: string;
+    children: ReactNode;
+    onClick?: () => void;
+  } & ButtonProps
+> = ({ children, onClick, className, tokenAddress, ...rest }) => {
   return (
     <ConnectButton.Custom>
       {({
@@ -70,6 +79,11 @@ export const CustomConnectWallet2: FC<
           account &&
           chain &&
           (!authenticationStatus || authenticationStatus === 'authenticated');
+        const [approvalState, approve] = useERC20ApproveCallback(
+          true,
+          tokenAddress ?? '',
+          MaxUint256
+        );
 
         return (
           <div
@@ -85,56 +99,77 @@ export const CustomConnectWallet2: FC<
             {(() => {
               if (!connected) {
                 return (
-                  <button onClick={openConnectModal} type='button'>
+                  <Button
+                    onClick={openConnectModal}
+                    className={clsxm('w-full justify-center py-5', className)}
+                    variant='light'
+                  >
                     Connect Wallet
-                  </button>
+                  </Button>
                 );
               }
 
               if (chain.unsupported) {
                 return (
-                  <button onClick={openChainModal} type='button'>
+                  <Button
+                    onClick={openChainModal}
+                    className={clsxm('w-full justify-center py-5', className)}
+                    variant='light'
+                  >
                     Wrong network
-                  </button>
+                  </Button>
+                );
+              }
+              if (tokenAddress && approvalState == ApprovalState.NOT_APPROVED) {
+                return (
+                  <Button
+                    onClick={approve}
+                    className={clsxm('w-full justify-center py-5', className)}
+                    variant='light'
+                  >
+                    Approve token
+                  </Button>
                 );
               }
 
               return (
                 <div style={{ display: 'flex', gap: 12 }}>
-                  <button
-                    onClick={openChainModal}
-                    style={{ display: 'flex', alignItems: 'center' }}
-                    type='button'
-                  >
-                    {chain.hasIcon && (
-                      <div
-                        style={{
-                          background: chain.iconBackground,
-                          width: 12,
-                          height: 12,
-                          borderRadius: 999,
-                          overflow: 'hidden',
-                          marginRight: 4,
-                        }}
-                      >
-                        {chain.iconUrl && (
-                          <img
-                            alt={chain.name ?? 'Chain icon'}
-                            src={chain.iconUrl}
-                            style={{ width: 12, height: 12 }}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {chain.name}
-                  </button>
+                  {/*<Button*/}
+                  {/*  onClick={openChainModal}*/}
+                  {/*  style={{ display: 'flex', alignItems: 'center' }}*/}
+                  {/*  type='button'*/}
+                  {/*>*/}
+                  {/*  {chain.hasIcon && (*/}
+                  {/*    <div*/}
+                  {/*      style={{*/}
+                  {/*        background: chain.iconBackground,*/}
+                  {/*        width: 12,*/}
+                  {/*        height: 12,*/}
+                  {/*        borderRadius: 999,*/}
+                  {/*        overflow: 'hidden',*/}
+                  {/*        marginRight: 4,*/}
+                  {/*      }}*/}
+                  {/*    >*/}
+                  {/*      {chain.iconUrl && (*/}
+                  {/*        <img*/}
+                  {/*          alt={chain.name ?? 'Chain icon'}*/}
+                  {/*          src={chain.iconUrl}*/}
+                  {/*          style={{ width: 12, height: 12 }}*/}
+                  {/*        />*/}
+                  {/*      )}*/}
+                  {/*    </div>*/}
+                  {/*  )}*/}
+                  {/*  {chain.name}*/}
+                  {/*</Button>*/}
 
-                  <button onClick={openAccountModal} type='button'>
-                    {account.displayName}
-                    {account.displayBalance
-                      ? ` (${account.displayBalance})`
-                      : ''}
-                  </button>
+                  <Button
+                    onClick={onClick}
+                    type='button'
+                    className={clsxm('w-full justify-center py-5', className)}
+                    variant='light'
+                  >
+                    {children}
+                  </Button>
                 </div>
               );
             })()}

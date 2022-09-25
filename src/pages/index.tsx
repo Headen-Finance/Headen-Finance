@@ -1,15 +1,13 @@
 import * as React from 'react';
-import { useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useMemo } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoIosAdd } from 'react-icons/io';
-import { useAccount, useBalance } from 'wagmi';
+import { erc20ABI, useAccount, useBalance, useContractRead } from 'wagmi';
 
 import {
   MarketsResponseDisplay,
   useAllMarketData,
 } from '@/hooks/useAllMarketData';
-import useDialog from '@/hooks/useDialog';
 
 import { AssetDialog } from '@/components/AssetDialog';
 import Button from '@/components/buttons/Button';
@@ -19,6 +17,8 @@ import Indicator from '@/components/home/Indicator';
 import Input from '@/components/inputs/Input';
 import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
+
+import useAssetDialogStore from '@/store/useAssetDialogStore';
 
 /**
  * SVGR Support
@@ -38,40 +38,55 @@ type PoolsRowData = {
 
 function PoolsRow({ item }: PoolsRowData) {
   const acc = useAccount();
-  const { data } = useBalance({
+  const { data: balance } = useBalance({
     addressOrName: acc.address,
+    cacheTime: 100,
     token: item.tokenAddress,
   });
+
+  const { data: tokenName } = useContractRead({
+    addressOrName: item.tokenAddress,
+    contractInterface: erc20ABI,
+    functionName: 'name',
+  });
+  const { data: tokenSymbol } = useContractRead({
+    addressOrName: item.tokenAddress,
+    contractInterface: erc20ABI,
+    functionName: 'symbol',
+  });
+
+  const openDialog = useAssetDialogStore.useOpenDialog();
   return (
     <tr
       // key={index}
       className='cursor-pointer border-b bg-white text-black hover:bg-gray-200'
-      onClick={() =>
-        toast.promise(
-          new Promise<void>((resolve, reject) => {
-            const fail = Math.random() < 0.5;
-            setTimeout(() => (fail ? reject() : resolve()), 2000);
-          }),
-          {
-            success: 'wohooo',
-            error: 'Ooops, something went wrong',
-            loading: 'Loading',
-          }
-        )
+      onClick={
+        () => openDialog(item.tokenAddress)
+        // toast.promise(
+        //   new Promise<void>((resolve, reject) => {
+        //     const fail = Math.random() < 0.5;
+        //     setTimeout(() => (fail ? reject() : resolve()), 2000);
+        //   }),
+        //   {
+        //     success: 'wohooo',
+        //     error: 'Ooops, something went wrong',
+        //     loading: 'Loading',
+        //   }
+        // )
       }
     >
       <th scope='row' className='whitespace-nowrap py-4 px-6 font-medium'>
-        <span>{data?.symbol} token</span>
+        <span>{tokenSymbol} token</span>
       </th>
-      <td className='py-4 px-6'>{data?.symbol} detail</td>
+      <td className='py-4 px-6'>{tokenName} detail</td>
       <td className='py-4 px-6'>{item.amountStaked}</td>
       <td className='py-4 px-6'>{item.supplyRate}%</td>
       <td className='py-4 px-6'>{item.borrowRate}%</td>
       <td className='py-4 px-6'>-</td>
       <td className='py-4 px-6'>0.08%</td>
       <td className='py-4 px-6'>
-        {data?.formatted}
-        {data?.symbol}
+        {balance?.formatted}
+        {balance?.symbol}
       </td>
     </tr>
   );
@@ -119,29 +134,28 @@ function PoolsTable() {
 }
 
 export default function HomePage() {
-  const [isOpen, setIsOpen] = useState(true);
+  const disableClose = useAssetDialogStore.useDisableClose();
+  const tokenAddress = useAssetDialogStore.useTokenAddress();
 
-  function closeModal() {
-    setIsOpen(false);
-  }
-
-  const openDialog = useDialog();
-  function openTestDialog() {
-    openDialog({
-      title: 'hello1',
-      description: 'oooops',
-      variant: 'danger',
-      // submitText: 'submit'
-    });
-  }
+  const closeModal = useAssetDialogStore.useHandleClose();
 
   const dialog = useMemo(
     () => (
-      <DialogFrame show={isOpen} onClose={closeModal} className='w-[100vw]'>
-        <AssetDialog />
+      <DialogFrame
+        show={!!tokenAddress}
+        onClose={
+          disableClose
+            ? () => {
+                /*lint...*/
+              }
+            : closeModal
+        }
+        className='w-[100vw]'
+      >
+        {tokenAddress && <AssetDialog tokenAddress={tokenAddress} />}
       </DialogFrame>
     ),
-    [isOpen]
+    [tokenAddress, disableClose, closeModal]
   );
 
   const createPoolButton = (
@@ -149,7 +163,6 @@ export default function HomePage() {
       variant='outline'
       leftIcon={<IoIosAdd size={24} />}
       className='h-8 rounded-full border-black text-xs font-light text-black'
-      onClick={() => setIsOpen(true)}
     >
       Create pool
     </Button>
@@ -172,11 +185,7 @@ export default function HomePage() {
       <main className='flex justify-center  text-white'>
         <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around bg-black sm:grid-cols-3 sm:grid-rows-1'>
           <div className=' order-1 col-span-2 sm:order-3 sm:col-span-1 '>
-            <Indicator
-              onClick={() => openTestDialog()}
-              value={0.4}
-              className='m-auto'
-            />
+            <Indicator value={0.4} className='m-auto' />
           </div>
           <HomeInfo title='Total borrowed' value='$130k ' className='order-1' />
           <HomeInfo title='Total supply' value='$300k' className='order-4' />

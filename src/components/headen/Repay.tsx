@@ -15,7 +15,7 @@ import { ConnectApproveAction } from '@/components/web3/ConnectWallet';
 type ActionProp = {
   tokenAddress: string;
 };
-export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
+export const Repay: FC<ActionProp> = ({ tokenAddress }) => {
   const acc = useAccount();
   const balance = useBalance({
     addressOrName: acc.address,
@@ -86,11 +86,8 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
         <Button isDarkBg className='mt-4 mb-2 sm:mt-8' variant='ghost'>
           More parameters <IoChevronDown />
         </Button>
-        <ConnectApproveAction
-          tokenAddress={tokenAddress}
-          className='w-full justify-center py-5'
-        >
-          Add supply
+        <ConnectApproveAction className='w-full justify-center py-5'>
+          Repay
         </ConnectApproveAction>
         <div className='mt-5 flex justify-between'>
           <span>

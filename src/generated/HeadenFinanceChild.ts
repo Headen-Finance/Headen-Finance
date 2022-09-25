@@ -1,11 +1,12 @@
 /* eslint-disable */
-import { EthersContractContextV5 } from 'ethereum-abi-types-generator';
 import {
+  ContractTransaction,
+  ContractInterface,
+  BytesLike as Arrayish,
   BigNumber,
   BigNumberish,
-  BytesLike as Arrayish,
-  ContractTransaction,
 } from 'ethers';
+import { EthersContractContextV5 } from 'ethereum-abi-types-generator';
 
 export type ContractContext = EthersContractContextV5<
   HeadenFinanceChild,
@@ -55,20 +56,28 @@ export interface ContractCallOverrides {
   gasLimit?: number;
 }
 export type HeadenFinanceChildEvents =
+  | 'AbacusConnectionManagerSet'
   | 'Borrowed'
   | 'ChainSyncRequired'
   | 'FullChainSyncRequired'
+  | 'Initialized'
+  | 'InterchainGasPaymasterSet'
   | 'LockUntilUpdateFromParentChain'
   | 'OwnershipTransferred'
+  | 'RemoteRouterEnrolled'
   | 'Staked'
   | 'UpdateParentChain'
   | 'Withdrawn';
 export interface HeadenFinanceChildEventsContext {
+  AbacusConnectionManagerSet(...parameters: any): EventFilter;
   Borrowed(...parameters: any): EventFilter;
   ChainSyncRequired(...parameters: any): EventFilter;
   FullChainSyncRequired(...parameters: any): EventFilter;
+  Initialized(...parameters: any): EventFilter;
+  InterchainGasPaymasterSet(...parameters: any): EventFilter;
   LockUntilUpdateFromParentChain(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
+  RemoteRouterEnrolled(...parameters: any): EventFilter;
   Staked(...parameters: any): EventFilter;
   UpdateParentChain(...parameters: any): EventFilter;
   Withdrawn(...parameters: any): EventFilter;
@@ -76,7 +85,7 @@ export interface HeadenFinanceChildEventsContext {
 export type HeadenFinanceChildMethodNames =
   | 'new'
   | 'SECONDS_PER_YEAR'
-  | 'addRelayers'
+  | 'abacusConnectionManager'
   | 'borrowInterestRates'
   | 'borrowKink'
   | 'borrowPerSecondInterestRateBase'
@@ -89,7 +98,10 @@ export type HeadenFinanceChildMethodNames =
   | 'createMarket'
   | 'createMarketPool'
   | 'dai'
+  | 'enrollRemoteRouter'
   | 'getRiskLevel'
+  | 'handle'
+  | 'interchainGasPaymaster'
   | 'interval'
   | 'lastTimeStamp'
   | 'lockThisUserUntilParentUpdate'
@@ -98,14 +110,16 @@ export type HeadenFinanceChildMethodNames =
   | 'matic'
   | 'multichainRouter'
   | 'owner'
+  | 'per_amount'
   | 'performUpkeep'
   | 'receiveFullUpdateFromParentChain'
   | 'receiveUpdateFromParentChain'
   | 'relayers'
   | 'renounceOwnership'
   | 'repayLoan'
-  | 'requestFullUpdateFromParent'
-  | 'requestUpdateFromParent'
+  | 'routers'
+  | 'setAbacusConnectionManager'
+  | 'setInterchainGasPaymaster'
   | 'stakeToken'
   | 'supplyInterestRates'
   | 'supplyKink'
@@ -114,8 +128,7 @@ export type HeadenFinanceChildMethodNames =
   | 'supplyPerSecondInterestRateSlopeLow'
   | 'tax'
   | 'transferOwnership'
-  | 'updateConfiguration'
-  | 'usd_amount'
+  | 'updateSettings'
   | 'usdc'
   | 'users'
   | 'usersborrows'
@@ -132,8 +145,17 @@ export interface undefinedRequest {
   borrowPerYearInterestRateSlopeHigh: BigNumberish;
   borrowPerYearInterestRateBase: BigNumberish;
 }
+export interface AbacusConnectionManagerSetEventEmittedResponse {
+  abacusConnectionManager: string;
+}
 export interface ChainSyncRequiredEventEmittedResponse {
   user: string;
+}
+export interface InitializedEventEmittedResponse {
+  version: BigNumberish;
+}
+export interface InterchainGasPaymasterSetEventEmittedResponse {
+  interchainGasPaymaster: string;
 }
 export interface LockUntilUpdateFromParentChainEventEmittedResponse {
   user: string;
@@ -142,6 +164,11 @@ export interface OwnershipTransferredEventEmittedResponse {
   previousOwner: string;
   newOwner: string;
 }
+export interface RemoteRouterEnrolledEventEmittedResponse {
+  domain: BigNumberish;
+  router: Arrayish;
+}
+
 export interface CheckUpkeepResponse {
   upkeepNeeded: boolean;
   0: boolean;
@@ -180,7 +207,7 @@ export interface ReceiveFullUpdateFromParentChainRequest {
   totalStakes: BigNumberish;
   totalBorrows: BigNumberish;
 }
-export interface UpdateConfigurationRequest {
+export interface UpdateSettingsRequest {
   supplyKink: BigNumberish;
   supplyPerYearInterestRateSlopeLow: BigNumberish;
   supplyPerYearInterestRateSlopeHigh: BigNumberish;
@@ -253,7 +280,6 @@ export interface HeadenFinanceChild {
    * @param _dai Type: address, Indexed: false
    * @param _matic Type: address, Indexed: false
    * @param config Type: tuple, Indexed: false
-   * @param overrides
    */
   'new'(
     _interval: BigNumberish,
@@ -275,23 +301,17 @@ export interface HeadenFinanceChild {
   SECONDS_PER_YEAR(overrides?: ContractCallOverrides): Promise<BigNumber>;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
+   * Constant: true
+   * StateMutability: view
    * Type: function
-   * @param _relayer Type: address, Indexed: false
-   * @param overrides
    */
-  addRelayers(
-    _relayer: string,
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
+  abacusConnectionManager(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
    * @param _id Type: uint128, Indexed: false
-   * @param overrides
    */
   borrowInterestRates(
     _id: BigNumberish,
@@ -338,7 +358,6 @@ export interface HeadenFinanceChild {
    * Type: function
    * @param _tokenAddress Type: address, Indexed: false
    * @param _amountToBorrow Type: uint256, Indexed: false
-   * @param overrides
    */
   borrowToken(
     _tokenAddress: string,
@@ -354,7 +373,6 @@ export interface HeadenFinanceChild {
    * @param _amountToBorrow Type: uint256, Indexed: false
    * @param _collateralAddress Type: address, Indexed: false
    * @param _collateralAmount Type: uint256, Indexed: false
-   * @param overrides
    */
   borrowTokenWithCollateral(
     _tokenAddress: string,
@@ -376,7 +394,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: bytes, Indexed: false
-   * @param overrides
    */
   checkUpkeep(
     parameter0: Arrayish,
@@ -388,7 +405,6 @@ export interface HeadenFinanceChild {
    * StateMutability: nonpayable
    * Type: function
    * @param _token Type: address, Indexed: false
-   * @param overrides
    */
   createMarket(
     _token: string,
@@ -401,7 +417,6 @@ export interface HeadenFinanceChild {
    * Type: function
    * @param _token Type: address, Indexed: false
    * @param amount Type: uint256, Indexed: false
-   * @param overrides
    */
   createMarketPool(
     _token: string,
@@ -417,11 +432,46 @@ export interface HeadenFinanceChild {
   dai(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param _domain Type: uint32, Indexed: false
+   * @param _router Type: bytes32, Indexed: false
+   */
+  enrollRemoteRouter(
+    _domain: BigNumberish,
+    _router: Arrayish,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
+  /**
+   * Payable: false
    * Constant: true
    * StateMutability: view
    * Type: function
    */
   getRiskLevel(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param _origin Type: uint32, Indexed: false
+   * @param _sender Type: bytes32, Indexed: false
+   * @param _message Type: bytes, Indexed: false
+   */
+  handle(
+    _origin: BigNumberish,
+    _sender: Arrayish,
+    _message: Arrayish,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  interchainGasPaymaster(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
    * Constant: true
@@ -442,7 +492,6 @@ export interface HeadenFinanceChild {
    * StateMutability: nonpayable
    * Type: function
    * @param user Type: address, Indexed: false
-   * @param overrides
    */
   lockThisUserUntilParentUpdate(
     user: string,
@@ -454,7 +503,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: address, Indexed: false
-   * @param overrides
    */
   marketTokens(
     parameter0: string,
@@ -466,7 +514,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: uint128, Indexed: false
-   * @param overrides
    */
   markets(
     parameter0: BigNumberish,
@@ -495,11 +542,21 @@ export interface HeadenFinanceChild {
   owner(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param amount Type: uint256, Indexed: false
+   */
+  per_amount(
+    amount: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<BigNumber>;
+  /**
+   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
    * @param parameter0 Type: bytes, Indexed: false
-   * @param overrides
    */
   performUpkeep(
     parameter0: Arrayish,
@@ -511,7 +568,6 @@ export interface HeadenFinanceChild {
    * StateMutability: nonpayable
    * Type: function
    * @param usersData Type: tuple[], Indexed: false
-   * @param overrides
    */
   receiveFullUpdateFromParentChain(
     usersData: ReceiveFullUpdateFromParentChainRequest[],
@@ -525,7 +581,6 @@ export interface HeadenFinanceChild {
    * @param user Type: address, Indexed: false
    * @param totalStakes Type: uint256, Indexed: false
    * @param totalBorrows Type: uint256, Indexed: false
-   * @param overrides
    */
   receiveUpdateFromParentChain(
     user: string,
@@ -539,7 +594,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: address, Indexed: false
-   * @param overrides
    */
   relayers(
     parameter0: string,
@@ -561,7 +615,6 @@ export interface HeadenFinanceChild {
    * Type: function
    * @param _tokenAddress Type: address, Indexed: false
    * @param _amount Type: uint256, Indexed: false
-   * @param overrides
    */
   repayLoan(
     _tokenAddress: string,
@@ -570,11 +623,24 @@ export interface HeadenFinanceChild {
   ): Promise<ContractTransaction>;
   /**
    * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   * @param parameter0 Type: uint32, Indexed: false
+   */
+  routers(
+    parameter0: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<string>;
+  /**
+   * Payable: false
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
+   * @param _abacusConnectionManager Type: address, Indexed: false
    */
-  requestFullUpdateFromParent(
+  setAbacusConnectionManager(
+    _abacusConnectionManager: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
@@ -582,11 +648,10 @@ export interface HeadenFinanceChild {
    * Constant: false
    * StateMutability: nonpayable
    * Type: function
-   * @param user Type: address, Indexed: false
-   * @param overrides
+   * @param _interchainGasPaymaster Type: address, Indexed: false
    */
-  requestUpdateFromParent(
-    user: string,
+  setInterchainGasPaymaster(
+    _interchainGasPaymaster: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
   /**
@@ -596,7 +661,6 @@ export interface HeadenFinanceChild {
    * Type: function
    * @param _tokenAddress Type: address, Indexed: false
    * @param _amountToStake Type: uint256, Indexed: false
-   * @param overrides
    */
   stakeToken(
     _tokenAddress: string,
@@ -609,7 +673,6 @@ export interface HeadenFinanceChild {
    * StateMutability: nonpayable
    * Type: function
    * @param _id Type: uint128, Indexed: false
-   * @param overrides
    */
   supplyInterestRates(
     _id: BigNumberish,
@@ -662,7 +725,6 @@ export interface HeadenFinanceChild {
    * StateMutability: nonpayable
    * Type: function
    * @param newOwner Type: address, Indexed: false
-   * @param overrides
    */
   transferOwnership(
     newOwner: string,
@@ -674,24 +736,13 @@ export interface HeadenFinanceChild {
    * StateMutability: nonpayable
    * Type: function
    * @param config Type: tuple, Indexed: false
-   * @param overrides
+   * @param _relayer Type: address, Indexed: false
    */
-  updateConfiguration(
-    config: UpdateConfigurationRequest,
+  updateSettings(
+    config: UpdateSettingsRequest,
+    _relayer: string,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
-  /**
-   * Payable: false
-   * Constant: true
-   * StateMutability: view
-   * Type: function
-   * @param amount Type: uint256, Indexed: false
-   * @param overrides
-   */
-  usd_amount(
-    amount: BigNumberish,
-    overrides?: ContractCallOverrides
-  ): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: true
@@ -705,7 +756,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: address, Indexed: false
-   * @param overrides
    */
   users(
     parameter0: string,
@@ -717,7 +767,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: bytes32, Indexed: false
-   * @param overrides
    */
   usersborrows(
     parameter0: Arrayish,
@@ -729,7 +778,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param parameter0 Type: bytes32, Indexed: false
-   * @param overrides
    */
   userstakes(
     parameter0: Arrayish,
@@ -753,7 +801,6 @@ export interface HeadenFinanceChild {
    * @param _amountToWithdraw Type: uint256, Indexed: false
    * @param _chainId Type: uint256, Indexed: false
    * @param _to Type: address, Indexed: false
-   * @param overrides
    */
   withdrawToken(
     _tokenAddress: string,

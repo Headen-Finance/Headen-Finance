@@ -9,7 +9,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 // const chains = [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum];
 
 const { chains, provider } = configureChains(
-  [chain.goerli, chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum],
+  [chain.polygonMumbai, chain.arbitrumGoerli],
   [
     // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
 
