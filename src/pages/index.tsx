@@ -1,9 +1,14 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoIosAdd } from 'react-icons/io';
+import { useAccount, useBalance } from 'wagmi';
 
+import {
+  MarketsResponseDisplay,
+  useAllMarketData,
+} from '@/hooks/useAllMarketData';
 import useDialog from '@/hooks/useDialog';
 
 import { AssetDialog } from '@/components/AssetDialog';
@@ -27,7 +32,16 @@ import Seo from '@/components/Seo';
 // Before you begin editing, follow all comments with `STARTERCONF`,
 // to customize the default configuration.
 
-function PoolsRow() {
+type PoolsRowData = {
+  item: MarketsResponseDisplay;
+};
+
+function PoolsRow({ item }: PoolsRowData) {
+  const acc = useAccount();
+  const { data } = useBalance({
+    addressOrName: acc.address,
+    token: item.tokenAddress,
+  });
   return (
     <tr
       // key={index}
@@ -47,20 +61,24 @@ function PoolsRow() {
       }
     >
       <th scope='row' className='whitespace-nowrap py-4 px-6 font-medium'>
-        <span>Aave token</span>
+        <span>{data?.symbol} token</span>
       </th>
-      <td className='py-4 px-6'>Aave detail</td>
-      <td className='py-4 px-6'>4.9k</td>
-      <td className='py-4 px-6'>0.2%</td>
-      <td className='py-4 px-6'>0.23%</td>
+      <td className='py-4 px-6'>{data?.symbol} detail</td>
+      <td className='py-4 px-6'>{item.amountStaked}</td>
+      <td className='py-4 px-6'>{item.supplyRate}%</td>
+      <td className='py-4 px-6'>{item.borrowRate}%</td>
       <td className='py-4 px-6'>-</td>
       <td className='py-4 px-6'>0.08%</td>
-      <td className='py-4 px-6'>0 AAVE</td>
+      <td className='py-4 px-6'>
+        {data?.formatted}
+        {data?.symbol}
+      </td>
     </tr>
   );
 }
 
 function PoolsTable() {
+  const { markets } = useAllMarketData();
   return (
     <table className='w-full text-left text-sm text-xs'>
       <thead className='text-xs uppercase text-black'>
@@ -92,8 +110,8 @@ function PoolsTable() {
         </tr>
       </thead>
       <tbody>
-        {[...Array(5)].map((value: undefined, index: number) => (
-          <PoolsRow key={index} />
+        {markets.map((value: MarketsResponseDisplay, index: number) => (
+          <PoolsRow key={index} item={value} />
         ))}
       </tbody>
     </table>
@@ -117,10 +135,13 @@ export default function HomePage() {
     });
   }
 
-  const dialog = (
-    <DialogFrame show={isOpen} onClose={closeModal} className='w-[100vw]'>
-      <AssetDialog />
-    </DialogFrame>
+  const dialog = useMemo(
+    () => (
+      <DialogFrame show={isOpen} onClose={closeModal} className='w-[100vw]'>
+        <AssetDialog />
+      </DialogFrame>
+    ),
+    [isOpen]
   );
 
   const createPoolButton = (

@@ -8,7 +8,7 @@ import { useChainlinkFeed } from '@/hooks/useChainlinkFeed';
 import { Stake } from '@/components/headen/Stake';
 
 export const AssetDialog = () => {
-  const tokenAddress = '0x326C977E6efc84E512bB9C30f76E30c160eD06FB';
+  const tokenAddress = '0x326C977E6efc84E512bB9C30f76E30c160eD06FB'; //LINK on goerli
   useChainlinkFeed();
   const [categories] = useState({
     Supply: () => <Stake tokenAddress={tokenAddress} />,

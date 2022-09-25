@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from 'react';
 import { useContract, useProvider } from 'wagmi';
 const addr = '0x48731cF7e84dc94C5f84577882c14Be11a5B7456';
 const aggregatorV3InterfaceABI = [
@@ -50,16 +51,41 @@ const aggregatorV3InterfaceABI = [
   },
 ];
 
+export enum FeedState {
+  INIT = 'INIT',
+  FETCHING = 'FETCHING',
+  FETCHED = 'FETCHED',
+  ERROR = 'ERROR',
+}
+
 export function useChainlinkFeed() {
   const provider = useProvider();
+  const [lastRoundData, setLastRoundData] = useState<Record<string, unknown>>();
+  const [state, setState] = useState(FeedState.INIT);
   const priceFeed = useContract({
     addressOrName: addr,
     contractInterface: aggregatorV3InterfaceABI,
     signerOrProvider: provider,
   });
-  priceFeed.latestRoundData().then((roundData: Record<string, unknown>) => {
-    // Do something with roundData
-    // eslint-disable-next-line no-console
-    console.log('Latest Round Data', roundData);
-  });
+
+  const refresh = useCallback(() => {
+    setState(FeedState.FETCHING);
+    priceFeed
+      .latestRoundData()
+      .then((roundData: Record<string, unknown>) => {
+        setState(FeedState.FETCHED);
+        setLastRoundData(roundData);
+        // Do something with roundData
+        // eslint-disable-next-line no-console
+        console.log('Latest Round Data', roundData);
+      })
+      .catch(() => {
+        setState(FeedState.ERROR);
+        setLastRoundData(undefined);
+      });
+  }, [priceFeed]);
+
+  useEffect(() => refresh(), [refresh]);
+
+  return { lastRoundData, state, refresh };
 }

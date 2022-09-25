@@ -1,13 +1,15 @@
 import { useContract, useProvider } from 'wagmi';
 
+import { useHeadenFinanceAddress } from '@/hooks/useHeadenFinanceAddress';
+
+import { headenFinanceAbi } from '@/constant/env';
 import { ContractContext } from '@/generated/HeadenFinanceChild';
 
-import { abi } from '../../artifacts/contracts/headenFinanceChild.sol/HeadenFinanceChild.json';
-
 export function useHeadenFinance(): ContractContext {
+  const address = useHeadenFinanceAddress();
   return useContract<ContractContext>({
-    addressOrName: '',
-    contractInterface: abi,
+    addressOrName: address,
+    contractInterface: headenFinanceAbi,
     signerOrProvider: useProvider(),
   });
 }
