@@ -1106,6 +1106,11 @@
     stream-browserify "^3.0.0"
     util "^0.12.4"
 
+"@colors/colors@1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
+  integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
+
 "@commitlint/cli@^16.3.0":
   version "16.3.0"
   resolved "https://registry.npmjs.org/@commitlint/cli/-/cli-16.3.0.tgz"
@@ -1701,6 +1706,32 @@
   version "1.2.1"
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
+
+"@hyperlane-xyz/app@^0.5.0-beta0":
+  version "0.5.0-beta0"
+  resolved "https://registry.yarnpkg.com/@hyperlane-xyz/app/-/app-0.5.0-beta0.tgz#4bdea122ad393d39bd20a7b83bdd253ba6337172"
+  integrity sha512-EiuGLnrpDKidpfIwUEWwXgZTXOlpOxV/ixzSRIJ/7x93y9W6mZV2EB9bUw3Ta7JaWUJPAcfse2nVcmNL4uoqIA==
+  dependencies:
+    "@hyperlane-xyz/core" "0.5.0-beta0"
+    "@hyperlane-xyz/utils" "0.5.0-beta0"
+    "@openzeppelin/contracts-upgradeable" "^4.5.0"
+
+"@hyperlane-xyz/core@0.5.0-beta0":
+  version "0.5.0-beta0"
+  resolved "https://registry.yarnpkg.com/@hyperlane-xyz/core/-/core-0.5.0-beta0.tgz#6da1b4162080c176fd0334379e7a089d12dcf644"
+  integrity sha512-RHUCqATFb6krKROuf7FVZ7lHrJfhCoRdn1PgCFTfHA8pTnjdh+1f797FcGN3ApivH/MGQo8348BRmwRo/nYUbQ==
+  dependencies:
+    "@hyperlane-xyz/utils" "0.5.0-beta0"
+    "@openzeppelin/contracts" "^4.6.0"
+    "@openzeppelin/contracts-upgradeable" "^4.6.0"
+    "@summa-tx/memview-sol" "^2.0.0"
+
+"@hyperlane-xyz/utils@0.5.0-beta0":
+  version "0.5.0-beta0"
+  resolved "https://registry.yarnpkg.com/@hyperlane-xyz/utils/-/utils-0.5.0-beta0.tgz#7864ece3fe862283a8cdd040b311ded1fc4758ec"
+  integrity sha512-IZ56p3DJS+Rrhl8+yRVt0FWLVbOR5iewdk09ovloaGjLZyaftItKe/jqgSI2Hu/t0Hr+//EMc56SLbaNlX3RuA==
+  dependencies:
+    ethers "^5.6.8"
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
@@ -2327,7 +2358,12 @@
     "@nomicfoundation/solidity-analyzer-win32-ia32-msvc" "0.0.3"
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc" "0.0.3"
 
-"@openzeppelin/contracts@^4.7.3":
+"@openzeppelin/contracts-upgradeable@^4.5.0", "@openzeppelin/contracts-upgradeable@^4.6.0":
+  version "4.7.3"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.7.3.tgz#f1d606e2827d409053f3e908ba4eb8adb1dd6995"
+  integrity sha512-+wuegAMaLcZnLCJIvrVUDzA9z/Wp93f0Dla/4jJvIhijRrPabjQbZe6fWiECLaJyfn5ci9fqf9vTw3xpQOad2A==
+
+"@openzeppelin/contracts@^4.6.0", "@openzeppelin/contracts@^4.7.3":
   version "4.7.3"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.7.3.tgz#939534757a81f8d69cc854c7692805684ff3111e"
   integrity sha512-dGRS0agJzu8ybo44pCIf3xBaPQN/65AIXNgK8+4gzKd5kbvlqyxryUYVLJv7fK98Seyd2hDZzVEHSWAh0Bt1Yw==
@@ -2487,6 +2523,11 @@
     secp256k1 "^4.0.2"
     superstruct "^0.14.2"
     tweetnacl "^1.0.3"
+
+"@summa-tx/memview-sol@^2.0.0":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@summa-tx/memview-sol/-/memview-sol-2.0.1.tgz#1ef30762451683d3484c0aaa08e1453a0075d0c4"
+  integrity sha512-GuaXBYG6/aIjKae3UJSBS61J/IuK/NTuk2IJBpGxytkxN1p3ZdRNIp8HQAIOVoCKZQtvzdPaBWokzCk/LakA/Q==
 
 "@svgr/babel-plugin-add-jsx-attribute@^6.3.1":
   version "6.3.1"
@@ -4142,6 +4183,15 @@ cli-cursor@^3.1.0:
   dependencies:
     restore-cursor "^3.1.0"
 
+cli-table3@^0.6.0:
+  version "0.6.3"
+  resolved "https://registry.yarnpkg.com/cli-table3/-/cli-table3-0.6.3.tgz#61ab765aac156b52f222954ffc607a6f01dbeeb2"
+  integrity sha512-w5Jac5SykAeZJKntOxJCrm63Eg5/4dhMWIcuTbo9rpE+brgaSZo0RuNJZeOyMgsUdhDeojvgyQLmjI+K50ZGyg==
+  dependencies:
+    string-width "^4.2.0"
+  optionalDependencies:
+    "@colors/colors" "1.5.0"
+
 cli-truncate@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/cli-truncate/-/cli-truncate-2.1.0.tgz"
@@ -5348,6 +5398,7 @@ ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.1:
     ethjs-util "0.1.6"
     rlp "^2.2.3"
 
+<<<<<<< HEAD
 ethers@^4.0.47:
   version "4.0.49"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.49.tgz#0eb0e9161a0c8b4761be547396bbe2fb121a8894"
@@ -5364,6 +5415,9 @@ ethers@^4.0.47:
     xmlhttprequest "1.8.0"
 
 ethers@^5.7.1:
+=======
+ethers@^5.6.8, ethers@^5.7.1:
+>>>>>>> 84321b2 (update contracts)
   version "5.7.1"
   resolved "https://registry.npmjs.org/ethers/-/ethers-5.7.1.tgz"
   integrity sha512-5krze4dRLITX7FpU8J4WscXqADiKmyeNlylmmDLbS95DaZpBhDe2YSwRQwKXWNyXcox7a3gBgm/MkGXV1O1S/Q==
@@ -5921,6 +5975,14 @@ hard-rejection@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/hard-rejection/-/hard-rejection-2.1.0.tgz"
   integrity sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==
+
+hardhat-contract-sizer@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/hardhat-contract-sizer/-/hardhat-contract-sizer-2.6.1.tgz#2b0046a55fa1ec96f19fdab7fde372377401c874"
+  integrity sha512-b8wS7DBvyo22kmVwpzstAQTdDCThpl/ySBqZh5ga9Yxjf61/uTL12TEg5nl7lDeWy73ntEUzxMwY6XxbQEc2wA==
+  dependencies:
+    chalk "^4.0.0"
+    cli-table3 "^0.6.0"
 
 hardhat@^2.9.9:
   version "2.11.2"

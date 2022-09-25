@@ -6,8 +6,8 @@ import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
+import {Router} from "@hyperlane-xyz/app/contracts/Router.sol";
 
 
 interface ChainLinkAggregatorInterface {
@@ -31,18 +31,46 @@ interface IMultiChain {
 
 }
 
-contract chainLinkFeedUSDC {
-    ChainLinkAggregatorInterface chainLink = ChainLinkAggregatorInterface(0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6);
+interface IHyperLane {
+    function handle(
+        uint32 _origin,
+        bytes32 _sender,
+        bytes calldata _messageBody
+    ) external;
+
+    function dispatch(
+        uint32 _destinationDomain,
+        bytes32 _recipientAddress,
+        bytes calldata _messageBody
+    ) external returns (uint256);
 }
 
-contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, KeeperCompatibleInterface{
+interface IDeBridge {
+    function send(
+        address _tokenAddress,
+        uint256 _amount,
+        uint256 _chainIdTo,
+        bytes memory _receiver,
+        bytes memory _permit,
+        bool _useAssetFee,
+        uint32 _referralCode,
+        bytes calldata _autoParams
+    ) external payable;
+}
+
+contract chainLinkFeedUSDC {
+    ChainLinkAggregatorInterface chainLink = ChainLinkAggregatorInterface(0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0);
+}
+
+// Mumbai testnet
+contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, KeeperCompatibleInterface, Router{
     address swapRouter;
     string  hashSalt;
     uint public tax = 350; //3.5%
     uint public immutable interval;
     uint public lastTimeStamp = block.timestamp;
-    uint8 public chainId;
-    uint8 public immutable defaultId = 0;
+    uint32 public chainId;
+    uint32 public immutable defaultId = 0;
     uint public SECONDS_PER_YEAR = 3600 * 24 * 365;
     address public multichainRouter;
     address public usdc;
@@ -124,7 +152,7 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
     }
 
     //mapping (address=>User) public users;
-    mapping (uint8=>mapping(address=>User)) public users;
+    mapping (uint32=>mapping(address=>User)) public users;
     mapping (bytes32=>UserBorrow) public usersborrows;
     mapping (bytes32=>UserStake) public userstakes;
     mapping (uint128 => Market) public markets;
@@ -133,12 +161,12 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
     uint128 market_pools = 0;
     //string[] availableTokens;
     address[] userAddresses;
-    uint8[] chains;
+    uint32[] chains;
 
     event ParentChainSynced(address user, uint totalStakes, uint totalBorrows);
     event FullParentChainSynced(FullUpdateData[] usersdata);
 
-    constructor(uint _interval, uint8 _chainId, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, Configuration memory config){
+    constructor(uint _interval, uint32 _chainId, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, Configuration memory config){
         interval = _interval;
         lastTimeStamp = block.timestamp;
         chainId = _chainId;
@@ -150,6 +178,9 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         usdc = _usdc;
         matic = _matic;
         chains.push(_chainId);
+        _setAbacusConnectionManager(0xb636B2c65A75d41F0dBe98fB33eb563d245a241a);
+        // Set IGP contract address
+        _setInterchainGasPaymaster(0x9A27744C249A11f68B3B56f09D280599585DFBb8);
 
         // Set interest rate model configs
         unchecked {
@@ -164,15 +195,8 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         }
     }
 
-    function addRelayers(address _relayer) public onlyOwner{
+    function updateSettings (Configuration calldata config, address _relayer) external onlyOwner{
         relayers[_relayer] = true;
-    }
-
-    function registerChildChain(uint8 _chainId) public onlyOwner{
-        chains.push(_chainId);
-    }
-
-    function updateConfiguration (Configuration calldata config) public onlyOwner{
         unchecked {
             supplyKink = config.supplyKink;
             supplyPerSecondInterestRateSlopeLow = config.supplyPerYearInterestRateSlopeLow / SECONDS_PER_YEAR;
@@ -185,6 +209,10 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         }
     }
 
+    function registerChildChain(uint32 _chainId) public onlyOwner{
+        chains.push(_chainId);
+    }
+
     // ---- UTILS ----
 
     function getAvgPriceForTokens(uint amountIn, address _router, address[] memory path) internal view returns(uint){
@@ -193,7 +221,7 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
     }
 
     function findBestPairWithStableCoin  (address token) internal view returns (address[] memory){
-        address[] memory path = new address[](2);
+         address[] memory path = new address[](2);
         path[0] = token;
         path[1] = usdc;
         
@@ -202,16 +230,15 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         if(result > 0){
             return path;
         }
+        path = new address[](3);
         
+        path[0] = token;
         path[1] = dai;
         path[2] = usdc;
         result = getAvgPriceForTokens(1*multiplier, swapRouter, path);
         if(result >0){
             return path;
-        } 
-
-        //manipulate path length
-        path = new address[](3);
+        }         
         
         //try matic in between
         path[1] = matic;
@@ -223,31 +250,22 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         
         return new address[](0);
     }
-
-    function usd_amount(uint amount) public view returns(uint){
-        return amount * 10**(chainLink.decimals());
-    }
-
-    function extractValueOfSingleToken(address token) internal returns(uint){
-        //value of pool
-        address[] memory path = findBestPairWithStableCoin(token);
-        require(path.length > 0,"path must be definitive and greater than zero");
-        uint value = getAvgPriceForTokens(1*multiplier, swapRouter, path); 
-        uint feedValue = uint(chainLink.latestAnswer());
-        return value * feedValue / multiplier;
+    
+    function per_amount(uint amount) public view returns(uint){
+        return amount * 10000;
     }
 
     function getValueOfToken(address token, uint amount)internal returns(uint){
-        return extractValueOfSingleToken(token) * amount / multiplier;
-    }
-
-    function getPairTokens(address token1, address token2, address factory) view internal returns (address pair){
-        return IUniswapV2Factory(factory).getPair(token1, token2);
+         //value of pool
+        address[] memory path = findBestPairWithStableCoin(token);
+        require(path.length > 0,"path must be definitive and greater than zero");
+        uint value = getAvgPriceForTokens(1 * multiplier, swapRouter, path); 
+        return uint(chainLink.latestAnswer()) * value * amount / multiplier * multiplier;
     }
 
     function updateUserTotalValueInUSD(address user) internal {
         for(uint128 j=0; j<=chains.length; j++){
-            uint8 _chainId = chains[j];
+            uint32 _chainId = chains[j];
             users[_chainId][user].totalAmountBorrowed = getBorrowedValue(user);
             users[_chainId][user].totalAmountStaked = getStakedValue(user);
             users[_chainId][user].ltv = users[_chainId][user].totalAmountBorrowed * 10000 / users[chainId][user].totalAmountStaked;
@@ -259,15 +277,15 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         uint totalstakes=0;
         uint totalborrows=0;
         for(uint128 j=0; j<=chains.length; j++){
-            uint8 _chainId = chains[j];
+            uint32 _chainId = chains[j];
             totalstakes += users[_chainId][user].totalAmountBorrowed;
             totalborrows += users[_chainId][user].totalAmountStaked;
-            users[_chainId][user].ltv = users[_chainId][user].totalAmountBorrowed * 10000 / users[chainId][user].totalAmountStaked;
+            users[_chainId][user].ltv = per_amount(users[_chainId][user].totalAmountBorrowed) / users[chainId][user].totalAmountStaked;
         }
 
         users[defaultId][user].totalAmountBorrowed = totalborrows;
         users[defaultId][user].totalAmountStaked = totalstakes;
-        users[defaultId][user].ltv = users[defaultId][user].totalAmountBorrowed * 10000 / users[defaultId][user].totalAmountStaked;
+        users[defaultId][user].ltv = per_amount(users[defaultId][user].totalAmountBorrowed) / users[defaultId][user].totalAmountStaked;
     }
 
     // ---- DEPOSITS ----
@@ -435,7 +453,7 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         usersborrows[_hash].amountBorrowed += (borrowRate * usersborrows[_hash].amountBorrowed) / 10**(chainLink.decimals());
         users[chainId][user].totalAmountStaked += (supplyRate * users[chainId][user].totalAmountStaked) / 10**(chainLink.decimals()) - fee;
         users[chainId][user].totalAmountBorrowed += (borrowRate * users[chainId][user].totalAmountBorrowed) / 10**(chainLink.decimals());
-        users[chainId][user].ltv = usd_amount(users[chainId][user].totalAmountBorrowed)/ users[chainId][user].totalAmountStaked;
+        users[chainId][user].ltv = per_amount(users[chainId][user].totalAmountBorrowed)/ users[chainId][user].totalAmountStaked;
 
     }
 
@@ -450,7 +468,7 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         userstakes[_hash].amountStaked = 0; 
         users[chainId][user].totalAmountStaked -= valueOfTokens + fee;
         users[chainId][user].totalAmountBorrowed -= valueOfTokens;
-        users[chainId][user].ltv = usd_amount(users[chainId][user].totalAmountBorrowed)/ users[chainId][user].totalAmountStaked;
+        users[chainId][user].ltv = per_amount(users[chainId][user].totalAmountBorrowed)/ users[chainId][user].totalAmountStaked;
     }
 
     function validateUser(address user) private{
@@ -501,12 +519,12 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
 
         //availableTokens.push(_token);
         uint valueOfTokens = getValueOfToken(_token, amount);
-        require(valueOfTokens >= usd_amount(3500), "Not enough amount to kickstart a new pool"); // at least 3.5kUSD needed
+        require(valueOfTokens >= 3500 * 10**(chainLink.decimals()), "Not enough amount to kickstart a new pool"); // at least 3.5kUSD needed
         stakeToken(_token, amount);
     }
 
     function borrowInterestRates(uint128 _id) public returns(uint){
-        uint utilization = usd_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked;
+        uint utilization = per_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked;
         if (utilization <= borrowKink) {
             // interestRateBase + interestRateSlopeLow * utilization
             return borrowPerSecondInterestRateBase + borrowPerSecondInterestRateSlopeLow * utilization;
@@ -517,7 +535,7 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
     }
 
     function supplyInterestRates(uint128 _id) public returns (uint){
-        uint utilization = usd_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked;
+        uint utilization = per_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked;
         if (utilization <= supplyKink) {
             // interestRateBase + interestRateSlopeLow * utilization
             return supplyPerSecondInterestRateBase + (supplyPerSecondInterestRateSlopeLow * utilization);
@@ -567,6 +585,7 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
     // parent chain
     function updateChildChain(address user) public onlyRelayers {
         collateDataAllChains(user);
+        _dispatchWithGas(0x61722d72, abi.encode(user, users[defaultId][user].totalAmountStaked, users[defaultId][user].totalAmountBorrowed), 100000);
         emit ParentChainSynced(user, users[defaultId][user].totalAmountStaked, users[defaultId][user].totalAmountBorrowed);
     }
 
@@ -579,7 +598,19 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         emit FullParentChainSynced(updatesdata);
     }
 
-    function receiveUpdateFromChildChain(User calldata user, uint8 _chainId) public onlyRelayers{
+    function receiveUpdateFromChildChainPrivate(User memory user, uint32 _chainId)private{
+        if(users[chainId][user.userAddress].available){
+            users[_chainId][user.userAddress]= user;
+            
+        }else{
+            userAddresses.push(user.userAddress);
+            users[_chainId][user.userAddress] = User(user.userAddress, true, user.totalAmountBorrowed, user.totalAmountStaked, user.creditScore, user.ltv, user.lock);
+        }
+        collateDataAllChains(user.userAddress);
+        emit ParentChainSynced(user.userAddress, users[defaultId][user.userAddress].totalAmountStaked, users[defaultId][user.userAddress].totalAmountBorrowed);
+    }
+
+    function receiveUpdateFromChildChain(User calldata user, uint32 _chainId) public onlyRelayers{
         if(users[chainId][user.userAddress].available){
             users[_chainId][user.userAddress]= user;
             
@@ -607,6 +638,29 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         // We don't use the performData in this example. The performData is generated by the Keeper's call to your checkUpkeep function
     }
 
+    // HyperLane
+    // function _handle(
+    //     uint32 _origin,
+    //     bytes32,
+    //     bytes memory _message
+    // ) internal override {
+    //     (address recipient, uint256 tokenStaked, uint256 tokenBorrowed) = abi.decode(
+    //         _message,
+    //         (address, uint256, uint256)
+    //     );
+    // }
+    function _handle(
+        uint32 _origin,
+        bytes32,
+        bytes memory _message
+    ) internal override {
+        (User memory user, uint32 _chainId) = abi.decode(
+            _message,
+            (User , uint32)
+        );
+        receiveUpdateFromChildChainPrivate(user, _chainId);
+    }
+
     
     // ---- Modifiers ----
 
@@ -628,15 +682,15 @@ contract HeadenFinanceParent is chainLinkFeedUSDC, ReentrancyGuard, Ownable, Kee
         require(relayers[msg.sender], "User not allowed for this function, Admin only.");
         _;
     }
+
 }
 
-
-
-    // calculate credit score /
-    // liquidation *
-    // borrow with univ2 and univ3 collateral /
-    // borrow with nft as collateral /
-    // calculate interest rates for staking and borrowing *
-    // allow users twith higher credit score have higher ltv -
-    // multichain -
-    // create pool -
+// rebalance liquidity logic and executed with DeBridge
+// 200
+// 0xC10Ef9F491C9B59f936957026020C321651ac078
+// nidnidjiwjdiswism
+// 0xa5e0829caced8ffdd4de3c43696c57f7d7a678ff
+// 0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747
+// 0x5A01Ea01Ba9A8DC2B066714A65E61a78838B1b9e
+// 0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270
+// [5,3,4,3,4,6,6,5]
