@@ -57,7 +57,6 @@ export const ConnectApproveAction: FC<
   {
     tokenAddress: string;
     children: ReactNode;
-    onClick?: () => void;
   } & ButtonProps
 > = ({ children, onClick, className, tokenAddress, ...rest }) => {
   return (
@@ -162,14 +161,7 @@ export const ConnectApproveAction: FC<
                   {/*  {chain.name}*/}
                   {/*</Button>*/}
 
-                  <Button
-                    onClick={onClick}
-                    type='button'
-                    className={clsxm('w-full justify-center py-5', className)}
-                    variant='light'
-                  >
-                    {children}
-                  </Button>
+                  {children}
                 </div>
               );
             })()}

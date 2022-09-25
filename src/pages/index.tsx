@@ -54,7 +54,14 @@ function PoolsRow({ item }: PoolsRowData) {
     contractInterface: erc20ABI,
     functionName: 'symbol',
   });
-
+  // const hfAddress = useHeadenFinanceAddress()
+  // const {address} = useAccount()
+  // const { data: collateral } = useContractRead({
+  //   addressOrName: hfAddress,
+  //   contractInterface: headenFinanceAbi,
+  //   functionName: 'getStakedValue',
+  //   args: [address]
+  // });
   const openDialog = useAssetDialogStore.useOpenDialog();
   return (
     <tr
@@ -79,10 +86,10 @@ function PoolsRow({ item }: PoolsRowData) {
         <span>{tokenSymbol} token</span>
       </th>
       <td className='py-4 px-6'>{tokenName} detail</td>
-      <td className='py-4 px-6'>{item.amountStaked}</td>
+      <td className='py-4 px-6'>{item.liquidity}</td>
       <td className='py-4 px-6'>{item.supplyRate}%</td>
       <td className='py-4 px-6'>{item.borrowRate}%</td>
-      <td className='py-4 px-6'>-</td>
+      <td className='py-4 px-6'>{item.amountStaked}</td>
       <td className='py-4 px-6'>0.08%</td>
       <td className='py-4 px-6'>
         {balance?.formatted}
@@ -90,6 +97,7 @@ function PoolsRow({ item }: PoolsRowData) {
       </td>
     </tr>
   );
+  //todo item.amountStaked should be how much the user has staked
 }
 
 function PoolsTable() {

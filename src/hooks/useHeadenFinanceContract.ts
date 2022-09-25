@@ -1,4 +1,4 @@
-import { useContract, useProvider } from 'wagmi';
+import { useContract, useProvider, useSigner } from 'wagmi';
 
 import { useHeadenFinanceAddress } from '@/hooks/useHeadenFinanceAddress';
 
@@ -11,5 +11,15 @@ export function useHeadenFinance(): ContractContext {
     addressOrName: address,
     contractInterface: headenFinanceAbi,
     signerOrProvider: useProvider(),
+  });
+}
+
+export function useHeadenFinanceWrite(): ContractContext {
+  const address = useHeadenFinanceAddress();
+  const { data: signer } = useSigner();
+  return useContract<ContractContext>({
+    addressOrName: address,
+    contractInterface: headenFinanceAbi,
+    signerOrProvider: signer,
   });
 }
