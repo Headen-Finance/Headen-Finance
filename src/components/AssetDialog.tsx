@@ -4,7 +4,10 @@ import * as React from 'react';
 
 import clsxm from '@/lib/clsxm';
 
+import { Borrow } from '@/components/headen/Borrow';
+import { Repay } from '@/components/headen/Repay';
 import { Stake } from '@/components/headen/Stake';
+import { Withdraw } from '@/components/headen/Withdraw';
 
 type AssetDialogProp = {
   tokenAddress: string;
@@ -14,9 +17,9 @@ export const AssetDialog = ({ tokenAddress }: AssetDialogProp) => {
   // useChainlinkFeed();
   const [categories] = useState({
     Supply: () => <Stake tokenAddress={tokenAddress} />,
-    Borrow: () => <div> borrow...</div>,
-    Withdraw: () => <div> withdraw...</div>,
-    Repay: () => <div> repay...</div>,
+    Borrow: () => <Borrow tokenAddress={tokenAddress} />,
+    Withdraw: () => <Withdraw tokenAddress={tokenAddress} />,
+    Repay: () => <Repay tokenAddress={tokenAddress} />,
   });
 
   return (
