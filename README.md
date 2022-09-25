@@ -40,10 +40,11 @@ Please note that The contracts have not yet been audited and some features are i
 - Polygon (Parent) - 0x76A1ee1738818566D6663db22b0061ae0A57C9fd
 - Arbitrium (Child) -
 
-### Protoype Design
+### Protoypes
 
-[Design](https://www.figma.com/proto/6twO6s4wxXVkgROXhY5hjz/ETHGlobal-Hackathon?page-id=252%3A1124&node-id=342%3A1950&viewport=207%2C-1450%2C0.24&scaling=min-zoom&starting-point-node-id=342%3A1950)
-[Website](https://headen-finance-w8hk.vercel.app/)
+- [Design Prototype](https://www.figma.com/proto/6twO6s4wxXVkgROXhY5hjz/ETHGlobal-Hackathon?page-id=252%3A1124&node-id=342%3A1950&viewport=207%2C-1450%2C0.24&scaling=min-zoom&starting-point-node-id=342%3A1950)
+
+- [Website Page](https://headen-finance-w8hk.vercel.app/)
 
 ## Disclaimer
 
