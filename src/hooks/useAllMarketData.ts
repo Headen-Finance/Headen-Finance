@@ -6,13 +6,16 @@ import useIsMounted from '@/hooks/useIsMounted';
 
 export interface MarketsResponseDisplay {
   tokenAddress: string;
-  amountStaked: string;
-  amountBorrowed: string;
-  liquidity: string;
+  amountStaked: string | number;
+  amountBorrowed: string | number;
+  liquidity: string | number;
   borrowRate: string;
   supplyRate: string;
   collateral: string;
 }
+
+const USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+const USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
 
 export function useAllMarketData() {
   const hf = useHeadenFinance();
@@ -27,22 +30,33 @@ export function useAllMarketData() {
   const refresh = useCallback(async () => {
     const data: MarketsResponseDisplay[] = [];
     //todo generate demo data
-    for (let index = 0; index < 3; index++) {
+    for (let index = 1; index < 5; index++) {
       try {
         const market = await hf.markets(index);
         if (market.tokenAddress !== AddressZero) {
-          data.push({
-            tokenAddress: market.tokenAddress,
-            amountStaked: market.amountStaked.div(10 ** 8).toString(),
-            amountBorrowed: market.amountBorrowed.div(10 ** 8).toString(),
-            borrowRate: (market.borrowRate.toNumber() / 100).toString(),
-            supplyRate: (market.supplyRate.toNumber() / 100).toString(),
-            liquidity: market.amountStaked
-              .sub(market.amountBorrowed)
-              .div(10 ** 8)
-              .toString(),
-            collateral: ' - ',
-          } as MarketsResponseDisplay);
+          if(market.tokenAddress === USDC || market.tokenAddress === USDT){
+            data.push({
+              tokenAddress: market.tokenAddress,
+              amountStaked: +(market.amountStaked.toNumber()/10 ** 6).toFixed(5),
+              amountBorrowed: +(market.amountBorrowed.toNumber()/10 ** 6).toFixed(5),
+              borrowRate: (market.borrowRate.toNumber() / 100).toString(),
+              supplyRate: (market.supplyRate.toNumber() / 100).toString(),
+              liquidity: +((market.amountStaked.sub(market.amountBorrowed)).toNumber()/10 ** 6).toFixed(5),
+              collateral: ' - ',
+            } as MarketsResponseDisplay);
+          }else{
+            // avoid overflow error
+            data.push({
+              tokenAddress: market.tokenAddress,
+              amountStaked: +(Number(market.amountStaked)/ 10 ** 18).toFixed(5),
+              amountBorrowed: +(Number(market.amountBorrowed) / 10 ** 18).toFixed(5),
+              borrowRate: (market.borrowRate.toNumber() / 100).toString(),
+              supplyRate: (market.supplyRate.toNumber() / 100).toString(),
+              liquidity: +(Number(market.amountStaked.sub(market.amountBorrowed))/10 ** 18).toFixed(5),
+              collateral: ' - ',
+            } as MarketsResponseDisplay);
+          }
+          
         }
       } catch (err) {
         //market doesnt exist
