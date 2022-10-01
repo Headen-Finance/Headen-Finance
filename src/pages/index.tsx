@@ -1,220 +1,79 @@
+import Image from 'next/image';
 import * as React from 'react';
-import { useMemo, useState } from 'react';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { IoIosAdd } from 'react-icons/io';
-import { erc20ABI, useAccount, useBalance, useContractRead } from 'wagmi';
 
-import {
-  MarketsResponseDisplay,
-  useAllMarketData,
-} from '@/hooks/useAllMarketData';
-
-import { AssetDialog } from '@/components/AssetDialog';
-import Button from '@/components/buttons/Button';
-import { DialogFrame } from '@/components/dialog/DialogFrame';
-import { CreateMarketDialog } from '@/components/headen/CreateMarketDialog';
-import HomeInfo from '@/components/home/HomeInfo';
-import Indicator from '@/components/home/Indicator';
-import Input from '@/components/inputs/Input';
-import Layout from '@/components/layout/Layout';
+import LandingLayout from '@/components/layout/LandingLayout';
 import Seo from '@/components/Seo';
 
-import useAssetDialogStore from '@/store/useAssetDialogStore';
-
-/**
- * SVGR Support
- * Caveat: No React Props Type.
- *
- * You can override the next-env if the type is important to you
- * @see https://stackoverflow.com/questions/68103844/how-to-override-next-js-svg-module-declaration
- */
-
-// !STARTERCONF -> Select !STARTERCONF and CMD + SHIFT + F
-// Before you begin editing, follow all comments with `STARTERCONF`,
-// to customize the default configuration.
-
-type PoolsRowData = {
-  item: MarketsResponseDisplay;
-};
-
-function PoolsRow({ item }: PoolsRowData) {
-  const acc = useAccount();
-  const { data: balance } = useBalance({
-    addressOrName: acc.address,
-    cacheTime: 100,
-    token: item.tokenAddress,
-  });
-
-  const { data: tokenName } = useContractRead({
-    addressOrName: item.tokenAddress,
-    contractInterface: erc20ABI,
-    functionName: 'name',
-  });
-  const { data: tokenSymbol } = useContractRead({
-    addressOrName: item.tokenAddress,
-    contractInterface: erc20ABI,
-    functionName: 'symbol',
-  });
-  // const hfAddress = useHeadenFinanceAddress()
-  // const {address} = useAccount()
-  // const { data: collateral } = useContractRead({
-  //   addressOrName: hfAddress,
-  //   contractInterface: headenFinanceAbi,
-  //   functionName: 'getStakedValue',
-  //   args: [address]
-  // });
-  const openDialog = useAssetDialogStore.useOpenDialog();
+export default function LandingPage() {
   return (
-    <tr
-      // key={index}
-      className='cursor-pointer border-b bg-white text-black hover:bg-gray-200'
-      onClick={() => openDialog(item.tokenAddress)}
-    >
-      <th scope='row' className='whitespace-nowrap py-4 px-6 font-medium'>
-        <span>{tokenSymbol} token</span>
-      </th>
-      <td className='py-4 px-6'>{tokenName} detail</td>
-      <td className='py-4 px-6'>{item.liquidity}</td>
-      <td className='py-4 px-6'>{item.supplyRate}%</td>
-      <td className='py-4 px-6'>{item.borrowRate}%</td>
-      <td className='py-4 px-6'>{item.amountStaked}</td>
-      <td className='py-4 px-6'>4.08%</td>
-      <td className='py-4 px-6'>
-        {balance?.formatted}
-        {balance?.symbol}
-      </td>
-    </tr>
-  );
-  //todo item.amountStaked should be how much the user has staked
-}
-
-function PoolsTable() {
-  const { markets } = useAllMarketData();
-  return (
-    <table className='w-full text-left text-sm text-xs'>
-      <thead className='text-xs uppercase text-black'>
-        <tr className='bg-gray-300'>
-          <th scope='col' className='w-1/4 py-3 px-6'>
-            Asset
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            Detail
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            Available liquidity
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            Deposit rate
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            Borrow rate
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            Collateral
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            APY
-          </th>
-          <th scope='col' className='py-3 px-6'>
-            Wallet
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {markets.map((value: MarketsResponseDisplay, index: number) => (
-          <PoolsRow key={index} item={value} />
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-export default function HomePage() {
-  const disableClose = useAssetDialogStore.useDisableClose();
-  const tokenAddress = useAssetDialogStore.useTokenAddress();
-
-  const closeModal = useAssetDialogStore.useHandleClose();
-  const [showCreateMarketDialog, setShowCreateMarketDialog] = useState(false);
-  const dialog = useMemo(
-    () => (
-      <DialogFrame
-        show={!!tokenAddress}
-        onClose={
-          disableClose
-            ? () => {
-                /*lint...*/
-              }
-            : closeModal
-        }
-        className='w-[100vw]'
-      >
-        {tokenAddress && <AssetDialog tokenAddress={tokenAddress} />}
-      </DialogFrame>
-    ),
-    [tokenAddress, disableClose, closeModal]
-  );
-  const createMarketDialog = useMemo(
-    () => (
-      <DialogFrame
-        show={showCreateMarketDialog}
-        onClose={() => setShowCreateMarketDialog(false)}
-        className='w-[100vw]'
-      >
-        <CreateMarketDialog />
-      </DialogFrame>
-    ),
-    [showCreateMarketDialog]
-  );
-
-  const createPoolButton = (
-    <Button
-      variant='outline'
-      leftIcon={<IoIosAdd size={24} />}
-      className='h-8 rounded-full border-black text-xs font-light text-black'
-      onClick={() => setShowCreateMarketDialog(true)}
-    >
-      Create pool
-    </Button>
-  );
-
-  const searchInput = (
-    <Input
-      leftIcon={<AiOutlineSearch color='black' />}
-      placeholder='Search Market'
-      variant='outline'
-      className='rounded-full border-black py-[7px] text-black'
-    />
-  );
-
-  return (
-    <Layout>
+    <LandingLayout>
       {/* <Seo templateTitle='Home' /> */}
       <Seo />
-      {dialog}
-      {createMarketDialog}
-      <main className='flex justify-center  text-white'>
-        <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around bg-black sm:grid-cols-3 sm:grid-rows-1'>
-          <div className=' order-1 col-span-2 sm:order-3 sm:col-span-1 '>
-            <Indicator value={0.4} className='m-auto' />
+      <main className='flex flex-col  justify-center text-white'>
+        <section className="flex min-h-screen w-full items-center justify-center bg-black bg-[url('/images/landing/landing_bg.png')] bg-cover bg-center">
+          <div className='mx-12 flex w-full max-w-7xl flex-col items-center'>
+            <h1 className='text-center font-normal font-medium leading-normal  md:text-3xl lg:text-4xl xl:text-5xl'>
+              Stake NFTs, Liquidity tokens as collateral, and borrow without
+              needing 70% of total staked value.
+            </h1>
+            <h3 className='mt-24 max-w-xl text-center font-normal font-medium md:text-lg lg:text-xl xl:text-2xl'>
+              <span className='text-secondary'>$789,982,343</span> of liquidity
+              is located in Headen.Finance with over{' '}
+              <span className='text-secondary'>2</span> networks
+            </h3>
           </div>
-          <HomeInfo title='Total borrowed' value='$130k ' className='order-1' />
-          <HomeInfo title='Total supply' value='$300k' className='order-4' />
         </section>
-      </main>
-      <div className='mt-[150px] flex justify-center bg-gray-100 pb-24'>
-        <div className='mx-2 -mt-[100px] w-full  max-w-screen-xl flex-1 shrink rounded-lg bg-white p-2 text-black sm:p-10'>
-          <div className='mb-3 flex flex-col items-center justify-between border-b sm:flex-row'>
-            <span className='p-2 font-semibold'> ALL POOLS</span>
-            <div className='flex gap-2'>
-              {createPoolButton}
-              {searchInput}
+        <section className='flex justify-center bg-gradient-to-r from-[#CDEDF7] to-[#FFFFFF]'>
+          <div className='mx-12 flex max-w-screen-2xl items-center text-black '>
+            <div className='px-20 py-28'>
+              <h2 className='text-lg font-light leading-normal lg:text-xl  xl:text-2xl'>
+                Insurance YC DAO Protocol
+              </h2>
+              <h3 className='mt-6  text-lg font-semibold leading-normal lg:text-xl  xl:text-2xl'>
+                Earn interest, multi chain lending and better collateral
+                opportunities.
+              </h3>
             </div>
+            <div></div>
+            <h4>
+              Credit based lending possible without having a collateral upto 70%
+              of total staked assets value.
+            </h4>
+            <div></div>
           </div>
-          <div className='relative w-full overflow-x-auto'>
-            <PoolsTable />
-          </div>
-        </div>
-      </div>
-    </Layout>
+        </section>
+        {Array.of(...Array(3)).map((value, index) => (
+          <section key={index} className='flex justify-center bg-[#0E1118]'>
+            <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
+              <h3 className='mt-20 ml-20 text-4xl'>Headen markets</h3>
+              <div className='m-10 grid grid-cols-3 gap-10'>
+                {Array.of(...Array(3)).map((value, index) => (
+                  <div
+                    key={index}
+                    className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'
+                  >
+                    <div>
+                      <Image
+                        src='/images/landing/eth.png'
+                        alt='Eth logo'
+                        width={48}
+                        height={48}
+                      />
+                    </div>
+                    <span className='mt-3.5 text-lg  font-bold'>Ethereum</span>
+                    <p className='mt-3.5 text-sm'>
+                      YC DAO will soon be depoloyed on the Ethereum network in
+                      2022. Ethereum will be the largest market on the YC DAO
+                      protocol by liquidity and will have the most listed
+                      assets.
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
+      </main>
+    </LandingLayout>
   );
 }
