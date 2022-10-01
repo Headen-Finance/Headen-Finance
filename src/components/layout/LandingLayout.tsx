@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import BaseDialog from '@/components/dialog/BaseDialog';
+import { LandingFooter } from '@/components/layout/LandingFooter';
 import LandingHeader from '@/components/layout/LandingHeader';
 
 import useDialogStore from '@/store/useDialogStore';
@@ -21,6 +22,7 @@ export default function LandingLayout({
     <div className=''>
       <LandingHeader />
       {children}
+      <LandingFooter />
       <BaseDialog
         onClose={handleClose}
         onSubmit={handleSubmit}
