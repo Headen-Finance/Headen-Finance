@@ -37,7 +37,9 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.0",
     "react-icons": "^4.4.0",
+    "react-tsparticles": "^2.3.3",
     "tailwind-merge": "^1.6.0",
+    "tsparticles": "^2.3.4",
     "wagmi": "^0.6.6",
     "zustand": "^4.1.1"
   },

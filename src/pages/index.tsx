@@ -1,17 +1,38 @@
 import Image from 'next/image';
 import * as React from 'react';
+import { useCallback } from 'react';
 import { MdOutlineBuild } from 'react-icons/md';
+import Particles from 'react-tsparticles';
+import { loadFull } from 'tsparticles';
+import { Engine } from 'tsparticles-engine';
 
 import LandingLayout from '@/components/layout/LandingLayout';
 import Seo from '@/components/Seo';
 
 export default function LandingPage() {
+  const particlesInit = useCallback(async (engine: Engine) => {
+    // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
+    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
+    // starting from v2 you can add only the features you need reducing the bundle size
+    await loadFull(engine);
+  }, []);
+
+  // const particlesLoaded = useCallback(async (container?: Container) => {
+  // }, []);
+
   return (
     <LandingLayout>
       {/* <Seo templateTitle='Home' /> */}
       <Seo />
       <main className='flex flex-col  justify-center text-white'>
-        <section className="flex min-h-screen w-full items-center justify-center bg-black bg-[url('/images/landing/landing_bg.png')] bg-cover bg-center">
+        <section className="relative flex min-h-screen w-full items-center justify-center bg-black bg-[url('/images/landing/landing_bg.png')] bg-cover bg-center">
+          <Particles
+            className='absolute inset-0'
+            id='tsparticles'
+            url='/particlesjs-config.json'
+            init={particlesInit}
+          />
+
           <div className='mx-12 flex w-full max-w-7xl flex-col items-center'>
             <h1 className='text-center font-normal font-medium leading-normal  md:text-3xl lg:text-4xl xl:text-5xl'>
               Stake NFTs, Liquidity tokens as collateral, and borrow without
@@ -91,7 +112,7 @@ export default function LandingPage() {
         </section>
         <section className='flex justify-center bg-[#0E1118] pb-24'>
           <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
-            <h3 className='mt-20 ml-20 text-4xl'>Headen markets</h3>
+            <h3 className='mt-20 ml-20 text-4xl'>Investors</h3>
             <div className='m-10 flex flex-wrap justify-center'>
               {Array.of(...Array(10)).map((value, index) => (
                 <div key={index} className='w-1/4 px-10 py-8'>
