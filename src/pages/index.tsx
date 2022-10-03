@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import * as React from 'react';
+import { MdOutlineBuild } from 'react-icons/md';
 
 import LandingLayout from '@/components/layout/LandingLayout';
 import Seo from '@/components/Seo';
@@ -42,37 +43,70 @@ export default function LandingPage() {
             <div></div>
           </div>
         </section>
-        {Array.of(...Array(3)).map((value, index) => (
-          <section key={index} className='flex justify-center bg-[#0E1118]'>
-            <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
-              <h3 className='mt-20 ml-20 text-4xl'>Headen markets</h3>
-              <div className='m-10 grid grid-cols-3 gap-10'>
-                {Array.of(...Array(3)).map((value, index) => (
-                  <div
-                    key={index}
-                    className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'
-                  >
-                    <div>
-                      <Image
-                        src='/images/landing/eth.png'
-                        alt='Eth logo'
-                        width={48}
-                        height={48}
-                      />
-                    </div>
-                    <span className='mt-3.5 text-lg  font-bold'>Ethereum</span>
-                    <p className='mt-3.5 text-sm'>
-                      YC DAO will soon be depoloyed on the Ethereum network in
-                      2022. Ethereum will be the largest market on the YC DAO
-                      protocol by liquidity and will have the most listed
-                      assets.
-                    </p>
+        <section className='flex justify-center bg-[#0E1118]'>
+          <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
+            <h3 className='mt-20 ml-20 text-4xl'>Headen markets</h3>
+            <div className='m-10 grid grid-cols-3 gap-10'>
+              {Array.of(...Array(3)).map((value, index) => (
+                <div
+                  key={index}
+                  className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'
+                >
+                  <div>
+                    <Image
+                      src='/images/landing/eth.png'
+                      alt='Eth logo'
+                      width={48}
+                      height={48}
+                    />
                   </div>
-                ))}
-              </div>
+                  <span className='mt-3.5 text-lg  font-bold'>Ethereum</span>
+                  <p className='mt-3.5 text-sm'>
+                    YC DAO will soon be depoloyed on the Ethereum network in
+                    2022. Ethereum will be the largest market on the YC DAO
+                    protocol by liquidity and will have the most listed assets.
+                  </p>
+                </div>
+              ))}
             </div>
-          </section>
-        ))}
+          </div>
+        </section>
+        <section className='flex justify-center bg-[#0E1118]'>
+          <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
+            <h3 className='mt-20 ml-20 text-4xl'>Community</h3>
+            <div className='m-10 grid grid-cols-3 gap-10'>
+              {Array.of(...Array(3)).map((value, index) => (
+                <div
+                  key={index}
+                  className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'
+                >
+                  <span className='my-14 text-lg  font-bold'>
+                    <MdOutlineBuild className='mr-2 inline' />
+                    Community
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+        <section className='flex justify-center bg-[#0E1118] pb-24'>
+          <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
+            <h3 className='mt-20 ml-20 text-4xl'>Headen markets</h3>
+            <div className='m-10 flex flex-wrap justify-center'>
+              {Array.of(...Array(10)).map((value, index) => (
+                <div key={index} className='w-1/4 px-10 py-8'>
+                  <Image
+                    src='/images/landing/ethglobal.png'
+                    alt='ETHGlobal logo'
+                    height={100}
+                    width={200}
+                    layout='responsive'
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
     </LandingLayout>
   );
