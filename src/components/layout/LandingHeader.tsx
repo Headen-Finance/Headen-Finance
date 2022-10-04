@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-import Button from '@/components/buttons/Button';
 import UnstyledLink from '@/components/links/UnstyledLink';
 
 export default function LandingHeader() {
@@ -64,12 +63,12 @@ export default function LandingHeader() {
           </UnstyledLink>
         </div>
         <div className='flex justify-end'>
-          <Button
-            variant='outline'
-            className='rounded-[20px] border-white font-semibold text-white hover:border-secondary hover:bg-transparent'
+          <UnstyledLink
+            href='/app'
+            className='rounded-[20px] border border-white py-2 px-4 font-semibold text-white hover:border-secondary hover:bg-transparent'
           >
             Launch App
-          </Button>
+          </UnstyledLink>
         </div>
 
         {/*<nav>*/}
