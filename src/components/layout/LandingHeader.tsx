@@ -21,13 +21,13 @@ export default function LandingHeader() {
     };
   }, [top]);
   return (
-    <header className='fixed left-0 right-0 top-0 z-50 text-white'>
-      <div
-        className={clsxm(
-          'mx-auto grid h-20 max-w-screen-2xl grid-cols-[200px_1fr_200px] items-center justify-between px-10 transition-[background]',
-          !top && 'bg-black/50  backdrop-blur'
-        )}
-      >
+    <header
+      className={clsxm(
+        'fixed left-0 right-0 top-0 z-50 text-white',
+        !top && 'bg-black/50  backdrop-blur'
+      )}
+    >
+      <div className='mx-auto grid h-20 max-w-screen-2xl grid-cols-[200px_1fr_200px] items-center justify-between px-10 transition-[background]'>
         <div>
           <UnstyledLink
             href='/'
