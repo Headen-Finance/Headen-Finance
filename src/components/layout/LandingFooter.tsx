@@ -18,29 +18,29 @@ export const LandingFooter = () => {
           </p>
         </FooterSection>
         <FooterSection title='Markets'>
-          {Array.of(...Array(5)).map((value) => (
-            <LandingLink key={value} href='#'>
+          {Array.of(...Array(5)).map((value, index) => (
+            <LandingLink key={index} href='#'>
               eTokens
             </LandingLink>
           ))}
         </FooterSection>
         <FooterSection title='Docs'>
-          {Array.of(...Array(5)).map((value) => (
-            <LandingLink key={value} href='#'>
+          {Array.of(...Array(5)).map((value, index) => (
+            <LandingLink key={index} href='#'>
               eTokens
             </LandingLink>
           ))}
         </FooterSection>
         <FooterSection title='FAQ'>
-          {Array.of(...Array(5)).map((value) => (
-            <LandingLink key={value} href='#'>
+          {Array.of(...Array(5)).map((value, index) => (
+            <LandingLink key={index} href='#'>
               eTokens
             </LandingLink>
           ))}
         </FooterSection>
         <FooterSection title='Security'>
-          {Array.of(...Array(5)).map((value) => (
-            <LandingLink key={value} href='#'>
+          {Array.of(...Array(5)).map((value, index) => (
+            <LandingLink key={index} href='#'>
               eTokens
             </LandingLink>
           ))}
