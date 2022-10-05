@@ -193,7 +193,7 @@ export default function HomePage() {
       {dialog}
       {createMarketDialog}
       <main className='flex justify-center  text-white'>
-        <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around bg-black sm:grid-cols-3 sm:grid-rows-1'>
+        <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around sm:grid-cols-3 sm:grid-rows-1'>
           <div className=' order-1 col-span-2 sm:order-3 sm:col-span-1 '>
             <Indicator value={0.4} className='m-auto' />
           </div>

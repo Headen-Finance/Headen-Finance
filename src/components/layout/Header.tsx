@@ -5,7 +5,7 @@ import { ConnectWallet } from '@/components/web3/ConnectWallet';
 
 export default function Header() {
   return (
-    <header className='sticky top-0 z-50 bg-black text-white'>
+    <header className='sticky top-0 z-50 bg-[#0E1118] text-white'>
       <div className='layout flex h-14 items-center justify-between'>
         <div className='grow basis-0'>
           <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
