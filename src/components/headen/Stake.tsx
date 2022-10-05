@@ -72,6 +72,9 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
   return (
     <>
       <div className='p-0 sm:p-5 md:p-10'>
+        <div className='flex justify-center text-[0.6em]'>
+          <span>{tokenAddress}</span>
+        </div>
         {acc.status == 'disconnected' && (
           <div className='flex flex-col items-center text-xs '>
             <NoWalletImage style={{ height: 172, width: 189, margin: 20 }} />
@@ -105,26 +108,31 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
             {/*{allowance === ApprovalState.NOT_APPROVED && (*/}
             {/*  <Button onClick={allow}> Approve</Button>*/}
             {/*)}*/}
-            <div className='relative py-5 sm:py-10 '>
-              <input
-                type='range'
-                className='range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100'
-                min={1}
-                max={100}
-                step={1}
-                value={percent}
-                onChange={(event) => setPercent(parseInt(event.target.value))}
-                id='customRange1'
-              />
-              <div className='flex justify-between'>
-                <span> 0</span>
-                <span> {balance.data?.formatted}</span>
+
+            {balance.data?.value?.eq(0) ? (
+              <div className='pb-4 text-sm font-bold'>
+                Ooops, it looks like that you do not have any{' '}
+                {balance.data?.symbol}
               </div>
-            </div>
+            ) : (
+              <div className='relative py-5 sm:py-10 '>
+                <input
+                  type='range'
+                  className='range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100'
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={percent}
+                  onChange={(event) => setPercent(parseInt(event.target.value))}
+                  id='customRange1'
+                />
+                <div className='flex justify-between'>
+                  <span> 0</span>
+                  <span> {balance.data?.formatted}</span>
+                </div>
+              </div>
+            )}
             <div className='flex flex-col gap-1'>
-              <div className='flex justify-center text-[0.6em]'>
-                <span>{tokenAddress}</span>
-              </div>
               <div className='flex justify-between'>
                 <span>User Borrow Limit</span>
                 <span>$0.00</span>
@@ -160,10 +168,11 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
             Add supply
           </Button>
         </ConnectApproveAction>
-        <div className='py-5 text-[0.625rem]'>
+        <div className='pt-5 text-[0.625rem]'>
           <MdInfoOutline className='mr-1 -mt-0.5 inline-block' />
           You are yet to connect your wallet
         </div>
+
         {/*<div className='mt-5 flex justify-between'>*/}
         {/*  <span>*/}
         {/*    {' '}*/}
