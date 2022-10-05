@@ -46,8 +46,8 @@ export default function LandingPage() {
           </div>
         </section>
         <section className='flex justify-center bg-gradient-to-r from-[#CDEDF7] to-[#FFFFFF]'>
-          <div className='mx-12 flex max-w-screen-2xl items-center text-black '>
-            <div className='px-20 py-28'>
+          <div className='mx-12 flex max-w-screen-2xl flex-col items-center text-black md:flex-row '>
+            <div className='px-4 py-10 md:px-10 md:py-20 lg:px-20 lg:py-28'>
               <h2 className='text-lg font-light leading-normal lg:text-xl  xl:text-2xl'>
                 Insurance YC DAO Protocol
               </h2>
@@ -56,66 +56,68 @@ export default function LandingPage() {
                 opportunities.
               </h3>
             </div>
-            <div></div>
-            <h4>
-              Credit based lending possible without having a collateral upto 70%
-              of total staked assets value.
-            </h4>
-            <div></div>
+            <div className='px-4 py-10 md:px-10 md:py-20 lg:px-20 lg:py-28'>
+              <h4>
+                Credit based lending possible without having a collateral upto
+                70% of total staked assets value.
+              </h4>
+            </div>
           </div>
         </section>
         <section className='flex justify-center bg-[#0E1118]'>
-          <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
-            <h3 className='mt-20 ml-20 text-4xl'>Headen markets</h3>
-            <div className='m-10 grid grid-cols-3 gap-10'>
+          <div className='mx-2 mt-40  flex w-full max-w-screen-2xl flex-col text-white sm:mx-12 '>
+            <h3 className='mt-20 ml-10 text-4xl sm:ml-20'>Headen markets</h3>
+            <div className='m-4 flex flex-wrap sm:m-10'>
               {Array.of(...Array(3)).map((value, index) => (
-                <div
-                  key={index}
-                  className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'
-                >
-                  <div>
-                    <Image
-                      src='/images/landing/eth.png'
-                      alt='Eth logo'
-                      width={48}
-                      height={48}
-                    />
+                <div key={index} className='w-full p-5 md:w-1/2 lg:w-1/3'>
+                  <div className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8 '>
+                    <div>
+                      <Image
+                        src='/images/landing/eth.png'
+                        alt='Eth logo'
+                        width={48}
+                        height={48}
+                      />
+                    </div>
+                    <span className='mt-3.5 text-lg  font-bold'>Ethereum</span>
+                    <p className='mt-3.5 text-sm'>
+                      YC DAO will soon be depoloyed on the Ethereum network in
+                      2022. Ethereum will be the largest market on the YC DAO
+                      protocol by liquidity and will have the most listed
+                      assets.
+                    </p>
                   </div>
-                  <span className='mt-3.5 text-lg  font-bold'>Ethereum</span>
-                  <p className='mt-3.5 text-sm'>
-                    YC DAO will soon be depoloyed on the Ethereum network in
-                    2022. Ethereum will be the largest market on the YC DAO
-                    protocol by liquidity and will have the most listed assets.
-                  </p>
                 </div>
               ))}
             </div>
           </div>
         </section>
         <section className='flex justify-center bg-[#0E1118]'>
-          <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
-            <h3 className='mt-20 ml-20 text-4xl'>Community</h3>
-            <div className='m-10 grid grid-cols-3 gap-10'>
+          <div className='mx-2 mt-40 flex w-full max-w-screen-2xl flex-col text-white sm:mx-12 '>
+            <h3 className='mt-20 ml-10 text-4xl sm:ml-20'>Community</h3>
+            <div className='m-4 flex flex-wrap sm:m-10'>
               {Array.of(...Array(3)).map((value, index) => (
-                <div
-                  key={index}
-                  className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'
-                >
-                  <span className='my-14 text-lg  font-bold'>
-                    <MdOutlineBuild className='mr-2 inline' />
-                    Community
-                  </span>
+                <div key={index} className='w-full p-5 md:w-1/2 lg:w-1/3'>
+                  <div className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'>
+                    <span className='my-14 text-lg  font-bold'>
+                      <MdOutlineBuild className='mr-2 inline' />
+                      Community
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
         <section className='flex justify-center bg-[#0E1118] pb-24'>
-          <div className='mx-12 mt-40 flex w-full max-w-screen-2xl flex-col text-white '>
-            <h3 className='mt-20 ml-20 text-4xl'>Investors</h3>
-            <div className='m-10 flex flex-wrap justify-center'>
+          <div className='mx-2 mt-40 flex w-full max-w-screen-2xl flex-col text-white sm:mx-12 '>
+            <h3 className='mt-20 ml-10 text-4xl sm:ml-20'>Investors</h3>
+            <div className='m-4 flex flex-wrap justify-center sm:m-10'>
               {Array.of(...Array(10)).map((value, index) => (
-                <div key={index} className='w-1/4 px-10 py-8'>
+                <div
+                  key={index}
+                  className='w-full px-10 py-8 md:w-1/2 lg:w-1/3 xl:w-1/4'
+                >
                   <Image
                     src='/images/landing/ethglobal.png'
                     alt='ETHGlobal logo'

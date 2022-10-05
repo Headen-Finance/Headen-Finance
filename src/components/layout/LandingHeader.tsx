@@ -27,7 +27,7 @@ export default function LandingHeader() {
         !top && 'bg-black/50  backdrop-blur'
       )}
     >
-      <div className='mx-auto grid h-20 max-w-screen-2xl grid-cols-[200px_1fr_200px] items-center justify-between px-10 transition-[background]'>
+      <div className='mx-auto grid h-20 max-w-screen-2xl grid-cols-2 items-center justify-between px-5 transition-[background] sm:px-10 md:grid-cols-[200px_1fr_200px]'>
         <div>
           <UnstyledLink
             href='/'
@@ -36,7 +36,7 @@ export default function LandingHeader() {
             Headen.Finance
           </UnstyledLink>
         </div>
-        <div className='flex justify-center gap-12'>
+        <div className='hidden justify-center gap-8 md:flex lg:gap-12 '>
           <UnstyledLink
             href='/'
             className='text-sm font-semibold hover:text-secondary'
