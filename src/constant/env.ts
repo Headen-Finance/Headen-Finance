@@ -2,7 +2,7 @@ export const isProd = process.env.NODE_ENV === 'production';
 export const isLocal = process.env.NODE_ENV === 'development';
 import { chain } from 'wagmi';
 
-import { abi } from '../../artifacts/contracts/headenFinanceChild.sol/HeadenFinanceChild.json';
+import ChildContract from '../../artifacts/contracts/headenFinanceChild.sol/HeadenFinanceChild.json';
 
 export const showLogger = isLocal
   ? true
@@ -19,4 +19,4 @@ export const CONTRACT_ADDRESS = {
   [chain.goerli.id]: '0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6',
 };
 
-export const headenFinanceAbi = abi;
+export const headenFinanceAbi = ChildContract.abi;
