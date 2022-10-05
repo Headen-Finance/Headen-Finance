@@ -146,7 +146,7 @@ export default function HomePage() {
               }
             : closeModal
         }
-        className='w-[100vw]'
+        className='w-[100vw] p-0'
       >
         {tokenAddress && <AssetDialog tokenAddress={tokenAddress} />}
       </DialogFrame>

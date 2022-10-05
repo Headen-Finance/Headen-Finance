@@ -23,19 +23,19 @@ export const AssetDialog = ({ tokenAddress }: AssetDialogProp) => {
   });
 
   return (
-    <div className='w-full px-2 sm:px-0'>
+    <div className='w-full px-2 sm:px-0 '>
       <Tab.Group>
-        <Tab.List className='sticky -top-6 z-10 flex space-x-1 bg-neutral-800 p-1'>
+        <Tab.List className='sticky -top-6 z-10 flex bg-[#F5F5F5]'>
           {Object.keys(categories).map((category) => (
             <Tab
               key={category}
               className={({ selected }) =>
                 clsxm(
-                  'w-full  py-2.5 text-sm font-medium leading-5 text-white',
-                  'border-b-2 ring-white ring-opacity-60 ring-offset-2 focus-visible:bg-white/[0.1] focus-visible:outline-none',
+                  'w-full  rounded-none py-3.5 text-sm font-medium leading-5 text-white',
+                  'ring-white ring-opacity-60 ring-offset-2 focus-visible:bg-primary-500',
                   selected
-                    ? 'border-white'
-                    : 'border-transparent text-blue-100 hover:bg-white/[0.2] hover:text-white'
+                    ? ' bg-primary text-white'
+                    : 'text-primary hover:bg-primary-600 hover:text-white'
                 )
               }
             >

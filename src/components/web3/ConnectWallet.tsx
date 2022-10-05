@@ -124,7 +124,7 @@ export const ConnectApproveAction: FC<
                   <Button
                     onClick={approve}
                     className={clsxm('w-full justify-center py-5', className)}
-                    variant='light'
+                    variant='primary'
                   >
                     Approve token
                   </Button>

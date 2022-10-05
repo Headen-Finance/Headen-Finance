@@ -146,7 +146,7 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
                 <span>6.99%</span>
               </div>
             </div>
-            <Button isDarkBg className='mt-4 mb-2 sm:mt-8' variant='ghost'>
+            <Button className='mt-4 mb-2 sm:mt-8' variant='ghost'>
               More parameters <IoChevronDown />
             </Button>
           </>
