@@ -43,7 +43,7 @@ export const CustomConnectWallet: FC<
             onClick={isConnected ? onClick : show}
             variant='light'
             {...rest}
-            className={clsxm('w-full justify-center py-5', className)}
+            className={clsxm('w-full justify-center py-3.5 sm:py-5', className)}
           >
             {isConnected ? children : 'Connect Wallet'}
           </Button>
@@ -100,7 +100,10 @@ export const ConnectApproveAction: FC<
                 return (
                   <Button
                     onClick={openConnectModal}
-                    className={clsxm('w-full justify-center py-5', className)}
+                    className={clsxm(
+                      'w-full justify-center py-3.5 sm:py-5',
+                      className
+                    )}
                     variant='light'
                   >
                     Connect Wallet
@@ -112,7 +115,10 @@ export const ConnectApproveAction: FC<
                 return (
                   <Button
                     onClick={openChainModal}
-                    className={clsxm('w-full justify-center py-5', className)}
+                    className={clsxm(
+                      'w-full justify-center py-3.5 sm:py-5',
+                      className
+                    )}
                     variant='light'
                   >
                     Wrong network
@@ -123,7 +129,10 @@ export const ConnectApproveAction: FC<
                 return (
                   <Button
                     onClick={approve}
-                    className={clsxm('w-full justify-center py-5', className)}
+                    className={clsxm(
+                      'w-full justify-center py-3.5 sm:py-5',
+                      className
+                    )}
                     variant='primary'
                   >
                     Approve token

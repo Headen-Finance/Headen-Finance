@@ -54,7 +54,7 @@ export default function LandingHeader() {
             href='/'
             className='text-lg font-semibold  hover:text-secondary sm:text-xl'
           >
-            Headen.Finance
+            <span>Headen</span>.<span>Finance</span>
           </UnstyledLink>
         </div>
         <nav className='hidden justify-center gap-8 md:flex lg:gap-12 '>

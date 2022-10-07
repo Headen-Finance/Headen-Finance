@@ -25,18 +25,28 @@ const menuItems = [
 export default function Header() {
   return (
     <header className='sticky top-0 z-50 bg-[#0E1118] text-white'>
-      <div className='layout flex h-14 items-center justify-between'>
+      <div className='mx-auto flex h-20 max-w-screen-2xl items-center justify-between px-5 sm:px-10'>
         <div className='flex grow basis-0 flex-nowrap items-center'>
           <HamburgerMenu menuItems={menuItems} />
-          <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
-            Headen Finance
+          <UnstyledLink
+            href='/'
+            className='break-words text-lg  font-semibold hover:text-secondary sm:text-xl'
+          >
+            <span className='inline-block'>Headen.</span>
+            <span className='inline-block'>Finance</span>
           </UnstyledLink>
         </div>
-        <div>
-          <UnstyledLink href='/' className='font-bold hover:text-gray-600'>
-            Dashboard
-          </UnstyledLink>
-        </div>
+        <nav className='hidden justify-center gap-8 md:flex lg:gap-12 '>
+          {menuItems.map((value) => (
+            <UnstyledLink
+              key={value.title}
+              href={value.href}
+              className='text-sm font-semibold hover:text-secondary'
+            >
+              {value.title}
+            </UnstyledLink>
+          ))}
+        </nav>
         <div className='flex grow basis-0 justify-end'>
           {/*<UnstyledLink href='/' className='font-bold hover:text-gray-600'>*/}
           {/*  User Account*/}

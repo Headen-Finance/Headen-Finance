@@ -23,9 +23,9 @@ export const AssetDialog = ({ tokenAddress }: AssetDialogProp) => {
   });
 
   return (
-    <div className='w-full px-2 sm:px-0 '>
+    <div className='w-full px-0'>
       <Tab.Group>
-        <Tab.List className='sticky -top-6 z-10 flex bg-[#F5F5F5]'>
+        <Tab.List className='sticky top-0 z-10 flex bg-[#F5F5F5]'>
           {Object.keys(categories).map((category) => (
             <Tab
               key={category}
@@ -43,7 +43,7 @@ export const AssetDialog = ({ tokenAddress }: AssetDialogProp) => {
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels className='mt-2 w-full'>
+        <Tab.Panels className='mt-2 w-full px-2 pb-2'>
           {Object.values(categories).map((element, idx) => (
             <Tab.Panel key={idx}>{element()}</Tab.Panel>
           ))}

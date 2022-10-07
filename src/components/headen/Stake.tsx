@@ -71,7 +71,7 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
 
   return (
     <>
-      <div className='p-0 sm:p-5 md:p-10'>
+      <div className='p-0 px-2.5 sm:p-5 md:p-10'>
         <div className='flex justify-center text-[0.6em]'>
           <span>{tokenAddress}</span>
         </div>
@@ -86,9 +86,9 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
         )}
         {acc.status != 'disconnected' && (
           <>
-            <div className='md:py-10'>
+            <div className='py-3.5 sm:py-5 md:py-10'>
               <div className='relative'>
-                <span className='text-2xl sm:text-5xl'>
+                <span className='text-2xl sm:text-3xl md:text-5xl'>
                   {displayAmount}
                   {balance.data?.symbol}
                 </span>
@@ -153,15 +153,15 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
         )}
         <ConnectApproveAction
           tokenAddress={tokenAddress}
-          className='w-full justify-center py-5'
+          className='w-full justify-center'
         >
           <Button
             onClick={stake}
             type='button'
             isLoading={loading}
             className={clsxm(
-              'w-full justify-center py-5',
-              'w-full justify-center py-5'
+              'w-full justify-center py-3.5 sm:py-5',
+              'w-full justify-center py-3.5 sm:py-5'
             )}
             variant='light'
           >
