@@ -18,11 +18,11 @@ const menuItems = [
     title: 'Withdraw',
   },
   {
-    href: '#',
+    href: '/app/borrow',
     title: 'Borrow',
   },
   {
-    href: '#',
+    href: '/app/repay',
     title: 'Repay',
   },
 ];

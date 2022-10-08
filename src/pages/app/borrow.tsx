@@ -6,16 +6,16 @@ import Button from '@/components/buttons/Button';
 import Layout from '@/components/layout/Layout';
 import Seo from '@/components/Seo';
 
-export default function StakePage() {
+export default function BorrowPage() {
   return (
     <Layout>
       {/* <Seo templateTitle='Home' /> */}
-      <Seo title='Stake' />
+      <Seo title='Borrow' />
 
       <main className='flex justify-center  text-white'>
         <section className='w-full max-w-screen-xl'>
           <div className='px-4 text-center md:w-2/3 md:px-10 md:text-left lg:w-1/2 '>
-            <h1 className='mt-4 text-3xl md:mt-14 md:text-5xl'>Staking</h1>
+            <h1 className='mt-4 text-3xl md:mt-14 md:text-5xl'>Borrow</h1>
             <p className='mt-5 text-sm text-[#8E93A3]'>
               Put your crypto assets to work today.Start generating the best
               yields.
@@ -70,13 +70,14 @@ export default function StakePage() {
               </div>
               <Button
                 type='button'
+                disabled={true}
                 className={clsxm(
                   'w-full justify-center py-3.5 sm:py-5',
                   'mt-12 w-full justify-center rounded-lg'
                 )}
                 variant='primary'
               >
-                Stake
+                Borrow
               </Button>
             </div>
           ))}
