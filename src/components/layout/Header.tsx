@@ -14,12 +14,12 @@ const menuItems = [
     title: 'Stake',
   },
   {
-    href: '#',
-    title: 'Borrow',
+    href: '/app/withdraw',
+    title: 'Withdraw',
   },
   {
     href: '#',
-    title: 'Withdraw',
+    title: 'Borrow',
   },
   {
     href: '#',

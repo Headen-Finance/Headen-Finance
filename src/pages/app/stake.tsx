@@ -10,12 +10,12 @@ export default function StakePage() {
   return (
     <Layout>
       {/* <Seo templateTitle='Home' /> */}
-      <Seo />
+      <Seo title='Stake' />
 
       <main className='flex justify-center  text-white'>
         <section className='w-full max-w-screen-xl'>
           <div className='px-4 text-center md:w-2/3 md:px-10 md:text-left lg:w-1/2 '>
-            <h1 className='text-3xl md:text-5xl'>Staking</h1>
+            <h1 className='mt-4 text-3xl md:mt-14 md:text-5xl'>Staking</h1>
             <p className='mt-5 text-sm text-[#8E93A3]'>
               Put your crypto assets to work today.Start generating the best
               yields.
