@@ -1,4 +1,5 @@
 import { Popover, Transition } from '@headlessui/react';
+import { useRouter } from 'next/router';
 import { Fragment, ReactNode } from 'react';
 import * as React from 'react';
 import { MdClose, MdMenu } from 'react-icons/md';
@@ -15,6 +16,7 @@ export type HamburgerMenuProps = {
 };
 
 export default function HamburgerMenu({ menuItems }: HamburgerMenuProps) {
+  const { pathname } = useRouter();
   return (
     <Popover className='relative block md:hidden'>
       {({ open }) => (
@@ -47,7 +49,9 @@ export default function HamburgerMenu({ menuItems }: HamburgerMenuProps) {
                       <Popover.Button
                         key={value.title}
                         href={value.href}
-                        className='block rounded-md p-4 text-sm font-semibold text-primary hover:bg-primary hover:text-secondary'
+                        className={`block rounded-md p-4 text-sm font-semibold text-primary hover:bg-primary hover:text-secondary/50 ${
+                          pathname == value.href ? 'text-secondary' : undefined
+                        }`}
                         as={UnstyledLink}
                       >
                         {value.title}

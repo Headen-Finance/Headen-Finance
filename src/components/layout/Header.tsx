@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import * as React from 'react';
 
 import HamburgerMenu from '@/components/layout/HamburgerMenu';
@@ -5,7 +6,11 @@ import UnstyledLink from '@/components/links/UnstyledLink';
 import { ConnectWallet } from '@/components/web3/ConnectWallet';
 const menuItems = [
   {
-    href: '#',
+    href: '/app',
+    title: 'Dashboard',
+  },
+  {
+    href: '/app/stake',
     title: 'Stake',
   },
   {
@@ -23,6 +28,7 @@ const menuItems = [
 ];
 
 export default function Header() {
+  const { pathname } = useRouter();
   return (
     <header className='sticky top-0 z-50 bg-[#0E1118] text-white'>
       <div className='mx-auto flex h-20 max-w-screen-2xl items-center justify-between px-5 sm:px-10'>
@@ -30,7 +36,7 @@ export default function Header() {
           <HamburgerMenu menuItems={menuItems} />
           <UnstyledLink
             href='/'
-            className='break-words text-lg  font-semibold hover:text-secondary sm:text-xl'
+            className='text-md break-words font-semibold hover:text-secondary/50 sm:text-xl'
           >
             <span className='inline-block'>Headen.</span>
             <span className='inline-block'>Finance</span>
@@ -41,7 +47,9 @@ export default function Header() {
             <UnstyledLink
               key={value.title}
               href={value.href}
-              className='text-sm font-semibold hover:text-secondary'
+              className={`text-sm font-semibold hover:text-secondary/50 ${
+                pathname == value.href ? 'text-secondary' : undefined
+              }`}
             >
               {value.title}
             </UnstyledLink>

@@ -73,7 +73,7 @@ function LandingLink({ children, className, ...rest }: UnstyledLinkProps) {
   return (
     <UnstyledLink
       className={clsxm(
-        'mx-auto block text-sm font-semibold text-gray-500 hover:text-secondary',
+        'mx-auto block text-sm font-semibold text-gray-500 hover:text-secondary/50',
         className
       )}
       {...rest}

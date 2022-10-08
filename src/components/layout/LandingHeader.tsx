@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
@@ -40,6 +41,7 @@ export default function LandingHeader() {
       window.removeEventListener('scroll', handleScroll);
     };
   }, [top]);
+  const { pathname } = useRouter();
   return (
     <header
       className={clsxm(
@@ -52,7 +54,7 @@ export default function LandingHeader() {
           <HamburgerMenu menuItems={menuItems} />
           <UnstyledLink
             href='/'
-            className='text-lg font-semibold  hover:text-secondary sm:text-xl'
+            className='text-md font-semibold  hover:text-secondary/50 sm:text-xl'
           >
             <span>Headen</span>.<span>Finance</span>
           </UnstyledLink>
@@ -62,7 +64,9 @@ export default function LandingHeader() {
             <UnstyledLink
               key={value.title}
               href={value.href}
-              className='text-sm font-semibold hover:text-secondary'
+              className={`text-sm font-semibold hover:text-secondary/50 ${
+                pathname == value.href ? 'text-secondary' : undefined
+              }`}
             >
               {value.title}
             </UnstyledLink>
