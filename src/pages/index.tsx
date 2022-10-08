@@ -67,7 +67,7 @@ export default function LandingPage() {
         <section className='flex justify-center bg-[#0E1118]'>
           <div className='mx-2 mt-40  flex w-full max-w-screen-2xl flex-col text-white sm:mx-12 '>
             <h3 className='mt-20 ml-10 text-4xl sm:ml-20'>Headen markets</h3>
-            <div className='m-4 flex flex-wrap sm:m-10'>
+            <div className='m-4 flex flex-wrap justify-center sm:m-10'>
               {Array.of(...Array(3)).map((value, index) => (
                 <div key={index} className='w-full p-5 md:w-1/2 lg:w-1/3'>
                   <div className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8 '>
@@ -95,7 +95,7 @@ export default function LandingPage() {
         <section className='flex justify-center bg-[#0E1118]'>
           <div className='mx-2 mt-40 flex w-full max-w-screen-2xl flex-col text-white sm:mx-12 '>
             <h3 className='mt-20 ml-10 text-4xl sm:ml-20'>Community</h3>
-            <div className='m-4 flex flex-wrap sm:m-10'>
+            <div className='m-4 flex flex-wrap justify-center sm:m-10'>
               {Array.of(...Array(3)).map((value, index) => (
                 <div key={index} className='w-full p-5 md:w-1/2 lg:w-1/3'>
                   <div className='flex flex-col justify-start rounded bg-[#1B1D23] px-10 py-8'>
