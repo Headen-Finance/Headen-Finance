@@ -10,6 +10,7 @@ import { useHeadenFinanceWrite } from '@/hooks/useHeadenFinanceContract';
 import { useUniswapTokenList } from '@/hooks/useUniswapTokenList';
 
 import Button from '@/components/buttons/Button';
+import { Select } from '@/components/selects/Select';
 import { ConnectApproveAction } from '@/components/web3/ConnectWallet';
 
 export const CreateMarket: FC = () => {
@@ -48,7 +49,7 @@ export const CreateMarket: FC = () => {
     }
     if (tokenAddress == null) {
       // eslint-disable-next-line no-console
-      console.error('ano token is selected');
+      console.error('no token is selected');
       return;
     }
     try {
@@ -78,6 +79,21 @@ export const CreateMarket: FC = () => {
       <div className='p-0 sm:p-5 md:p-10'>
         <div className='md:py-10'>
           <div className='relative'>
+            {!tokenAddress && (
+              <>
+                <span> Select token address</span>
+                <Select
+                  options={availableTokens.map((value) => ({
+                    label: value.name,
+                    value: value,
+                    id: value.address,
+                  }))}
+                  selectedOption={null}
+                  onChanged={(it) => setTokenAddress(it.value.address)}
+                />
+              </>
+            )}
+
             <span className='text-2xl sm:text-5xl'>
               {displayAmount}
               {balance.data?.symbol}

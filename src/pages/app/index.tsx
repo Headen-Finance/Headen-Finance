@@ -158,7 +158,7 @@ export default function HomePage() {
       <DialogFrame
         show={showCreateMarketDialog}
         onClose={() => setShowCreateMarketDialog(false)}
-        className='w-[100vw]'
+        className='w-[100vw] p-0'
       >
         <CreateMarketDialog />
       </DialogFrame>
