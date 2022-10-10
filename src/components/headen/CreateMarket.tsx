@@ -79,25 +79,24 @@ export const CreateMarket: FC = () => {
       <div className='p-0 sm:p-5 md:p-10'>
         <div className='md:py-10'>
           <div className='relative'>
-            {!tokenAddress && (
-              <>
-                <span> Select token address</span>
-                <Select
-                  options={availableTokens.map((value) => ({
-                    label: value.name,
-                    value: value,
-                    id: value.address,
-                  }))}
-                  selectedOption={null}
-                  onChanged={(it) => setTokenAddress(it.value.address)}
-                />
-              </>
-            )}
+            {!tokenAddress && <span> Select token address</span>}
+            <Select
+              options={availableTokens.map((value) => ({
+                label: value.name,
+                value: value,
+                id: value.address,
+              }))}
+              className='mb-8'
+              selectedOption={null}
+              onChanged={(it) => setTokenAddress(it.value.address)}
+            />
 
-            <span className='text-2xl sm:text-5xl'>
-              {displayAmount}
-              {balance.data?.symbol}
-            </span>
+            {tokenAddress && (
+              <span className='text-2xl sm:text-5xl'>
+                {displayAmount}
+                {balance.data?.symbol}
+              </span>
+            )}
             {/*<span className='text-2xl sm:text-5xl'>{(balance.data?.value?.div(10**balance.data?.decimals )?.toNumber() ?? 0) * percent/100}{balance.data?.symbol}</span>*/}
             {/*<Button*/}
             {/*  variant='outline'*/}
@@ -114,23 +113,30 @@ export const CreateMarket: FC = () => {
         {/*{allowance === ApprovalState.NOT_APPROVED && (*/}
         {/*  <Button onClick={allow}> Approve</Button>*/}
         {/*)}*/}
-        <div className='relative py-5 sm:py-10 '>
-          <input
-            type='range'
-            className='range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100'
-            min={1}
-            max={100}
-            step={1}
-            value={percent}
-            onChange={(event) => setPercent(parseInt(event.target.value))}
-            id='customRange1'
-          />
-          <div className='flex justify-between'>
-            <span> 0</span>
-            <span> {balance.data?.formatted}</span>
+        {!tokenAddress ? (
+          <></>
+        ) : balance.data?.value?.eq(0) ? (
+          <div className='pb-4 text-sm font-bold'>
+            Ooops, it looks like that you do not have any {balance.data?.symbol}
           </div>
-        </div>
-
+        ) : (
+          <div className='relative py-5 sm:py-10 '>
+            <input
+              type='range'
+              className='range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100'
+              min={1}
+              max={100}
+              step={1}
+              value={percent}
+              onChange={(event) => setPercent(parseInt(event.target.value))}
+              id='customRange1'
+            />
+            <div className='flex justify-between'>
+              <span> 0</span>
+              <span> {balance.data?.formatted}</span>
+            </div>
+          </div>
+        )}
         {tokenAddress && (
           <ConnectApproveAction
             tokenAddress={tokenAddress}

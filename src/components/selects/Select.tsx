@@ -1,6 +1,8 @@
 import { Listbox, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 
+import clsxm from '@/lib/clsxm';
+
 type SelectOption<T> = {
   id: string;
   value: T;
@@ -11,12 +13,14 @@ type SelectProps<T> = {
   options: SelectOption<T>[];
   selectedOption: SelectOption<T> | null;
   onChanged: (opt: SelectOption<T>) => void;
+  className?: string;
 };
 
 export const Select = <T,>({
   options,
   selectedOption,
   onChanged,
+  className,
 }: SelectProps<T>) => {
   return (
     <Listbox value={selectedOption} onChange={onChanged}>
@@ -26,9 +30,13 @@ export const Select = <T,>({
               {label}
             </Listbox.Label>
           )*/}
-        <div className='relative mt-1'>
-          <span className='inline-block w-full rounded-md shadow-sm'>
-            <Listbox.Button className='relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left  transition duration-150 ease-in-out'>
+        <div className={clsxm('relative mt-1', className)}>
+          <span className={clsxm('inline-block w-full rounded-md shadow-sm')}>
+            <Listbox.Button
+              className={clsxm(
+                'relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left  transition duration-150 ease-in-out'
+              )}
+            >
               <span className='block truncate'>
                 {selectedOption?.label ?? 'Select Token'}
               </span>

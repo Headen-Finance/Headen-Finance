@@ -25,6 +25,7 @@
     "@hyperlane-xyz/app": "^0.5.0-beta0",
     "@openzeppelin/contracts": "^4.7.3",
     "@rainbow-me/rainbowkit": "^0.7.1",
+    "@uniswap/default-token-list": "^5.0.0",
     "@uniswap/v2-core": "^1.0.1",
     "@uniswap/v2-periphery": "^1.1.0-beta.0",
     "auto-zustand-selectors-hook": "^2.0.0",

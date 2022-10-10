@@ -1,3 +1,4 @@
+import tokenList from '@uniswap/default-token-list';
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import produce from 'immer';
 import create from 'zustand';
@@ -39,10 +40,12 @@ const useUniswapTokensStoreBase = create<UniswapTokensStoreType>(
           state.state = LoadingState.LOADING;
         })
       );
-      const data = await fetch(
-        'https://gateway.ipfs.io/ipns/tokens.uniswap.org'
-      );
-      const list = (await data.json()).tokens as TokenResponse[];
+
+      // const data = await fetch(
+      //   'https://gateway.ipfs.io/ipns/tokens.uniswap.org'
+      // );
+      const data = tokenList;
+      const list = data.tokens as unknown as TokenResponse[];
       set({
         state: LoadingState.LOADED,
         tokens: list,
