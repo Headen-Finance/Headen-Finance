@@ -1,15 +1,14 @@
-import tokenList from '@uniswap/default-token-list';
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import produce from 'immer';
 import create from 'zustand';
 
-enum LoadingState {
+export enum LoadingState {
   INIT,
   LOADING,
   LOADED,
 }
 
-type TokenResponse = {
+export type TokenResponse = {
   chainId: number;
   address: string;
   name: string;
@@ -41,10 +40,10 @@ const useUniswapTokensStoreBase = create<UniswapTokensStoreType>(
         })
       );
 
-      // const data = await fetch(
-      //   'https://gateway.ipfs.io/ipns/tokens.uniswap.org'
-      // );
-      const data = tokenList;
+      const data = await (
+        await fetch('https://gateway.ipfs.io/ipns/tokens.uniswap.org')
+      ).json();
+      // const data = tokenList;
       const list = data.tokens as unknown as TokenResponse[];
       set({
         state: LoadingState.LOADED,

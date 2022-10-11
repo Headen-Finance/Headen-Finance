@@ -3,15 +3,17 @@ import { BigNumber } from 'ethers';
 import * as React from 'react';
 import { FC, useCallback, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useAccount, useBalance } from 'wagmi';
+import { RpcError, useAccount, useBalance, useNetwork } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
 import { useHeadenFinanceWrite } from '@/hooks/useHeadenFinanceContract';
 import { useUniswapTokenList } from '@/hooks/useUniswapTokenList';
 
 import Button from '@/components/buttons/Button';
-import { Select } from '@/components/selects/Select';
+import { Select, SelectOption } from '@/components/selects/Select';
 import { ConnectApproveAction } from '@/components/web3/ConnectWallet';
+
+import { TokenResponse } from '@/store/useUniswapTokensStore';
 
 export const CreateMarket: FC = () => {
   // eslint-disable-next-line unused-imports/no-unused-vars
@@ -19,10 +21,26 @@ export const CreateMarket: FC = () => {
 
   // eslint-disable-next-line unused-imports/no-unused-vars
   const availableTokens = useUniswapTokenList();
+
+  const options = useMemo(
+    () =>
+      availableTokens.map(
+        (value) =>
+          ({
+            label: value.name,
+            value: value,
+            id: value.address,
+          } as SelectOption<TokenResponse>)
+      ),
+    [availableTokens]
+  );
   const acc = useAccount();
+  const { chain } = useNetwork();
+
   const balance = useBalance({
     addressOrName: acc.address,
     token: tokenAddress ?? AddressZero,
+    enabled: !!tokenAddress,
   });
   const [percent, setPercent] = useState(50);
   const amount = useMemo(
@@ -66,10 +84,11 @@ export const CreateMarket: FC = () => {
         ),
       });
       setLoading(false);
-    } catch (e) {
+    } catch ({ error }) {
       // eslint-disable-next-line no-console
-      console.error(e);
-      toast.error(`${e}`);
+      console.error();
+
+      toast.error(`${(error as RpcError<RpcError>).data?.message}`);
       setLoading(false);
     }
   }, [amount, hf, tokenAddress]);
@@ -81,13 +100,13 @@ export const CreateMarket: FC = () => {
           <div className='relative'>
             {!tokenAddress && <span> Select token address</span>}
             <Select
-              options={availableTokens.map((value) => ({
-                label: value.name,
-                value: value,
-                id: value.address,
-              }))}
+              options={options}
               className='mb-8'
-              selectedOption={null}
+              selectedOption={options.find(
+                (value) =>
+                  value.value.address == tokenAddress &&
+                  value.value.chainId == (chain?.id ?? 1)
+              )}
               onChanged={(it) => setTokenAddress(it.value.address)}
             />
 

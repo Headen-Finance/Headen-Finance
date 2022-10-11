@@ -3,7 +3,7 @@ import { Fragment } from 'react';
 
 import clsxm from '@/lib/clsxm';
 
-type SelectOption<T> = {
+export type SelectOption<T> = {
   id: string;
   value: T;
   label: string;
@@ -11,7 +11,7 @@ type SelectOption<T> = {
 
 type SelectProps<T> = {
   options: SelectOption<T>[];
-  selectedOption: SelectOption<T> | null;
+  selectedOption?: SelectOption<T> | null;
   onChanged: (opt: SelectOption<T>) => void;
   className?: string;
 };
