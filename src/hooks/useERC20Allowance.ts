@@ -6,7 +6,8 @@ export function useERC20Allowance(
   watch: boolean,
   address: string,
   owner?: string,
-  spender?: string
+  spender?: string,
+  enabled?: boolean
 ): BigNumber | undefined {
   const args = useMemo(() => [owner, spender], [owner, spender]);
   const { data } = useContractRead({
@@ -15,7 +16,7 @@ export function useERC20Allowance(
     functionName: 'allowance',
     args,
     watch,
-    enabled: true,
+    enabled: enabled ?? true,
   });
 
   return data ? BigNumber.from(data.toString()) : undefined;

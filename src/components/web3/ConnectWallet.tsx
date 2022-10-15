@@ -2,7 +2,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ConnectKitButton } from 'connectkit';
 import * as React from 'react';
-import { FC, ReactNode } from 'react';
+import { FC, ReactNode, useCallback, useMemo } from 'react';
 import { useAccount } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
@@ -55,7 +55,7 @@ export const CustomConnectWallet: FC<
 
 export const ConnectApproveAction: FC<
   {
-    tokenAddress: string;
+    tokenAddress: string | null;
     children: ReactNode;
   } & ButtonProps
 > = ({ children, onClick, className, tokenAddress, ...rest }) => {
@@ -70,18 +70,33 @@ export const ConnectApproveAction: FC<
         authenticationStatus,
         mounted,
       }) => {
-        // Note: If your app doesn't use authentication, you
-        // can remove all 'authenticationStatus' checks
-        const ready = mounted && authenticationStatus !== 'loading';
-        const connected =
-          ready &&
-          account &&
-          chain &&
-          (!authenticationStatus || authenticationStatus === 'authenticated');
-        const [approvalState, approve] = useERC20ApproveCallback(
-          true,
-          tokenAddress ?? '',
-          MaxUint256
+        const ready = mounted;
+        const connected = ready && account && chain && !authenticationStatus;
+
+        const ApproveOrActionButton = useCallback(
+          ({ children }: { children: ReactNode }) => {
+            const [approvalState, approve] = useERC20ApproveCallback(
+              true,
+              tokenAddress!,
+              MaxUint256
+            );
+            if (approvalState == ApprovalState.NOT_APPROVED) {
+              return (
+                <Button
+                  onClick={approve}
+                  className={clsxm(
+                    'w-full justify-center py-3.5 sm:py-5',
+                    className
+                  )}
+                  variant='primary'
+                >
+                  Approve token
+                </Button>
+              );
+            }
+            return <>{children}</>;
+          },
+          [tokenAddress]
         );
 
         return (
@@ -125,20 +140,6 @@ export const ConnectApproveAction: FC<
                   </Button>
                 );
               }
-              if (tokenAddress && approvalState == ApprovalState.NOT_APPROVED) {
-                return (
-                  <Button
-                    onClick={approve}
-                    className={clsxm(
-                      'w-full justify-center py-3.5 sm:py-5',
-                      className
-                    )}
-                    variant='primary'
-                  >
-                    Approve token
-                  </Button>
-                );
-              }
 
               return (
                 <div style={{ display: 'flex', gap: 12 }}>
@@ -170,7 +171,11 @@ export const ConnectApproveAction: FC<
                   {/*  {chain.name}*/}
                   {/*</Button>*/}
 
-                  {children}
+                  {tokenAddress ? (
+                    <ApproveOrActionButton children={children} />
+                  ) : (
+                    children
+                  )}
                 </div>
               );
             })()}
