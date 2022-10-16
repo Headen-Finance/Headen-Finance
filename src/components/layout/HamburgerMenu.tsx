@@ -41,7 +41,7 @@ export default function HamburgerMenu({ menuItems }: HamburgerMenuProps) {
             leaveFrom='opacity-100 translate-y-0'
             leaveTo='opacity-0 translate-y-1'
           >
-            <Popover.Panel className='fixed left-0 right-0 z-10 mt-3 max-w-xl transform px-5 sm:px-10'>
+            <Popover.Panel className='fixed top-16 left-0 right-0 z-10 mt-3 max-w-xl transform px-5 sm:px-10'>
               <div>
                 <div className='overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5'>
                   <nav className='bg-gray-50 p-4'>
