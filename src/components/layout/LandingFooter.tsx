@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { FaGithub, FaTwitter } from 'react-icons/fa';
+import { MdEmail } from 'react-icons/md';
 
 import clsxm from '@/lib/clsxm';
 
@@ -16,6 +18,28 @@ export const LandingFooter = () => {
             <br />
             Finance
           </p>
+          <div className='flex flex-col flex-wrap gap-2'>
+            <UnstyledLink
+              href='mailto:headenfinance@gmail.com'
+              className='flex flex-wrap items-center text-sm text-white hover:text-secondary'
+            >
+              <MdEmail size={30} className='mr-2' /> headenfinance@gmail.com
+            </UnstyledLink>
+            <UnstyledLink
+              href='https://twitter.com/HeadenFinance'
+              className='flex flex-wrap items-center text-sm text-white hover:text-secondary'
+            >
+              <FaTwitter size={30} className='mr-2' />
+              @HeadenFinance
+            </UnstyledLink>
+            <UnstyledLink
+              href='https://github.com/Headen-Finance/Headen-Finance'
+              className='flex flex-wrap items-center text-sm text-white hover:text-secondary'
+            >
+              <FaGithub size={30} className='mr-2' />
+              HeadenFinance
+            </UnstyledLink>
+          </div>
         </FooterSection>
         <FooterSection title='Markets'>
           {Array.of(...Array(5)).map((value, index) => (
@@ -46,6 +70,7 @@ export const LandingFooter = () => {
           ))}
         </FooterSection>
       </div>
+
       <div className=' mx-10 mb-20 border-b border-[#E2E2E233]'></div>
     </footer>
   );
