@@ -6,15 +6,14 @@ const defaultMeta = {
   title: 'Headen Finance',
   siteName: 'Headen Finance',
   description: 'Crypto lending protocol',
-  url: 'https://headen-finance-w8hk.vercel.app/',
+  url: 'https://headen.finance/',
   type: 'website',
   robots: 'follow, index',
   /**
    * No need to be filled, will be populated with openGraph function
    * If you wish to use a normal image, just specify the path below
    */
-  image:
-    'https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,f_auto,q_auto:eco,dpr_1/pstweatifgo8tmub5atc',
+  image: 'https://headen.finance/images/large-og.png',
 };
 
 type SeoProps = {
