@@ -5,6 +5,7 @@
 module.exports = {
   siteUrl: 'https://headen.finance',
   generateRobotsTxt: true,
+  exclude: ['/sandbox/', '/components'],
   robotsTxtOptions: {
     policies: [{ userAgent: '*', allow: '/' }],
   },
