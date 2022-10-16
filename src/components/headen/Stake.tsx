@@ -1,4 +1,6 @@
-import { FC, useCallback, useState } from 'react';
+import { Disclosure, Transition } from '@headlessui/react';
+import { FC, Fragment, useCallback, useState } from 'react';
+import * as React from 'react';
 import toast from 'react-hot-toast';
 import { IoChevronDown } from 'react-icons/io5';
 import { MdInfoOutline } from 'react-icons/md';
@@ -121,9 +123,39 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
               <span>6.99%</span>
             </div>
           </div>
-          <Button className='mt-4 mb-2 sm:mt-8' variant='ghost'>
-            More parameters <IoChevronDown />
-          </Button>
+          <Disclosure>
+            <Disclosure.Button as={Fragment}>
+              <Button className='mt-4 mb-2 sm:mt-8' variant='ghost'>
+                More parameters <IoChevronDown />
+              </Button>
+            </Disclosure.Button>
+
+            <Transition
+              enter='transition-all duration-100 ease-out'
+              enterFrom='transform max-h-0 scale-95 opacity-0'
+              enterTo='transform scale-100  max-h-[200px] opacity-100'
+              leave='transition-all duration-75 ease-out'
+              leaveFrom='transform scale-100  max-h-[200px] opacity-100'
+              leaveTo='transform max-h-0 scale-95 opacity-0'
+            >
+              <Disclosure.Panel>
+                <div className='flex flex-col gap-1 pb-4'>
+                  <div className='flex justify-between'>
+                    <span>User Borrow Limit</span>
+                    <span>$0.00</span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span>Utilization</span>
+                    <span>0%</span>
+                  </div>
+                  <div className='flex justify-between'>
+                    <span>Supply APR</span>
+                    <span>6.99%</span>
+                  </div>
+                </div>
+              </Disclosure.Panel>
+            </Transition>
+          </Disclosure>
         </WhenWallet>
         <ConnectApproveAction
           tokenAddress={tokenAddress}

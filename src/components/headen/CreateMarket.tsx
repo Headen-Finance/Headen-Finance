@@ -78,7 +78,7 @@ export const CreateMarket: FC = () => {
 
   return (
     <>
-      <div className='p-0 sm:p-5 md:p-10'>
+      <div className='p-2.5 sm:p-5 md:p-10'>
         <NoWalletConnected />
         <WhenWallet status='connected'>
           <div className='md:py-10'>
