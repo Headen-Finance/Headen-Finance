@@ -21,20 +21,20 @@ export const LandingFooter = () => {
           <div className='flex flex-col flex-wrap gap-2'>
             <UnstyledLink
               href='mailto:headenfinance@gmail.com'
-              className='flex flex-wrap items-center text-sm text-white hover:text-secondary'
+              className='flex flex-wrap items-center text-xs text-white hover:text-secondary'
             >
               <MdEmail size={30} className='mr-2' /> headenfinance@gmail.com
             </UnstyledLink>
             <UnstyledLink
               href='https://twitter.com/HeadenFinance'
-              className='flex flex-wrap items-center text-sm text-white hover:text-secondary'
+              className='flex flex-wrap items-center text-xs text-white hover:text-secondary'
             >
               <FaTwitter size={30} className='mr-2' />
               @HeadenFinance
             </UnstyledLink>
             <UnstyledLink
               href='https://github.com/Headen-Finance/Headen-Finance'
-              className='flex flex-wrap items-center text-sm text-white hover:text-secondary'
+              className='flex flex-wrap items-center text-xs text-white hover:text-secondary'
             >
               <FaGithub size={30} className='mr-2' />
               HeadenFinance
