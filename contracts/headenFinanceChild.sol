@@ -48,6 +48,8 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
     uint public immutable interval;
     uint public lastTimeStamp;
     uint public chainId;
+    uint public maxLTV = 7000;
+    uint public lastAPRUpdate = block.timestamp;
     
     uint public  supplyKink;
     uint public  supplyPerSecondInterestRateSlopeLow;
@@ -69,7 +71,7 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
         uint64 borrowPerYearInterestRateBase;
     }
 
-    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, Configuration memory config){
+    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, uint _chainId, Configuration memory config){
         multichainRouter=_multichainRouter;
         hashSalt =_hashSalt;
         swapRouter=_swapRouter;
@@ -78,6 +80,7 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
         matic = _matic;
         interval = _interval;
         lastTimeStamp = block.timestamp;
+        chainId = _chainId;
 
         // Set interest rate model configs
         unchecked {
@@ -97,47 +100,51 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
        return amount[amount.length-1];
     }
 
-    function findBestPairWithStableCoin  (address token) internal view returns (address[] memory){
+    function findBestPrice  (address token) internal view returns (uint){
+        uint _multiplier = IERC20(token).decimals();
         address[] memory path = new address[](2);
         path[0] = token;
         path[1] = usdc;
         
         // try direct pair
-        uint result = getAvgPriceForTokens(1*multiplier, swapRouter, path);
+        uint result = getAvgPriceForTokens(1*_multiplier, swapRouter, path);
         if(result > 0){
-            return path;
+            return result;
         }
         path = new address[](3);
         
         path[0] = token;
         path[1] = dai;
         path[2] = usdc;
-        result = getAvgPriceForTokens(1*multiplier, swapRouter, path);
+        result = getAvgPriceForTokens(1*_multiplier, swapRouter, path);
         if(result >0){
-            return path;
+            return result;
         }         
         
         //try matic in between
         path[1] = matic;
         path[2] = usdc;
-        result = getAvgPriceForTokens(1*multiplier, swapRouter, path);
+        result = getAvgPriceForTokens(1*_multiplier, swapRouter, path);
         if(result >0){
-            return path;
+            return result;
         }
         
-        return new address[](0);
+        return 0;
     }
 
-    function per_amount(uint amount) public view returns(uint){
+    function per_amount(uint amount) public pure returns(uint){
         return amount * 10000;
     }
 
-    function getValueOfToken(address token, uint amount)internal returns(uint){
+    function getValueOfToken(address token, uint amount)internal view returns(uint){
          //value of pool
-        address[] memory path = findBestPairWithStableCoin(token);
-        require(path.length > 0,"path must be definitive and greater than zero");
-        uint value = getAvgPriceForTokens(1 * multiplier, swapRouter, path); 
-        return uint(chainLink.latestAnswer()) * value * amount / multiplier * multiplier;
+         uint value = 1 * IERC20(usdc).decimals();
+         if(token != usdc){            
+            value = findBestPrice(token); 
+            require(value > 0,"price output must be greater than zero");
+         }
+        
+        return uint(chainLink.latestAnswer()) * value * amount / IERC20(token).decimals() * IERC20(usdc).decimals();
     }
 }
 // arbitrium
@@ -149,7 +156,6 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bool available;
         uint totalAmountBorrowed; //in usd up to 8 decimal places
         uint totalAmountStaked; //in usd
-        uint creditScore; //max is 10000
         uint ltv;
         bool lock;
     }
@@ -160,7 +166,6 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         address tokenAddress;
         bool available;
         uint amountStaked; 
-        uint timeLastStaked;
     }
 
     //borrow/collateral specific
@@ -169,10 +174,6 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         address tokenAddress;
         bool available;
         uint amountBorrowed; //amount of token address borrowed
-        address collateralAddress;
-        uint collateralAmount;
-        address borrowRouter;
-        uint timeLastBorrowed;
     }
 
     struct Market {
@@ -195,6 +196,18 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     struct MarketToken{
         bool available;
         uint128 _id;
+        //uint _hyperLaneId;
+    }
+
+    struct Parent{
+        address _parentAddress;
+        uint _parentChainId;
+        uint32 _hlParentId;
+    }
+
+    struct Abacus {
+        address _abacusManager;
+        address _abacusPay;
     }
 
     mapping (address=>User) public users;
@@ -206,6 +219,10 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     uint128 market_pools = 0;
     //string[] availableTokens;
     address[] userAddresses;
+    uint32 hlParentId;
+    address parentAddress;
+    uint parentChainId;
+    //uint[] hlChainIds;
 
     event Staked();
     event Borrowed();
@@ -215,11 +232,13 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     event ChainSyncRequired(address user);
     event UpdateParentChain(User user);
 
-    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, Configuration memory config) HeadenUtils (_interval,_multichainRouter, _hashSalt,_swapRouter,_usdc,_dai,_matic,config) {
+    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, Abacus memory _abacus, Parent memory _parent, uint _chainId, Configuration memory config) HeadenUtils (_interval,_multichainRouter, _hashSalt, _swapRouter, _usdc, _dai, _matic, _chainId, config) {
         relayers[msg.sender] = true;
-        _setAbacusConnectionManager(0xFb55597F07417b08195Ba674f4dd58aeC9B89FBB);
-        // Set IGP contract address
-        _setInterchainGasPaymaster(0x76D20943b68985dF999C5bb13d6E7AdF3CFc276F);
+        _setAbacusConnectionManager(_abacus._abacusManager);
+        _setInterchainGasPaymaster(_abacus._abacusPay);
+        hlParentId = _parent._hlParentId;
+        parentAddress = _parent._parentAddress;
+        parentChainId = _parent._parentChainId;
     }
 
     function updateSettings (Configuration calldata config, address _relayer) external onlyOwner{
@@ -238,8 +257,6 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     // ---- UTILS ----
 
-    
-
     function updateUserTotalValueInUSD(address user) internal {
         uint totalStakeValue = 0;
         uint totalBorrowValue = 0;
@@ -251,28 +268,54 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
         users[user].totalAmountBorrowed = totalBorrowValue;
         users[user].totalAmountStaked = totalStakeValue;
-        users[user].ltv = per_amount(users[user].totalAmountBorrowed) / users[user].totalAmountStaked;
+        if(users[user].totalAmountStaked > 0){
+            users[user].ltv = per_amount(users[user].totalAmountBorrowed) / users[user].totalAmountStaked;
+        }else{
+            users[user].ltv = 0;
+        }
+    }
+
+    // for input: true is for addition and false is for subtraction. SO stake will be true and withdraw will be false
+    function addToMarket(uint _tokenAmount, bool borrow, bool input, uint128 _id) private {
+        if(borrow){
+            if(input){
+                markets[_id].amountBorrowed -= _tokenAmount;
+            }else{
+                markets[_id].amountBorrowed += _tokenAmount;
+            }
+            
+            markets[_id].timeLastBorrowed = block.timestamp;
+        }else{
+            if(input){
+                markets[_id].amountStaked += _tokenAmount;
+            }else{
+                markets[_id].amountStaked -= _tokenAmount;
+            }
+            
+            markets[_id].timeLastStaked = block.timestamp;
+        }
+
+        updateMarket(_id);
     }
 
     // ---- DEPOSITS ----
 
-    function stakeToken(address _tokenAddress, uint _amountToStake) public makeUser confirmUser nonReentrant{
+    function _stakeToken(address _tokenAddress, uint _amountToStake) private{
         require(marketTokens[_tokenAddress].available, "market not available");
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint fee = (tax * _amountToStake) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToStake-fee);
-        require(valueOfTokens > 10, "Amount too low");
+        require(valueOfTokens > 5, "Amount too low, enter an input greater than 5 USD value");
         updateUserTotalValueInUSD(msg.sender);
 
         if(userstakes[_hash].available){
             userstakes[_hash].amountStaked += _amountToStake - fee; 
-            userstakes[_hash].timeLastStaked = block.timestamp;
         }else{
-            userstakes[_hash] = UserStake(msg.sender, _tokenAddress, true, _amountToStake - fee, block.timestamp);
+            userstakes[_hash] = UserStake(msg.sender, _tokenAddress, true, _amountToStake - fee);
         }  
 
         users[msg.sender].totalAmountStaked += valueOfTokens; 
-        addToMarket(_amountToStake, false, true, marketTokens[_tokenAddress]._id);
+        addToMarket(_amountToStake - fee, false, true, marketTokens[_tokenAddress]._id);
 
          //transfer tokens to contract
         require(IERC20(_tokenAddress).transferFrom(msg.sender, address(this), _amountToStake), "transferFrom failed from contract.");  
@@ -280,8 +323,11 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
          //child
         emit LockUntilUpdateFromParentChain(msg.sender);
         emit UpdateParentChain(users[msg.sender]);
-        _dispatchWithGas(80001, abi.encode(users[msg.sender], 42161), 100000);
+        dispatch(msg.sender);
+    }
 
+    function stakeToken(address _tokenAddress, uint _amountToStake) public makeUser confirmUser nonReentrant{
+        _stakeToken(_tokenAddress, _amountToStake);
     }
 
     function withdrawToken(address _tokenAddress, uint _amountToWithdraw, uint _chainId, address _to) external confirmUser nonReentrant{
@@ -293,17 +339,21 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         require(valueOfTokens > 10, "Amount too low");
         require(userstakes[_hash].amountStaked > _amountToWithdraw, "Not enough liquidity");
         updateUserTotalValueInUSD(msg.sender);
-        require(((users[msg.sender].totalAmountBorrowed) * 10000)/(users[msg.sender].totalAmountStaked - valueOfTokens) < 7000 , "Amount greater than allowed amount");
+        require(((users[msg.sender].totalAmountBorrowed) * 10000)/(users[msg.sender].totalAmountStaked - valueOfTokens) < maxLTV , "Amount greater than allowed amount");
 
 
         userstakes[_hash].amountStaked -= _amountToWithdraw; 
         users[msg.sender].totalAmountStaked -= valueOfTokens;  
 
-        if(chainId != _chainId){
+        if(IERC20(_tokenAddress).balanceOf(address(this)) < _amountToWithdraw){
+            requestForLiquidity(_tokenAddress, _amountToWithdraw * 2);
+            require(false, "Not enough Liquidity to send to user, please try again after sometime.");
+        }
+        else if(chainId != _chainId){
             // bridge token with multichain router
             IMultiChain(multichainRouter).anySwapOut(_tokenAddress, _to, _amountToWithdraw - fee, _chainId);
         }else{
-            require(IERC20(_tokenAddress).transferFrom(address(this),msg.sender, _amountToWithdraw - fee), "transferFrom failed");
+            require(IERC20(_tokenAddress).transferFrom(address(this), _to, _amountToWithdraw - fee), "transferFrom failed");
         }
 
         addToMarket(_amountToWithdraw, false, false, marketTokens[_tokenAddress]._id);
@@ -311,8 +361,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
          //child
         emit LockUntilUpdateFromParentChain(msg.sender);
         emit UpdateParentChain(users[msg.sender]);
-        _dispatchWithGas(80001, abi.encode(users[msg.sender], 42161), 100000);
-
+        dispatch(msg.sender);
     }
 
 
@@ -323,26 +372,30 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint fee = (tax * _amountToBorrow) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToBorrow);
-        require(valueOfTokens > 10, "Amount too low");
+        require(valueOfTokens > 5, "Amount too low to repay with, input at least 5 USD value");
         updateUserTotalValueInUSD(msg.sender);
-        require(((users[msg.sender].totalAmountBorrowed + valueOfTokens) * 10000)/users[msg.sender].totalAmountStaked < 7000 , "Amount greater than allowed amount");
+        require(((users[msg.sender].totalAmountBorrowed + valueOfTokens) * 10000)/users[msg.sender].totalAmountStaked < maxLTV , "Amount greater than allowed amount");
 
         if(usersborrows[_hash].available){
             usersborrows[_hash].amountBorrowed += _amountToBorrow; 
-            usersborrows[_hash].timeLastBorrowed = block.timestamp;
         }else{
-            usersborrows[_hash] = UserBorrow(msg.sender, _tokenAddress, true, _amountToBorrow, address(0), 0, address(0), block.timestamp);
+            usersborrows[_hash] = UserBorrow(msg.sender, _tokenAddress, true, _amountToBorrow);
         }  
 
         users[msg.sender].totalAmountBorrowed += valueOfTokens; 
-        require(IERC20(_tokenAddress).transfer(msg.sender, _amountToBorrow-fee), "transferFrom failed");  
+        if(IERC20(_tokenAddress).balanceOf(address(this)) < _amountToBorrow){
+            requestForLiquidity(_tokenAddress, _amountToBorrow * 2);
+            require(false, "Not enough Liquidity to send to user, please try again after sometime.");
+        }else{
+            require(IERC20(_tokenAddress).transfer(msg.sender, _amountToBorrow-fee), "transferFrom failed");  
+        }
+        
         addToMarket(_amountToBorrow, true, true, marketTokens[_tokenAddress]._id);
 
          //child
         emit LockUntilUpdateFromParentChain(msg.sender);
         emit UpdateParentChain(users[msg.sender]);
-        _dispatchWithGas(80001, abi.encode(users[msg.sender], 42161), 100000);
-
+        dispatch(msg.sender);
     }
 
     function borrowTokenWithCollateral(address _tokenAddress, uint _amountToBorrow, address _collateralAddress, uint _collateralAmount) public confirmUser nonReentrant{
@@ -351,31 +404,42 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint fee = (tax * _amountToBorrow) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToBorrow);
-        uint valueOfCollateral = getValueOfToken(_collateralAddress, _collateralAmount - fee);
-        require(valueOfTokens > 10, "Amount too low");
-        require(valueOfCollateral > 10, "Col amount too low");
+        uint valueOfCollateral = getValueOfToken(_collateralAddress, _collateralAmount);
+        require(valueOfTokens > 5, "Amount too low");
+        require(valueOfCollateral > 5, "Input amount too low");
         updateUserTotalValueInUSD(msg.sender);
-        require(((users[msg.sender].totalAmountBorrowed + valueOfTokens) * 10000)/(users[msg.sender].totalAmountStaked+valueOfCollateral) < 7000 , "Amount greater than allowed amount");
+        require(((users[msg.sender].totalAmountBorrowed + valueOfTokens) * 10000)/(users[msg.sender].totalAmountStaked+valueOfCollateral) < maxLTV , "Amount greater than allowed amount");
 
         if(usersborrows[_hash].available){
             usersborrows[_hash].amountBorrowed += _amountToBorrow; 
-            usersborrows[_hash].timeLastBorrowed = block.timestamp;
         }else{
-            usersborrows[_hash] = UserBorrow(msg.sender, _tokenAddress, true, _amountToBorrow, address(0), 0, address(0), block.timestamp);
+            usersborrows[_hash] = UserBorrow(msg.sender, _tokenAddress, true, _amountToBorrow);
+        }  
+
+        if(userstakes[_hash].available){
+            userstakes[_hash].amountStaked += _collateralAmount; 
+        }else{
+            userstakes[_hash] = UserStake(msg.sender, _tokenAddress, true, _collateralAmount);
         }  
 
         users[msg.sender].totalAmountBorrowed += valueOfTokens; 
         users[msg.sender].totalAmountStaked += valueOfCollateral;
-         //transfer tokens to contract
-        require(IERC20(_collateralAddress).transferFrom(msg.sender, address(this), _collateralAmount), "transferFrom failed"); 
-        require(IERC20(_tokenAddress).transfer(msg.sender, _amountToBorrow-fee), "transferFrom failed");  
-        addToMarket(_amountToBorrow, true, true, marketTokens[_tokenAddress]._id);
+        if(IERC20(_tokenAddress).balanceOf(address(this)) < _amountToBorrow){
+            requestForLiquidity(_tokenAddress, _amountToBorrow * 2);
+            require(false, "Not enough Liquidity to send to user, please try again after sometime.");
+        }else{
+            //transfer tokens to contract
+            require(IERC20(_collateralAddress).transferFrom(msg.sender, address(this), _collateralAmount), "transferFrom failed"); 
+            require(IERC20(_tokenAddress).transfer(msg.sender, _amountToBorrow-fee), "transferFrom failed");    
+        }
+         
+        addToMarket(_amountToBorrow, true, false, marketTokens[_tokenAddress]._id);
         addToMarket(_collateralAmount, false, true, marketTokens[_collateralAddress]._id);
 
         //child
         emit LockUntilUpdateFromParentChain(msg.sender);
         emit UpdateParentChain(users[msg.sender]);
-        _dispatchWithGas(80001, abi.encode(users[msg.sender], 42161), 100000);
+        dispatch(msg.sender);
     }
 
 
@@ -383,7 +447,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         require(marketTokens[_tokenAddress].available, "market not available");
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amount);
-        require(valueOfTokens > 10, "Amount too low");
+        require(valueOfTokens > 5, "Input Amount too low");
         updateUserTotalValueInUSD(msg.sender);
 
         usersborrows[_hash].amountBorrowed -= _amount;  
@@ -395,8 +459,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
          //child
         emit LockUntilUpdateFromParentChain(msg.sender); //other children
         emit UpdateParentChain(users[msg.sender]); //parent chain
-        _dispatchWithGas(80001, abi.encode(users[msg.sender], 42161), 100000);
-
+        dispatch(msg.sender);
     }
 
     // ---- RISKS AND LIQUIDATIONS ----
@@ -406,33 +469,47 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         return users[msg.sender].ltv;
     }
 
-    function collateAPR(address user, address token) private { //30mins
-        uint timeSpent = 1800;
+    function collateAPR(address user, address token) private returns(bool) { //every 1 month
+        uint timeSpent = 30 days;
+        if(block.timestamp - lastAPRUpdate < timeSpent){
+            return false;
+        }
+        
         bytes32 _hash = keccak256(abi.encodePacked(user, token, hashSalt));
         uint borrowRate = borrowInterestRates(marketTokens[token]._id) * timeSpent;
         uint supplyRate = supplyInterestRates(marketTokens[token]._id) * timeSpent;
         uint fee = (tax * 2 * users[user].totalAmountStaked) / 10000;
 
-        userstakes[_hash].amountStaked += (supplyRate * userstakes[_hash].amountStaked) / 10**(chainLink.decimals()); 
-        usersborrows[_hash].amountBorrowed += (borrowRate * usersborrows[_hash].amountBorrowed) / 10**(chainLink.decimals());
-        users[user].totalAmountStaked += (supplyRate * users[user].totalAmountStaked) / 10**(chainLink.decimals()) - fee;
-        users[user].totalAmountBorrowed += (borrowRate * users[user].totalAmountBorrowed) / 10**(chainLink.decimals());
-        users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
+        userstakes[_hash].amountStaked += (supplyRate * userstakes[_hash].amountStaked) / 10000; 
+        usersborrows[_hash].amountBorrowed += (borrowRate * usersborrows[_hash].amountBorrowed) / 10000;
+        users[user].totalAmountStaked += ((supplyRate * users[user].totalAmountStaked) / 10000) - fee;
+        users[user].totalAmountBorrowed += (borrowRate * users[user].totalAmountBorrowed) / 10000;
 
+        if(users[user].totalAmountStaked > 0){
+            users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
+        }else{
+            users[user].ltv = 0;
+        }
+        lastAPRUpdate = block.timestamp;
+        return true;
     }
 
     function liquidateUser(address user, address token) private {
-        require(users[user].ltv > 7001, "Liquidation not possible");
+        require(users[user].ltv < maxLTV, "Liquidation not possible");
         updateUserTotalValueInUSD(user);
         
         bytes32 _hash = keccak256(abi.encodePacked(user, token, hashSalt));
         
         uint valueOfTokens = getValueOfToken(token, userstakes[_hash].amountStaked);
-        uint fee = (tax * 2 * valueOfTokens) / 10000;
+        uint fee = (tax * 5 * valueOfTokens) / 10000;
         userstakes[_hash].amountStaked = 0; 
-        users[user].totalAmountStaked -= valueOfTokens + fee;
+        users[user].totalAmountStaked -= valueOfTokens - fee;
         users[user].totalAmountBorrowed -= valueOfTokens;
-        users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
+        if(users[user].totalAmountStaked > 0){
+            users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
+        }else{
+            users[user].ltv = 0;
+        }
         
     }
 
@@ -440,20 +517,16 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         for (uint i=0; i<userAddresses.length; i++){
             address user = userAddresses[i];
             updateUserTotalValueInUSD(user);
-            uint limit = 7001;
             
-            if(users[user].ltv > limit){
-                for(uint128 j=0; j<= market_pools; j++){
-                    if(users[user].ltv < limit){
-                        break;
-                    }
-                    collateAPR(user, markets[j].tokenAddress);
+            for(uint128 j=0; j<= market_pools; j++){
+                collateAPR(user, markets[j].tokenAddress);
+                if(users[user].ltv >= maxLTV){
                     liquidateUser(user, markets[j].tokenAddress);
                     updateUserTotalValueInUSD(user);
                 }
             }
             emit UpdateParentChain(users[user]);
-            _dispatchWithGas(80001, abi.encode(users[user], 42161), 100000);
+            dispatch(user);
         }
     }
 
@@ -461,8 +534,8 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     // ---- Markets ---
     
     function createMarket(address _token) external onlyRelayers {
-        market_pools +=1;
         require(!marketTokens[_token].available, "market already available");
+        market_pools +=1;
         markets[market_pools] = Market(_token, true, 0, 0, block.timestamp, block.timestamp, 0, 0);
         marketTokens[_token] = MarketToken(true, market_pools);
     }
@@ -473,13 +546,12 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         markets[market_pools] = Market(_token, true, amount, 0, block.timestamp, block.timestamp, 0, 0);
         marketTokens[_token] = MarketToken(true, market_pools);
 
-        //availableTokens.push(_token);
         uint valueOfTokens = getValueOfToken(_token, amount);
         require(valueOfTokens >= 3500 * 10**(chainLink.decimals()) , "Not enough start new pool"); // at least 3.5kUSD needed
-        stakeToken(_token, amount);
+        _stakeToken(_token, amount);
     }
 
-    function borrowInterestRates(uint128 _id) public returns(uint){
+    function borrowInterestRates(uint128 _id) public view returns(uint){
         uint utilization = per_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked; // same decimals as utilization 8d
         if (utilization <= borrowKink) {
             // interestRateBase + interestRateSlopeLow * utilization
@@ -490,7 +562,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         }
     }
 
-    function supplyInterestRates(uint128 _id) public returns (uint){
+    function supplyInterestRates(uint128 _id) public view returns (uint){
         uint utilization = per_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked;
         if (utilization <= supplyKink) {
             // interestRateBase + interestRateSlopeLow * utilization
@@ -514,53 +586,26 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         }
     }
 
-    // for input: true is for addition and false is for subtraction. SO stake will be true and withdraw will be false
-    function addToMarket(uint _tokenAmount, bool borrow, bool input, uint128 _id) private {
-        if(borrow){
-            if(input){
-                markets[_id].amountBorrowed += _tokenAmount;
-            }else{
-                markets[_id].amountBorrowed -= _tokenAmount;
-            }
-            
-            markets[_id].timeLastBorrowed = block.timestamp;
-        }else{
-            if(input){
-                markets[_id].amountStaked += _tokenAmount;
-            }else{
-                markets[_id].amountStaked -= _tokenAmount;
-            }
-            
-            markets[_id].timeLastStaked = block.timestamp;
-        }
-
-        updateMarket(_id);
-    }
-
-
-    // ---- Multichain Sync ----
+    // ---- Multichain Sync ---- (Moralis Relayers)
     // child chains
     function receiveUpdateFromParentChain(address user, uint totalStakes, uint totalBorrows) public onlyRelayers nonReentrant{
-        if(users[user].available){
-            users[user].totalAmountStaked = totalStakes;
-            users[user].totalAmountBorrowed = totalBorrows;
-            users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
-            users[user].lock = false;
-        }else{
-            userAddresses.push(user);
-            users[user] = User(user, true, totalBorrows, totalStakes, 0, per_amount(totalBorrows)/ totalStakes, false);
-        }
+        _receiveUpdateFromParentChain(user, totalStakes, totalBorrows);
     }
 
-    function receiveUpdateFromParentChainPrivate(address user, uint totalStakes, uint totalBorrows) private nonReentrant{
+    function _receiveUpdateFromParentChain(address user, uint totalStakes, uint totalBorrows) private{
+        uint _ltv=0;
+        if(totalStakes >0){
+            _ltv = per_amount(totalBorrows)/ totalStakes;
+        }
+
         if(users[user].available){
             users[user].totalAmountStaked = totalStakes;
             users[user].totalAmountBorrowed = totalBorrows;
-            users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
+            users[user].ltv = _ltv;
             users[user].lock = false;
         }else{
             userAddresses.push(user);
-            users[user] = User(user, true, totalBorrows, totalStakes, 0, per_amount(totalBorrows)/ totalStakes, false);
+            users[user] = User(user, true, totalBorrows, totalStakes, _ltv, false);
         }
     }
 
@@ -575,7 +620,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         }
     }
     
-    // ---- Keepers ----
+    // ---- Keepers ---- (Openzeppelin Keepers)
     function checkUpkeep(bytes calldata /* checkData */) external view override returns (bool upkeepNeeded, bytes memory /* performData */) {
         upkeepNeeded = (block.timestamp - lastTimeStamp) > interval;
     }
@@ -587,7 +632,11 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
             validateUsers();
             updateAllMarkets();
         }
-        // We don't use the performData in this example. The performData is generated by the Keeper's call to your checkUpkeep function
+    }
+
+    // ---- Hyperlane ----
+    function dispatch(address user) private {
+        _dispatchWithGas(hlParentId, abi.encode(user, users[user].totalAmountStaked, users[user].totalAmountBorrowed), 10000000);
     }
 
     function _handle(
@@ -595,11 +644,29 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bytes32,
         bytes memory _message
     ) internal override {
-        (address user, uint totalStakes, uint totalBorrows) = abi.decode(
-            _message,
-            (address, uint , uint)
-        );
-        receiveUpdateFromParentChainPrivate(user, totalStakes, totalBorrows);
+        if(_origin == hlParentId){
+            (address user, uint totalStakes, uint totalBorrows) = abi.decode(
+                _message,
+                (address, uint , uint)
+            );
+
+            if(users[user].available){
+                _receiveUpdateFromParentChain(user, totalStakes, totalBorrows);
+               
+            }else{
+                 sendLiquidity(user, totalStakes);
+            }
+            
+        }
+    }
+
+    // ---- Rebalancing ---- (use MultiChain and HyperLane)
+    function sendLiquidity(address _tokenAddress, uint _amount) private { //send liquidity to parent
+        IMultiChain(multichainRouter).anySwapOut(_tokenAddress, parentAddress, _amount, parentChainId);
+    }
+
+    function requestForLiquidity(address _tokenAddress, uint _amount) private{
+        _dispatchWithGas(hlParentId, abi.encode(_tokenAddress, _amount, 0), 10000000);
     }
 
     
@@ -607,7 +674,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     modifier makeUser {
         if(!users[msg.sender].available){
-            users[msg.sender] = User(msg.sender, true, 0, 0, 0,0, false);
+            users[msg.sender] = User(msg.sender, true, 0, 0, 0, false);
             userAddresses.push(msg.sender);
         }
         _;
@@ -624,11 +691,3 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         _;
     }
 }
-// 200
-// 0xC10Ef9F491C9B59f936957026020C321651ac078
-// nidnidjiwjdiswism
-// 0xE592427A0AEce92De3Edee1F18E0157C05861564
-// 0xb0Ad46bD50b44cBE47E2d83143E0E415d6A842F6
-// 0x2f3C1B6A51A469051A22986aA0dDF98466cc8D3c
-// 0x207eD1742cc0BeBD03E50e855d3a14E41f93A461
-// [5,3,4,3,4,6,6,5]
