@@ -62,7 +62,7 @@ function InfoSection() {
       <div className='mx-6 flex max-w-screen-2xl flex-col items-center text-black sm:mx-12 md:flex-row '>
         <div className='px-4 py-10 md:px-10 md:py-20 lg:px-20 lg:py-28'>
           <h2 className='text-lg font-light leading-normal lg:text-xl  xl:text-2xl'>
-            Insurance YC DAO Protocol
+            Insurance HeadenFinance Protocol
           </h2>
           <h3 className='mt-6  text-lg font-semibold leading-normal lg:text-xl  xl:text-2xl'>
             Earn interest, multi chain lending and better collateral
@@ -108,9 +108,10 @@ function MarketsSection() {
                 </div>
                 <span className='mt-3.5 text-lg  font-bold'>Ethereum</span>
                 <p className='mt-3.5 text-sm'>
-                  YC DAO will soon be depoloyed on the Ethereum network in 2022.
-                  Ethereum will be the largest market on the YC DAO protocol by
-                  liquidity and will have the most listed assets.
+                  HeadenFinance will soon be depoloyed on the Ethereum network
+                  in 2022. Ethereum will be the largest market on the
+                  HeadenFinance protocol by liquidity and will have the most
+                  listed assets.
                 </p>
               </div>
             </div>
