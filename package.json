@@ -40,7 +40,8 @@
     "react-icons": "^4.6.0",
     "react-tsparticles": "^2.3.3",
     "tailwind-merge": "^1.6.2",
-    "tsparticles": "^2.3.4",
+    "tsparticles-preset-links": "^2.3.3",
+    "tsparticles-slim": "^2.3.4",
     "wagmi": "^0.7.3",
     "zustand": "^4.1.2"
   },
