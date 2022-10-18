@@ -14,8 +14,8 @@ export interface MarketsResponseDisplay {
   collateral: string;
 }
 
-const USDC = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
-const USDT = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F"
+const USDC = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
+const USDT = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
 
 export function useAllMarketData() {
   const hf = useHeadenFinance();
@@ -34,29 +34,44 @@ export function useAllMarketData() {
       try {
         const market = await hf.markets(index);
         if (market.tokenAddress !== AddressZero) {
-          if(market.tokenAddress === USDC || market.tokenAddress === USDT){
+          if (market.tokenAddress === USDC || market.tokenAddress === USDT) {
             data.push({
               tokenAddress: market.tokenAddress,
-              amountStaked: +(market.amountStaked.toNumber()/10 ** 6).toFixed(5),
-              amountBorrowed: +(market.amountBorrowed.toNumber()/10 ** 6).toFixed(5),
+              amountStaked: +(market.amountStaked.toNumber() / 10 ** 6).toFixed(
+                5
+              ),
+              amountBorrowed: +(
+                market.amountBorrowed.toNumber() /
+                10 ** 6
+              ).toFixed(5),
               borrowRate: (market.borrowRate.toNumber() / 100).toString(),
               supplyRate: (market.supplyRate.toNumber() / 100).toString(),
-              liquidity: +((market.amountStaked.sub(market.amountBorrowed)).toNumber()/10 ** 6).toFixed(5),
+              liquidity: +(
+                market.amountStaked.sub(market.amountBorrowed).toNumber() /
+                10 ** 6
+              ).toFixed(5),
               collateral: ' - ',
             } as MarketsResponseDisplay);
-          }else{
+          } else {
             // avoid overflow error
             data.push({
               tokenAddress: market.tokenAddress,
-              amountStaked: +(Number(market.amountStaked)/ 10 ** 18).toFixed(5),
-              amountBorrowed: +(Number(market.amountBorrowed) / 10 ** 18).toFixed(5),
+              amountStaked: +(Number(market.amountStaked) / 10 ** 18).toFixed(
+                5
+              ),
+              amountBorrowed: +(
+                Number(market.amountBorrowed) /
+                10 ** 18
+              ).toFixed(5),
               borrowRate: (market.borrowRate.toNumber() / 100).toString(),
               supplyRate: (market.supplyRate.toNumber() / 100).toString(),
-              liquidity: +(Number(market.amountStaked.sub(market.amountBorrowed))/10 ** 18).toFixed(5),
+              liquidity: +(
+                Number(market.amountStaked.sub(market.amountBorrowed)) /
+                10 ** 18
+              ).toFixed(5),
               collateral: ' - ',
             } as MarketsResponseDisplay);
           }
-          
         }
       } catch (err) {
         //market doesnt exist
