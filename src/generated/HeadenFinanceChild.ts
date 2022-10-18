@@ -1,12 +1,11 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { EthersContractContextV5 } from 'ethereum-abi-types-generator';
 import {
-  ContractTransaction,
-  ContractInterface,
-  BytesLike as Arrayish,
   BigNumber,
   BigNumberish,
+  BytesLike as Arrayish,
+  ContractTransaction,
 } from 'ethers';
-import { EthersContractContextV5 } from 'ethereum-abi-types-generator';
 
 export type ContractContext = EthersContractContextV5<
   HeadenFinanceChild,
@@ -103,11 +102,13 @@ export type HeadenFinanceChildMethodNames =
   | 'handle'
   | 'interchainGasPaymaster'
   | 'interval'
+  | 'lastAPRUpdate'
   | 'lastTimeStamp'
   | 'lockThisUserUntilParentUpdate'
   | 'marketTokens'
   | 'markets'
   | 'matic'
+  | 'maxLTV'
   | 'multichainRouter'
   | 'owner'
   | 'per_amount'
@@ -136,14 +137,8 @@ export type HeadenFinanceChildMethodNames =
   | 'validateUsers'
   | 'withdrawToken';
 export interface undefinedRequest {
-  supplyKink: BigNumberish;
-  supplyPerYearInterestRateSlopeLow: BigNumberish;
-  supplyPerYearInterestRateSlopeHigh: BigNumberish;
-  supplyPerYearInterestRateBase: BigNumberish;
-  borrowKink: BigNumberish;
-  borrowPerYearInterestRateSlopeLow: BigNumberish;
-  borrowPerYearInterestRateSlopeHigh: BigNumberish;
-  borrowPerYearInterestRateBase: BigNumberish;
+  _abacusManager: string;
+  _abacusPay: string;
 }
 export interface AbacusConnectionManagerSetEventEmittedResponse {
   abacusConnectionManager: string;
@@ -168,7 +163,6 @@ export interface RemoteRouterEnrolledEventEmittedResponse {
   domain: BigNumberish;
   router: Arrayish;
 }
-
 export interface CheckUpkeepResponse {
   upkeepNeeded: boolean;
   0: boolean;
@@ -226,13 +220,11 @@ export interface UsersResponse {
   2: BigNumber;
   totalAmountStaked: BigNumber;
   3: BigNumber;
-  creditScore: BigNumber;
-  4: BigNumber;
   ltv: BigNumber;
-  5: BigNumber;
+  4: BigNumber;
   lock: boolean;
-  6: boolean;
-  length: 7;
+  5: boolean;
+  length: 6;
 }
 export interface UsersborrowsResponse {
   userAddress: string;
@@ -243,15 +235,7 @@ export interface UsersborrowsResponse {
   2: boolean;
   amountBorrowed: BigNumber;
   3: BigNumber;
-  collateralAddress: string;
-  4: string;
-  collateralAmount: BigNumber;
-  5: BigNumber;
-  borrowRouter: string;
-  6: string;
-  timeLastBorrowed: BigNumber;
-  7: BigNumber;
-  length: 8;
+  length: 4;
 }
 export interface UserstakesResponse {
   userAddress: string;
@@ -262,9 +246,7 @@ export interface UserstakesResponse {
   2: boolean;
   amountStaked: BigNumber;
   3: BigNumber;
-  timeLastStaked: BigNumber;
-  4: BigNumber;
-  length: 5;
+  length: 4;
 }
 export interface HeadenFinanceChild {
   /**
@@ -279,6 +261,9 @@ export interface HeadenFinanceChild {
    * @param _usdc Type: address, Indexed: false
    * @param _dai Type: address, Indexed: false
    * @param _matic Type: address, Indexed: false
+   * @param _abacus Type: tuple, Indexed: false
+   * @param _parent Type: tuple, Indexed: false
+   * @param _chainId Type: uint256, Indexed: false
    * @param config Type: tuple, Indexed: false
    */
   'new'(
@@ -289,6 +274,9 @@ export interface HeadenFinanceChild {
     _usdc: string,
     _dai: string,
     _matic: string,
+    _abacus: undefinedRequest,
+    _parent: undefinedRequest,
+    _chainId: BigNumberish,
     config: undefinedRequest,
     overrides?: ContractTransactionOverrides
   ): Promise<ContractTransaction>;
@@ -308,15 +296,16 @@ export interface HeadenFinanceChild {
   abacusConnectionManager(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
+   * Constant: true
+   * StateMutability: view
    * Type: function
    * @param _id Type: uint128, Indexed: false
+   * @param overrides
    */
   borrowInterestRates(
     _id: BigNumberish,
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
+    overrides?: ContractCallOverrides
+  ): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: true
@@ -358,6 +347,7 @@ export interface HeadenFinanceChild {
    * Type: function
    * @param _tokenAddress Type: address, Indexed: false
    * @param _amountToBorrow Type: uint256, Indexed: false
+   * @param overrides
    */
   borrowToken(
     _tokenAddress: string,
@@ -485,6 +475,13 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    */
+  lastAPRUpdate(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
   lastTimeStamp(overrides?: ContractCallOverrides): Promise<BigNumber>;
   /**
    * Payable: false
@@ -532,6 +529,13 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    */
+  maxLTV(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
   multichainRouter(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
@@ -543,7 +547,7 @@ export interface HeadenFinanceChild {
   /**
    * Payable: false
    * Constant: true
-   * StateMutability: view
+   * StateMutability: pure
    * Type: function
    * @param amount Type: uint256, Indexed: false
    */
@@ -669,15 +673,15 @@ export interface HeadenFinanceChild {
   ): Promise<ContractTransaction>;
   /**
    * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
+   * Constant: true
+   * StateMutability: view
    * Type: function
    * @param _id Type: uint128, Indexed: false
    */
   supplyInterestRates(
     _id: BigNumberish,
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
+    overrides?: ContractCallOverrides
+  ): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: true
