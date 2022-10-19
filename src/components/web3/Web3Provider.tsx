@@ -1,5 +1,4 @@
 import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { ConnectKitProvider } from 'connectkit';
 import React from 'react';
 import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
@@ -44,9 +43,7 @@ type Web3ProviderProps = {
 const Web3Provider = ({ children }: Web3ProviderProps) => {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-        <ConnectKitProvider mode='dark'>{children}</ConnectKitProvider>
-      </RainbowKitProvider>
+      <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
     </WagmiConfig>
   );
 };
