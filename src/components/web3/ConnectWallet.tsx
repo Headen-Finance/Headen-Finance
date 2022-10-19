@@ -1,6 +1,6 @@
 /* eslint-disable */
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { ConnectKitButton } from 'connectkit';
+// import { ConnectKitButton } from 'connectkit';
 import * as React from 'react';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
 import { Address, useAccount } from 'wagmi';
@@ -29,29 +29,29 @@ export const ConnectWallet: FC<{ show?: Visibility }> = ({
 
   return <ConnectButton showBalance={false} />;
 };
-
-//https://docs.family.co/connectkit/connect-button#connect-button
-export const CustomConnectWallet: FC<
-  { children?: ReactNode; onClick?: () => void } & ButtonProps
-> = ({ children, onClick, className, ...rest }) => {
-  return (
-    <ConnectKitButton.Custom>
-      {({ isConnected, isConnecting, show, hide, address, ensName }) => {
-        return (
-          <Button
-            isLoading={isConnecting}
-            onClick={isConnected ? onClick : show}
-            variant='light'
-            {...rest}
-            className={clsxm('w-full justify-center py-3.5 sm:py-5', className)}
-          >
-            {isConnected ? children : 'Connect Wallet'}
-          </Button>
-        );
-      }}
-    </ConnectKitButton.Custom>
-  );
-};
+//
+// //https://docs.family.co/connectkit/connect-button#connect-button
+// export const CustomConnectWallet: FC<
+//   { children?: ReactNode; onClick?: () => void } & ButtonProps
+// > = ({ children, onClick, className, ...rest }) => {
+//   return (
+//     <ConnectKitButton.Custom>
+//       {({ isConnected, isConnecting, show, hide, address, ensName }) => {
+//         return (
+//           <Button
+//             isLoading={isConnecting}
+//             onClick={isConnected ? onClick : show}
+//             variant='light'
+//             {...rest}
+//             className={clsxm('w-full justify-center py-3.5 sm:py-5', className)}
+//           >
+//             {isConnected ? children : 'Connect Wallet'}
+//           </Button>
+//         );
+//       }}
+//     </ConnectKitButton.Custom>
+//   );
+// };
 
 export const ConnectApproveAction: FC<
   {

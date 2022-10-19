@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { IoIosAdd } from 'react-icons/io';
-import { erc20ABI, useAccount, useBalance, useContractRead } from 'wagmi';
+import { erc20ABI, useAccount, useBalance, useContractReads } from 'wagmi';
 
 import {
   MarketsResponseDisplay,
@@ -45,24 +45,22 @@ function PoolsRow({ item }: PoolsRowData) {
     token: item.tokenAddress,
   });
 
-  const { data: tokenName } = useContractRead({
-    address: item.tokenAddress,
-    abi: erc20ABI,
-    functionName: 'name',
+  const {
+    data: [tokenName, tokenSymbol],
+  } = useContractReads({
+    contracts: [
+      {
+        address: item.tokenAddress,
+        abi: erc20ABI,
+        functionName: 'name',
+      },
+      {
+        address: item.tokenAddress,
+        abi: erc20ABI,
+        functionName: 'symbol',
+      },
+    ],
   });
-  const { data: tokenSymbol } = useContractRead({
-    address: item.tokenAddress,
-    abi: erc20ABI,
-    functionName: 'symbol',
-  });
-  // const hfAddress = useHeadenFinanceAddress()
-  // const {address} = useAccount()
-  // const { data: collateral } = useContractRead({
-  //   address: hfAddress,
-  //   abi: headenFinanceAbi,
-  //   functionName: 'getStakedValue',
-  //   args: [address]
-  // });
   const openDialog = useAssetDialogStore.useOpenDialog();
   return (
     <tr

@@ -1,5 +1,4 @@
 import { useRouter } from 'next/router';
-import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import clsxm from '@/lib/clsxm';
