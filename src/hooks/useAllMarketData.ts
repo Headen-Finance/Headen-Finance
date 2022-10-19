@@ -30,7 +30,6 @@ export function useAllMarketData() {
   // console.log("market pools:", marketPools)
   const refresh = useCallback(async () => {
     const data: MarketsResponseDisplay[] = [];
-    //todo generate demo data
     for (let index = 1; index < 5; index++) {
       try {
         const market = await hf?.markets(index);
@@ -78,23 +77,6 @@ export function useAllMarketData() {
         //market doesnt exist
       }
     }
-    // .map((_) => {
-    //   return {
-    //     amountBorrowed: BigNumber.from(
-    //       Math.floor(Math.random() * 1000000)
-    //     ).mul(100000000000),
-    //     available: true,
-    //     amountStaked: BigNumber.from(Math.floor(Math.random() * 1000000)).mul(
-    //       100000000000
-    //     ),
-    //     borrowRate: BigNumber.from(Math.floor(Math.random() * 10000)),
-    //     supplyRate: BigNumber.from(Math.floor(Math.random() * 10000)),
-    //     tokenAddress: '0x326C977E6efc84E512bB9C30f76E30c160eD06FB', //LINK on goerli
-    //   } as MarketsResponse;
-    // })
-    // .forEach((value) => {
-
-    // });
     setMarkets(data);
   }, [hf]);
 
