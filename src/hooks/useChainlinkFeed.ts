@@ -63,23 +63,23 @@ export function useChainlinkFeed() {
   const [lastRoundData, setLastRoundData] = useState<Record<string, unknown>>();
   const [state, setState] = useState(FeedState.INIT);
   const priceFeed = useContract({
-    addressOrName: addr,
-    contractInterface: aggregatorV3InterfaceABI,
+    address: addr,
+    abi: aggregatorV3InterfaceABI,
     signerOrProvider: provider,
   });
 
   const refresh = useCallback(() => {
     setState(FeedState.FETCHING);
     priceFeed
-      .latestRoundData()
-      .then((roundData: Record<string, unknown>) => {
+      ?.latestRoundData()
+      ?.then((roundData: Record<string, unknown>) => {
         setState(FeedState.FETCHED);
         setLastRoundData(roundData);
         // Do something with roundData
         // eslint-disable-next-line no-console
         console.log('Latest Round Data', roundData);
       })
-      .catch(() => {
+      ?.catch(() => {
         setState(FeedState.ERROR);
         setLastRoundData(undefined);
       });

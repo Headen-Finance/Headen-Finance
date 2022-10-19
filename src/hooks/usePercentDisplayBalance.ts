@@ -1,9 +1,9 @@
 import { AddressZero } from '@ethersproject/constants';
 import { BigNumber } from 'ethers';
 import { useMemo, useState } from 'react';
-import { useAccount, useBalance } from 'wagmi';
+import { Address, useAccount, useBalance } from 'wagmi';
 
-export function usePercentDisplayBalance(tokenAddress: string | null) {
+export function usePercentDisplayBalance(tokenAddress: Address | null) {
   const acc = useAccount();
   const balance = useBalance({
     addressOrName: acc.address,

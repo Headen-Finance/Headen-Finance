@@ -1,12 +1,13 @@
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import produce from 'immer';
+import { Address } from 'wagmi';
 import create from 'zustand';
 
 type AssetDialogStoreType = {
-  tokenAddress: string | null;
+  tokenAddress: Address | null;
   disableClose: boolean;
   handleClose: () => void;
-  openDialog: (tokenAddress: string) => void;
+  openDialog: (tokenAddress: Address) => void;
 };
 
 const useAssetDialogStoreBase = create<AssetDialogStoreType>((set) => ({
@@ -19,7 +20,7 @@ const useAssetDialogStoreBase = create<AssetDialogStoreType>((set) => ({
       })
     );
   },
-  openDialog: (tokenAddress: string) => {
+  openDialog: (tokenAddress: Address) => {
     set(
       produce<AssetDialogStoreType>((state) => {
         state.tokenAddress = tokenAddress;

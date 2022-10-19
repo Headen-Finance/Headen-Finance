@@ -4,7 +4,7 @@ import * as React from 'react';
 import { FC, useCallback, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoChevronDown } from 'react-icons/io5';
-import { useAccount, useBalance } from 'wagmi';
+import { Address, useAccount, useBalance } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
 import { useHeadenFinanceWrite } from '@/hooks/useHeadenFinanceContract';
@@ -13,7 +13,7 @@ import Button from '@/components/buttons/Button';
 import { ConnectApproveAction } from '@/components/web3/ConnectWallet';
 
 type ActionProp = {
-  tokenAddress: string;
+  tokenAddress: Address;
 };
 export const Repay: FC<ActionProp> = ({ tokenAddress }) => {
   const acc = useAccount();
@@ -46,7 +46,7 @@ export const Repay: FC<ActionProp> = ({ tokenAddress }) => {
     }
     try {
       setLoading(true);
-      const tx = await hf.repayLoan(tokenAddress, amount);
+      const tx = await hf?.repayLoan(tokenAddress, amount);
       await toast.promise(tx.wait(), {
         success: 'Successfully repaid',
         error: 'Ooops, something went wrong',

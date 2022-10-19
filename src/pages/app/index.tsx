@@ -46,20 +46,20 @@ function PoolsRow({ item }: PoolsRowData) {
   });
 
   const { data: tokenName } = useContractRead({
-    addressOrName: item.tokenAddress,
-    contractInterface: erc20ABI,
+    address: item.tokenAddress,
+    abi: erc20ABI,
     functionName: 'name',
   });
   const { data: tokenSymbol } = useContractRead({
-    addressOrName: item.tokenAddress,
-    contractInterface: erc20ABI,
+    address: item.tokenAddress,
+    abi: erc20ABI,
     functionName: 'symbol',
   });
   // const hfAddress = useHeadenFinanceAddress()
   // const {address} = useAccount()
   // const { data: collateral } = useContractRead({
-  //   addressOrName: hfAddress,
-  //   contractInterface: headenFinanceAbi,
+  //   address: hfAddress,
+  //   abi: headenFinanceAbi,
   //   functionName: 'getStakedValue',
   //   args: [address]
   // });

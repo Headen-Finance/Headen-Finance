@@ -4,7 +4,7 @@ import * as React from 'react';
 import toast from 'react-hot-toast';
 import { IoChevronDown } from 'react-icons/io5';
 import { MdInfoOutline } from 'react-icons/md';
-import { RpcError } from 'wagmi';
+import { Address, RpcError } from 'wagmi';
 
 import { useHeadenFinanceWrite } from '@/hooks/useHeadenFinanceContract';
 import { usePercentDisplayBalance } from '@/hooks/usePercentDisplayBalance';
@@ -17,7 +17,7 @@ import { NoWalletConnected } from '@/components/web3/NoWalletConnected';
 import { WhenWallet } from '@/components/web3/WhenAccount';
 
 type ActionProp = {
-  tokenAddress: string;
+  tokenAddress: Address;
 };
 
 export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
@@ -35,7 +35,7 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
     }
     try {
       setLoading(true);
-      const tx = await hf.stakeToken(tokenAddress, amount);
+      const tx = await hf?.stakeToken(tokenAddress, amount);
       await toast.promise(tx.wait(), {
         success: 'Successfully staked',
         error: 'Ooops, something went wrong',

@@ -1,6 +1,7 @@
 import { Tab } from '@headlessui/react';
 import { useState } from 'react';
 import * as React from 'react';
+import { Address } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
 
@@ -10,7 +11,7 @@ import { Stake } from '@/components/headen/Stake';
 import { Withdraw } from '@/components/headen/Withdraw';
 
 type AssetDialogProp = {
-  tokenAddress: string;
+  tokenAddress: Address;
 };
 export const AssetDialog = ({ tokenAddress }: AssetDialogProp) => {
   // const tokenAddress = '0x326C977E6efc84E512bB9C30f76E30c160eD06FB'; //LINK on goerli

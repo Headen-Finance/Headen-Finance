@@ -3,7 +3,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ConnectKitButton } from 'connectkit';
 import * as React from 'react';
 import { FC, ReactNode, useCallback, useMemo } from 'react';
-import { useAccount } from 'wagmi';
+import { Address, useAccount } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
 
@@ -55,7 +55,7 @@ export const CustomConnectWallet: FC<
 
 export const ConnectApproveAction: FC<
   {
-    tokenAddress: string | null;
+    tokenAddress: Address | null;
     children: ReactNode;
   } & ButtonProps
 > = ({ children, onClick, className, tokenAddress, ...rest }) => {

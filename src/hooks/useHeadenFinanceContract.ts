@@ -1,25 +1,25 @@
+import { GetContractResult } from '@wagmi/core';
 import { useContract, useProvider, useSigner } from 'wagmi';
 
 import { useHeadenFinanceAddress } from '@/hooks/useHeadenFinanceAddress';
 
 import { headenFinanceAbi } from '@/constant/env';
-import { ContractContext } from '@/generated/HeadenFinanceChild';
 
-export function useHeadenFinance(): ContractContext {
+export function useHeadenFinance(): GetContractResult | null {
   const address = useHeadenFinanceAddress();
-  return useContract<ContractContext>({
-    addressOrName: address,
-    contractInterface: headenFinanceAbi,
+  return useContract({
+    address: address,
+    abi: headenFinanceAbi,
     signerOrProvider: useProvider(),
   });
 }
 
-export function useHeadenFinanceWrite(): ContractContext {
+export function useHeadenFinanceWrite(): GetContractResult | null {
   const address = useHeadenFinanceAddress();
   const { data: signer } = useSigner();
-  return useContract<ContractContext>({
-    addressOrName: address,
-    contractInterface: headenFinanceAbi,
+  return useContract({
+    address: address,
+    abi: headenFinanceAbi,
     signerOrProvider: signer,
   });
 }

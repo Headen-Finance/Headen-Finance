@@ -1,5 +1,6 @@
 import { createSelectorHooks } from 'auto-zustand-selectors-hook';
 import produce from 'immer';
+import { Address } from 'wagmi';
 import create from 'zustand';
 
 export enum LoadingState {
@@ -10,7 +11,7 @@ export enum LoadingState {
 
 export type TokenResponse = {
   chainId: number;
-  address: string;
+  address: Address;
   name: string;
   symbol: string;
   logoURI?: string;

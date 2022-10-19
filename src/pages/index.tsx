@@ -1,13 +1,17 @@
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import * as React from 'react';
-import { useCallback } from 'react';
+import React from 'react';
 import { MdOutlineBuild } from 'react-icons/md';
-import Particles from 'react-tsparticles';
-import { Engine } from 'tsparticles-engine';
-import { loadLinksPreset } from 'tsparticles-preset-links';
 
 import LandingLayout from '@/components/layout/LandingLayout';
 import Seo from '@/components/Seo';
+
+const ParticlesBackground = dynamic(
+  () => import('@/components/ParticlesBackground'),
+  {
+    suspense: true,
+  }
+);
 
 export default function LandingPage() {
   return (
@@ -26,21 +30,11 @@ export default function LandingPage() {
 }
 
 function MainSection() {
-  const particlesInit = useCallback(async (engine: Engine) => {
-    // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
-    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-    // starting from v2 you can add only the features you need reducing the bundle size
-
-    await loadLinksPreset(engine);
-  }, []);
   return (
     <section className="relative flex min-h-screen w-full items-center justify-center bg-black bg-[url('/images/landing/landing_bg.png')] bg-cover bg-center">
-      <Particles
-        className='absolute inset-0'
-        id='tsparticles'
-        url='/particlesjs-config.json'
-        init={particlesInit}
-      />
+      <React.Suspense fallback='nothing'>
+        <ParticlesBackground />
+      </React.Suspense>
 
       <div className='mx-12 flex w-full max-w-7xl flex-col items-center'>
         <h1 className='text-center font-normal font-medium leading-normal  md:text-3xl lg:text-4xl xl:text-5xl'>

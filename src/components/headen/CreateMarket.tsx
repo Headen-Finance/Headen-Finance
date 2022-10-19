@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { FC, useCallback, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { RpcError, useNetwork } from 'wagmi';
+import { Address, RpcError, useNetwork } from 'wagmi';
 
 import clsxm from '@/lib/clsxm';
 import { useHeadenFinanceWrite } from '@/hooks/useHeadenFinanceContract';
@@ -18,7 +18,7 @@ import { TokenResponse } from '@/store/useUniswapTokensStore';
 
 export const CreateMarket: FC = () => {
   // eslint-disable-next-line unused-imports/no-unused-vars
-  const [tokenAddress, setTokenAddress] = useState<string | null>(null);
+  const [tokenAddress, setTokenAddress] = useState<Address | null>(null);
 
   // eslint-disable-next-line unused-imports/no-unused-vars
   const availableTokens = useUniswapTokenList();
@@ -55,7 +55,7 @@ export const CreateMarket: FC = () => {
     }
     try {
       setLoading(true);
-      const tx = await hf.createMarketPool(tokenAddress, amount);
+      const tx = await hf?.createMarketPool(tokenAddress, amount);
       await toast.promise(tx.wait(), {
         success: 'Successfully created the pool and staked',
         error: 'Ooops, something went wrong',

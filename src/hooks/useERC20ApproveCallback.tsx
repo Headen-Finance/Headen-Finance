@@ -1,8 +1,9 @@
 /* eslint-disable no-console */
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber } from 'ethers';
 import { useCallback, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
+  Address,
   erc20ABI,
   useAccount,
   useContract,
@@ -31,19 +32,20 @@ export enum ApprovalState {
 // returns a variable indicating the state of the approval and a function which approves if necessary or early returns
 export function useERC20ApproveCallback(
   watch: boolean,
-  tokenAddress: string,
-  amountToApprove?: BigNumber,
-  spender?: string
+  tokenAddress: Address,
+  amountToApprove: BigNumber,
+  spender?: Address
 ): [ApprovalState, () => Promise<void>] {
   const { chain } = useNetwork();
-  const _spender = spender ?? CONTRACT_ADDRESS[chain?.id ?? -1];
+  const _spender: Address = spender ?? CONTRACT_ADDRESS[chain?.id ?? -1];
 
   const { address } = useAccount();
   const { data: signer } = useSigner();
   //TODO handle tokens which limits the approve amount
+
   const { config } = usePrepareContractWrite({
-    addressOrName: tokenAddress,
-    contractInterface: erc20ABI,
+    address: tokenAddress,
+    abi: erc20ABI,
     functionName: 'approve',
     signer,
     args: [_spender, amountToApprove],
@@ -51,12 +53,12 @@ export function useERC20ApproveCallback(
   const { sendTransactionAsync, isLoading: isWritePending } =
     useSendTransaction(config);
 
-  const currentAllowance = useERC20Allowance(
-    watch,
-    tokenAddress,
-    address ?? undefined,
-    _spender
-  );
+  const currentAllowance = useERC20Allowance({
+    watch: watch,
+    address: tokenAddress,
+    owner: address,
+    spender: _spender,
+  });
   const [loading, setLoading] = useState(false);
 
   // check the current approval status
@@ -73,9 +75,9 @@ export function useERC20ApproveCallback(
       : ApprovalState.APPROVED;
   }, [amountToApprove, currentAllowance, isWritePending, _spender, loading]);
 
-  const tokenContract = useContract<Contract>({
-    addressOrName: tokenAddress,
-    contractInterface: erc20ABI,
+  const tokenContract = useContract({
+    address: tokenAddress,
+    abi: erc20ABI,
     signerOrProvider: signer,
   });
 
