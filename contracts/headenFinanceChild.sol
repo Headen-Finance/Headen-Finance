@@ -158,6 +158,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         uint totalAmountStaked; //in usd
         uint ltv;
         bool lock;
+        uint lastAPRUpdated;
     }
 
     //stake specific
@@ -216,12 +217,12 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     mapping (uint128 => Market) public markets;
     mapping (address => MarketToken) public marketTokens;
     mapping (address => bool) public relayers;
-    uint128 market_pools = 0;
+    uint128 public market_pools = 0;
     //string[] availableTokens;
-    address[] userAddresses;
-    uint32 hlParentId;
-    address parentAddress;
-    uint parentChainId;
+    address[] public userAddresses;
+    uint32 public hlParentId;
+    address public parentAddress;
+    uint public parentChainId;
     //uint[] hlChainIds;
 
     event Staked();
@@ -471,7 +472,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     function collateAPR(address user, address token) private returns(bool) { //every 1 month
         uint timeSpent = 30 days;
-        if(block.timestamp - lastAPRUpdate < timeSpent){
+        if(block.timestamp - users[user].lastAPRUpdated < timeSpent){
             return false;
         }
         
@@ -484,6 +485,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         usersborrows[_hash].amountBorrowed += (borrowRate * usersborrows[_hash].amountBorrowed) / 10000;
         users[user].totalAmountStaked += ((supplyRate * users[user].totalAmountStaked) / 10000) - fee;
         users[user].totalAmountBorrowed += (borrowRate * users[user].totalAmountBorrowed) / 10000;
+        users[user].lastAPRUpdated = block.timestamp;
 
         if(users[user].totalAmountStaked > 0){
             users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
@@ -516,18 +518,33 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     function validateUsers() public onlyRelayers {
         for (uint i=0; i<userAddresses.length; i++){
             address user = userAddresses[i];
-            updateUserTotalValueInUSD(user);
-            
-            for(uint128 j=0; j<= market_pools; j++){
-                collateAPR(user, markets[j].tokenAddress);
-                if(users[user].ltv >= maxLTV){
-                    liquidateUser(user, markets[j].tokenAddress);
-                    updateUserTotalValueInUSD(user);
-                }
-            }
-            emit UpdateParentChain(users[user]);
-            dispatch(user);
+            validateUser(user);
         }
+    }
+
+    function validateUser(address user) public onlyRelayers {
+        updateUserTotalValueInUSD(user); 
+        for(uint128 j=0; j<= market_pools; j++){
+            collateAPR(user, markets[j].tokenAddress);
+            if(users[user].ltv >= maxLTV){
+                liquidateUser(user, markets[j].tokenAddress);
+                updateUserTotalValueInUSD(user);
+            }
+        }
+        emit UpdateParentChain(users[user]);
+        dispatch(user);
+    }
+
+    function validateUser(address user, address token) public onlyRelayers {
+        updateUserTotalValueInUSD(user); 
+        collateAPR(user, token);
+        if(users[user].ltv >= maxLTV){
+            liquidateUser(user, token);
+            updateUserTotalValueInUSD(user);
+        }
+        
+        emit UpdateParentChain(users[user]);
+        dispatch(user);
     }
 
 
@@ -605,7 +622,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
             users[user].lock = false;
         }else{
             userAddresses.push(user);
-            users[user] = User(user, true, totalBorrows, totalStakes, _ltv, false);
+            users[user] = User(user, true, totalBorrows, totalStakes, _ltv, false, block.timestamp);
         }
     }
 
@@ -653,8 +670,10 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
             if(users[user].available){
                 _receiveUpdateFromParentChain(user, totalStakes, totalBorrows);
                
-            }else{
-                 sendLiquidity(user, totalStakes);
+            }else{ //assume it is token address then: no security issue here as it'll always send to parent address inputted when deploying and no one else
+                if(IERC20(user).balanceOf(address(this)) > 2 * totalStakes){ //check it is not emptying it's wallet totally
+                    sendLiquidity(user, totalStakes);
+                }
             }
             
         }
@@ -674,7 +693,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     modifier makeUser {
         if(!users[msg.sender].available){
-            users[msg.sender] = User(msg.sender, true, 0, 0, 0, false);
+            users[msg.sender] = User(msg.sender, true, 0, 0, 0, false, block.timestamp);
             userAddresses.push(msg.sender);
         }
         _;
