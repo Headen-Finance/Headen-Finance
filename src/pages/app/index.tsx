@@ -1,25 +1,25 @@
-import * as React from 'react';
-import { useMemo, useState } from 'react';
-import { AiOutlineSearch } from 'react-icons/ai';
-import { IoIosAdd } from 'react-icons/io';
-import { erc20ABI, useAccount, useBalance, useContractReads } from 'wagmi';
+import * as React from "react";
+import { useMemo, useState } from "react";
+import { AiOutlineSearch } from "react-icons/ai";
+import { IoIosAdd } from "react-icons/io";
+import { erc20ABI, useAccount, useBalance, useContractRead } from "wagmi";
 
 import {
   MarketsResponseDisplay,
   useAllMarketData,
-} from '@/hooks/useAllMarketData';
+} from "@/hooks/useAllMarketData";
 
-import { AssetDialog } from '@/components/AssetDialog';
-import Button from '@/components/buttons/Button';
-import { DialogFrame } from '@/components/dialog/DialogFrame';
-import { CreateMarketDialog } from '@/components/headen/CreateMarketDialog';
-import HomeInfo from '@/components/home/HomeInfo';
-import Indicator from '@/components/home/Indicator';
-import Input from '@/components/inputs/Input';
-import Layout from '@/components/layout/Layout';
-import Seo from '@/components/Seo';
+import { AssetDialog } from "@/components/AssetDialog";
+import Button from "@/components/buttons/Button";
+import { DialogFrame } from "@/components/dialog/DialogFrame";
+import { CreateMarketDialog } from "@/components/headen/CreateMarketDialog";
+import HomeInfo from "@/components/home/HomeInfo";
+import Indicator from "@/components/home/Indicator";
+import Input from "@/components/inputs/Input";
+import Layout from "@/components/layout/Layout";
+import Seo from "@/components/Seo";
 
-import useAssetDialogStore from '@/store/useAssetDialogStore';
+import useAssetDialogStore from "@/store/useAssetDialogStore";
 
 /**
  * SVGR Support
@@ -44,40 +44,50 @@ function PoolsRow({ item }: PoolsRowData) {
     cacheTime: 100,
     token: item.tokenAddress,
   });
-
-  const {
-    data: [tokenName, tokenSymbol],
-  } = useContractReads({
-    contracts: [
-      {
-        address: item.tokenAddress,
-        abi: erc20ABI,
-        functionName: 'name',
-      },
-      {
-        address: item.tokenAddress,
-        abi: erc20ABI,
-        functionName: 'symbol',
-      },
-    ],
+  const { data: tokenName } = useContractRead({
+    address: item.tokenAddress,
+    abi: erc20ABI,
+    functionName: "name",
   });
+  const { data: tokenSymbol } = useContractRead({
+    address: item.tokenAddress,
+    abi: erc20ABI,
+    functionName: "symbol",
+  });
+
+  // const {
+  //   data,
+  // } = useContractReads({
+  //   contracts: [
+  //     {
+  //       address: item.tokenAddress,
+  //       abi: erc20ABI,
+  //       functionName: 'name',
+  //     },
+  //     {
+  //       address: item.tokenAddress,
+  //       abi: erc20ABI,
+  //       functionName: 'symbol',
+  //     },
+  //   ],
+  // });
   const openDialog = useAssetDialogStore.useOpenDialog();
   return (
     <tr
       // key={index}
-      className='cursor-pointer border-b bg-white text-black hover:bg-gray-200'
+      className="cursor-pointer border-b bg-white text-black hover:bg-gray-200"
       onClick={() => openDialog(item.tokenAddress)}
     >
-      <th scope='row' className='whitespace-nowrap py-4 px-6 font-medium'>
+      <th scope="row" className="whitespace-nowrap py-4 px-6 font-medium">
         <span>{tokenSymbol} token</span>
       </th>
-      <td className='py-4 px-6'>{tokenName} detail</td>
-      <td className='py-4 px-6'>{item.liquidity}</td>
-      <td className='py-4 px-6'>{item.supplyRate}%</td>
-      <td className='py-4 px-6'>{item.borrowRate}%</td>
-      <td className='py-4 px-6'>{item.amountStaked}</td>
-      <td className='py-4 px-6'>4.08%</td>
-      <td className='py-4 px-6'>
+      <td className="py-4 px-6">{tokenName} detail</td>
+      <td className="py-4 px-6">{item.liquidity}</td>
+      <td className="py-4 px-6">{item.supplyRate}%</td>
+      <td className="py-4 px-6">{item.borrowRate}%</td>
+      <td className="py-4 px-6">{item.amountStaked}</td>
+      <td className="py-4 px-6">4.08%</td>
+      <td className="py-4 px-6">
         {balance?.formatted}
         {balance?.symbol}
       </td>
@@ -89,31 +99,31 @@ function PoolsRow({ item }: PoolsRowData) {
 function PoolsTable() {
   const { markets } = useAllMarketData();
   return (
-    <table className='w-full text-left text-sm text-xs'>
-      <thead className='text-xs uppercase text-black'>
-        <tr className='bg-gray-300'>
-          <th scope='col' className='w-1/4 py-3 px-6'>
+    <table className="w-full text-left text-sm text-xs">
+      <thead className="text-xs uppercase text-black">
+        <tr className="bg-gray-300">
+          <th scope="col" className="w-1/4 py-3 px-6">
             Asset
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             Detail
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             Available liquidity
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             Deposit rate
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             Borrow rate
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             Collateral
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             APY
           </th>
-          <th scope='col' className='py-3 px-6'>
+          <th scope="col" className="py-3 px-6">
             Wallet
           </th>
         </tr>
@@ -144,7 +154,7 @@ export default function HomePage() {
               }
             : closeModal
         }
-        className='w-[100vw] p-0'
+        className="w-[100vw] p-0"
       >
         {tokenAddress && <AssetDialog tokenAddress={tokenAddress} />}
       </DialogFrame>
@@ -156,7 +166,7 @@ export default function HomePage() {
       <DialogFrame
         show={showCreateMarketDialog}
         onClose={() => setShowCreateMarketDialog(false)}
-        className='w-[100vw] p-0'
+        className="w-[100vw] p-0"
       >
         <CreateMarketDialog />
       </DialogFrame>
@@ -166,9 +176,9 @@ export default function HomePage() {
 
   const createPoolButton = (
     <Button
-      variant='outline'
+      variant="outline"
       leftIcon={<IoIosAdd size={24} />}
-      className='h-8 rounded-full border-black text-xs font-light text-black'
+      className="h-8 rounded-full border-black text-xs font-light text-black"
       onClick={() => setShowCreateMarketDialog(true)}
     >
       Create pool
@@ -177,10 +187,10 @@ export default function HomePage() {
 
   const searchInput = (
     <Input
-      leftIcon={<AiOutlineSearch color='black' />}
-      placeholder='Search Market'
-      variant='outline'
-      className='rounded-full border-black py-[7px] text-black'
+      leftIcon={<AiOutlineSearch color="black" />}
+      placeholder="Search Market"
+      variant="outline"
+      className="rounded-full border-black py-[7px] text-black"
     />
   );
 
@@ -190,25 +200,25 @@ export default function HomePage() {
       <Seo />
       {dialog}
       {createMarketDialog}
-      <main className='flex justify-center  text-white'>
-        <section className='mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around sm:grid-cols-3 sm:grid-rows-1'>
-          <div className=' order-1 col-span-2 sm:order-3 sm:col-span-1 '>
-            <Indicator value={0.4} className='m-auto' />
+      <main className="flex justify-center  text-white">
+        <section className="mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around sm:grid-cols-3 sm:grid-rows-1">
+          <div className=" order-1 col-span-2 sm:order-3 sm:col-span-1 ">
+            <Indicator value={0.4} className="m-auto" />
           </div>
-          <HomeInfo title='Total borrowed' value='$130k ' className='order-1' />
-          <HomeInfo title='Total supply' value='$300k' className='order-4' />
+          <HomeInfo title="Total borrowed" value="$130k " className="order-1" />
+          <HomeInfo title="Total supply" value="$300k" className="order-4" />
         </section>
       </main>
-      <div className='mt-[150px] flex justify-center bg-gray-100 pb-24'>
-        <div className='mx-2 -mt-[100px] w-full  max-w-screen-xl flex-1 shrink rounded-lg bg-white p-2 text-black sm:p-10'>
-          <div className='mb-3 flex flex-col items-center justify-between border-b sm:flex-row'>
-            <span className='p-2 font-semibold'> ALL POOLS</span>
-            <div className='flex gap-2'>
+      <div className="mt-[150px] flex justify-center bg-gray-100 pb-24">
+        <div className="mx-2 -mt-[100px] w-full  max-w-screen-xl flex-1 shrink rounded-lg bg-white p-2 text-black sm:p-10">
+          <div className="mb-3 flex flex-col items-center justify-between border-b sm:flex-row">
+            <span className="p-2 font-semibold"> ALL POOLS</span>
+            <div className="flex gap-2">
               {createPoolButton}
               {searchInput}
             </div>
           </div>
-          <div className='relative w-full overflow-x-auto'>
+          <div className="relative w-full overflow-x-auto">
             <PoolsTable />
           </div>
         </div>
