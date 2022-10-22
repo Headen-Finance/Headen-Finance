@@ -2,10 +2,14 @@ import { Disclosure, Transition } from "@headlessui/react";
 import { Fragment } from "react";
 import * as React from "react";
 import { IoChevronDown } from "react-icons/io5";
+import { Address } from "wagmi";
 
 import clsxm from "@/lib/clsxm";
 
 import Button from "@/components/buttons/Button";
+import { Loading } from "@/components/Loading";
+import { NoWalletConnected } from "@/components/web3/NoWalletConnected";
+import { WhenWallet } from "@/components/web3/WhenAccount";
 
 export function WaitingForTx(props: { tx: unknown }) {
   return (
@@ -141,5 +145,29 @@ export function AssetBalance({
         )}
       </div>
     </div>
+  );
+}
+
+export type AssetFrameProps = {
+  tokenAddress?: Address;
+  children: React.ReactNode;
+};
+
+export function AssetFrame({ tokenAddress, children }: AssetFrameProps) {
+  return (
+    <>
+      <div className="p-0 px-2.5 pb-2.5 sm:p-5 md:p-10">
+        <div className="flex justify-center text-[0.6em]">
+          <span>{tokenAddress}</span>
+        </div>
+        <NoWalletConnected />
+        <WhenWallet status="connecting">
+          <div className="flex items-center justify-center p-5">
+            <Loading></Loading>
+          </div>
+        </WhenWallet>
+        {children}
+      </div>
+    </>
   );
 }
