@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { EthersContractContextV5 } from 'ethereum-abi-types-generator';
+import { EthersContractContextV5 } from "ethereum-abi-types-generator";
 import {
   BigNumber,
   BigNumberish,
   BytesLike as Arrayish,
   ContractTransaction,
-} from 'ethers';
+} from "ethers";
 
 export type ContractContext = EthersContractContextV5<
   HeadenFinanceChild,
@@ -55,18 +55,18 @@ export interface ContractCallOverrides {
   gasLimit?: number;
 }
 export type HeadenFinanceChildEvents =
-  | 'AbacusConnectionManagerSet'
-  | 'Borrowed'
-  | 'ChainSyncRequired'
-  | 'FullChainSyncRequired'
-  | 'Initialized'
-  | 'InterchainGasPaymasterSet'
-  | 'LockUntilUpdateFromParentChain'
-  | 'OwnershipTransferred'
-  | 'RemoteRouterEnrolled'
-  | 'Staked'
-  | 'UpdateParentChain'
-  | 'Withdrawn';
+  | "AbacusConnectionManagerSet"
+  | "Borrowed"
+  | "ChainSyncRequired"
+  | "FullChainSyncRequired"
+  | "Initialized"
+  | "InterchainGasPaymasterSet"
+  | "LockUntilUpdateFromParentChain"
+  | "OwnershipTransferred"
+  | "RemoteRouterEnrolled"
+  | "Staked"
+  | "UpdateParentChain"
+  | "Withdrawn";
 export interface HeadenFinanceChildEventsContext {
   AbacusConnectionManagerSet(...parameters: any): EventFilter;
   Borrowed(...parameters: any): EventFilter;
@@ -82,60 +82,67 @@ export interface HeadenFinanceChildEventsContext {
   Withdrawn(...parameters: any): EventFilter;
 }
 export type HeadenFinanceChildMethodNames =
-  | 'new'
-  | 'SECONDS_PER_YEAR'
-  | 'abacusConnectionManager'
-  | 'borrowInterestRates'
-  | 'borrowKink'
-  | 'borrowPerSecondInterestRateBase'
-  | 'borrowPerSecondInterestRateSlopeHigh'
-  | 'borrowPerSecondInterestRateSlopeLow'
-  | 'borrowToken'
-  | 'borrowTokenWithCollateral'
-  | 'chainId'
-  | 'checkUpkeep'
-  | 'createMarket'
-  | 'createMarketPool'
-  | 'dai'
-  | 'enrollRemoteRouter'
-  | 'getRiskLevel'
-  | 'handle'
-  | 'interchainGasPaymaster'
-  | 'interval'
-  | 'lastAPRUpdate'
-  | 'lastTimeStamp'
-  | 'lockThisUserUntilParentUpdate'
-  | 'marketTokens'
-  | 'markets'
-  | 'matic'
-  | 'maxLTV'
-  | 'multichainRouter'
-  | 'owner'
-  | 'per_amount'
-  | 'performUpkeep'
-  | 'receiveFullUpdateFromParentChain'
-  | 'receiveUpdateFromParentChain'
-  | 'relayers'
-  | 'renounceOwnership'
-  | 'repayLoan'
-  | 'routers'
-  | 'setAbacusConnectionManager'
-  | 'setInterchainGasPaymaster'
-  | 'stakeToken'
-  | 'supplyInterestRates'
-  | 'supplyKink'
-  | 'supplyPerSecondInterestRateBase'
-  | 'supplyPerSecondInterestRateSlopeHigh'
-  | 'supplyPerSecondInterestRateSlopeLow'
-  | 'tax'
-  | 'transferOwnership'
-  | 'updateSettings'
-  | 'usdc'
-  | 'users'
-  | 'usersborrows'
-  | 'userstakes'
-  | 'validateUsers'
-  | 'withdrawToken';
+  | "new"
+  | "SECONDS_PER_YEAR"
+  | "abacusConnectionManager"
+  | "borrowInterestRates"
+  | "borrowKink"
+  | "borrowPerSecondInterestRateBase"
+  | "borrowPerSecondInterestRateSlopeHigh"
+  | "borrowPerSecondInterestRateSlopeLow"
+  | "borrowToken"
+  | "borrowTokenWithCollateral"
+  | "chainId"
+  | "checkUpkeep"
+  | "createMarket"
+  | "createMarketPool"
+  | "dai"
+  | "enrollRemoteRouter"
+  | "getRiskLevel"
+  | "handle"
+  | "hlParentId"
+  | "interchainGasPaymaster"
+  | "interval"
+  | "lastAPRUpdate"
+  | "lastTimeStamp"
+  | "lockThisUserUntilParentUpdate"
+  | "marketTokens"
+  | "market_pools"
+  | "markets"
+  | "matic"
+  | "maxLTV"
+  | "multichainRouter"
+  | "owner"
+  | "parentAddress"
+  | "parentChainId"
+  | "per_amount"
+  | "performUpkeep"
+  | "receiveFullUpdateFromParentChain"
+  | "receiveUpdateFromParentChain"
+  | "relayers"
+  | "renounceOwnership"
+  | "repayLoan"
+  | "routers"
+  | "setAbacusConnectionManager"
+  | "setInterchainGasPaymaster"
+  | "stakeToken"
+  | "supplyInterestRates"
+  | "supplyKink"
+  | "supplyPerSecondInterestRateBase"
+  | "supplyPerSecondInterestRateSlopeHigh"
+  | "supplyPerSecondInterestRateSlopeLow"
+  | "tax"
+  | "transferOwnership"
+  | "updateSettings"
+  | "usdc"
+  | "userAddresses"
+  | "users"
+  | "usersborrows"
+  | "userstakes"
+  | "validateUser"
+  | "validateUser"
+  | "validateUsers"
+  | "withdrawToken";
 export interface undefinedRequest {
   _abacusManager: string;
   _abacusPay: string;
@@ -162,6 +169,9 @@ export interface OwnershipTransferredEventEmittedResponse {
 export interface RemoteRouterEnrolledEventEmittedResponse {
   domain: BigNumberish;
   router: Arrayish;
+}
+export interface UpdateParentChainEventEmittedResponse {
+  user: UserRequest;
 }
 export interface CheckUpkeepResponse {
   upkeepNeeded: boolean;
@@ -224,7 +234,9 @@ export interface UsersResponse {
   4: BigNumber;
   lock: boolean;
   5: boolean;
-  length: 6;
+  lastAPRUpdated: BigNumber;
+  6: BigNumber;
+  length: 7;
 }
 export interface UsersborrowsResponse {
   userAddress: string;
@@ -266,7 +278,7 @@ export interface HeadenFinanceChild {
    * @param _chainId Type: uint256, Indexed: false
    * @param config Type: tuple, Indexed: false
    */
-  'new'(
+  "new"(
     _interval: BigNumberish,
     _multichainRouter: string,
     _hashSalt: string,
@@ -300,7 +312,6 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    * @param _id Type: uint128, Indexed: false
-   * @param overrides
    */
   borrowInterestRates(
     _id: BigNumberish,
@@ -347,7 +358,6 @@ export interface HeadenFinanceChild {
    * Type: function
    * @param _tokenAddress Type: address, Indexed: false
    * @param _amountToBorrow Type: uint256, Indexed: false
-   * @param overrides
    */
   borrowToken(
     _tokenAddress: string,
@@ -461,6 +471,13 @@ export interface HeadenFinanceChild {
    * StateMutability: view
    * Type: function
    */
+  hlParentId(overrides?: ContractCallOverrides): Promise<number>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
   interchainGasPaymaster(overrides?: ContractCallOverrides): Promise<string>;
   /**
    * Payable: false
@@ -510,6 +527,13 @@ export interface HeadenFinanceChild {
    * Constant: true
    * StateMutability: view
    * Type: function
+   */
+  market_pools(overrides?: ContractCallOverrides): Promise<BigNumber>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    * @param parameter0 Type: uint128, Indexed: false
    */
   markets(
@@ -544,6 +568,20 @@ export interface HeadenFinanceChild {
    * Type: function
    */
   owner(overrides?: ContractCallOverrides): Promise<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  parentAddress(overrides?: ContractCallOverrides): Promise<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
+   */
+  parentChainId(overrides?: ContractCallOverrides): Promise<BigNumber>;
   /**
    * Payable: false
    * Constant: true
@@ -759,6 +797,17 @@ export interface HeadenFinanceChild {
    * Constant: true
    * StateMutability: view
    * Type: function
+   * @param parameter0 Type: uint256, Indexed: false
+   */
+  userAddresses(
+    parameter0: BigNumberish,
+    overrides?: ContractCallOverrides
+  ): Promise<string>;
+  /**
+   * Payable: false
+   * Constant: true
+   * StateMutability: view
+   * Type: function
    * @param parameter0 Type: address, Indexed: false
    */
   users(
@@ -787,6 +836,30 @@ export interface HeadenFinanceChild {
     parameter0: Arrayish,
     overrides?: ContractCallOverrides
   ): Promise<UserstakesResponse>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param user Type: address, Indexed: false
+   * @param token Type: address, Indexed: false
+   */
+  validateUser(
+    user: string,
+    token: string,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
+  /**
+   * Payable: false
+   * Constant: false
+   * StateMutability: nonpayable
+   * Type: function
+   * @param user Type: address, Indexed: false
+   */
+  validateUser(
+    user: string,
+    overrides?: ContractTransactionOverrides
+  ): Promise<ContractTransaction>;
   /**
    * Payable: false
    * Constant: false
