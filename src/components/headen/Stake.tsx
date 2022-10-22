@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from "react";
+import { FC, useCallback, useMemo, useState } from "react";
 import * as React from "react";
 import toast from "react-hot-toast";
 import { MdInfoOutline } from "react-icons/md";
@@ -7,9 +7,11 @@ import { Address, RpcError } from "wagmi";
 import { useHeadenFinanceWrite } from "@/hooks/useHeadenFinanceContract";
 import { usePercentDisplayBalance } from "@/hooks/usePercentDisplayBalance";
 
-import Button from "@/components/buttons/Button";
 import { AssetDialogActionButton } from "@/components/headen/AssetDialogActionButton";
 import {
+  AssetAmountInput,
+  AssetBalance,
+  AssetParameters,
   MoreParametersDisclosure,
   WaitingForTx,
 } from "@/components/headen/AssetDialogComponents";
@@ -28,6 +30,22 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
 
   const hf = useHeadenFinanceWrite();
   const [loading, setLoading] = useState(false);
+  const parameters = useMemo(
+    () => [
+      { title: "User Borrow Limit", value: "$0.00" },
+      { title: "Utilization", value: "$0.00" },
+      { title: "Supply APR", value: "$0.00" },
+    ],
+    []
+  );
+  const moreParameters = useMemo(
+    () => [
+      { title: "User Borrow Limit", value: "$0.00" },
+      { title: "User Borrow Limit", value: "$0.00" },
+      { title: "User Borrow Limit", value: "$0.00" },
+    ],
+    []
+  );
 
   const stake = useCallback(async () => {
     if (amount == undefined) {
@@ -65,67 +83,25 @@ export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
           </div>
         </WhenWallet>
         <WhenWallet status="connected">
-          <div className="py-3.5 sm:py-5 md:py-10">
-            <div className="relative">
-              <span className="text-2xl sm:text-3xl md:text-5xl">
-                {displayAmount}
-                {balance.data?.symbol}
-              </span>
-              {/*<span className='text-2xl sm:text-5xl'>{(balance.data?.value?.div(10**balance.data?.decimals )?.toNumber() ?? 0) * percent/100}{balance.data?.symbol}</span>*/}
-              <Button
-                variant="outline"
-                isDarkBg
-                className="absolute right-0 top-1 aspect-square rounded-full border-black p-0.5 text-xs text-black sm:text-lg"
-                onClick={() => setPercent(100)}
-              >
-                Max
-              </Button>
-            </div>
-          </div>
+          <AssetBalance
+            displayAmount={displayAmount}
+            symbol={balance.data?.symbol}
+            setMax={() => setPercent(100)}
+          />
           {balance.data?.value?.eq(0) ? (
             <div className="pb-4 text-sm font-bold">
               Ooops, it looks like that you do not have any{" "}
               {balance.data?.symbol}
             </div>
           ) : (
-            <div className="relative py-5 sm:py-10 ">
-              <input
-                type="range"
-                className="range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100"
-                min={1}
-                max={100}
-                step={1}
-                value={percent}
-                onChange={(event) => setPercent(parseInt(event.target.value))}
-                id="customRange1"
-              />
-              <div className="flex justify-between">
-                <span> 0</span>
-                <span> {balance.data?.formatted}</span>
-              </div>
-            </div>
+            <AssetAmountInput
+              percent={percent}
+              onPercentChanged={(p) => setPercent(p)}
+              maxText={balance.data?.formatted}
+            />
           )}
-          <div className="flex flex-col gap-1">
-            <div className="flex justify-between">
-              <span>User Borrow Limit</span>
-              <span>$0.00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Utilization</span>
-              <span>0%</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Supply APR</span>
-              <span>6.99%</span>
-            </div>
-          </div>
-          <MoreParametersDisclosure
-            items={[
-              { title: "User Borrow Limit", value: "$0.00" },
-              { title: "User Borrow Limit", value: "$0.00" },
-              { title: "User Borrow Limit", value: "$0.00" },
-            ]}
-          />
+          <AssetParameters items={parameters} />
+          <MoreParametersDisclosure items={moreParameters} />
         </WhenWallet>
         <ConnectApproveAction
           tokenAddress={tokenAddress}
