@@ -137,6 +137,18 @@ function PoolsTable() {
   );
 }
 
+function DashboardInfoSection() {
+  return (
+    <section className="mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around sm:grid-cols-3 sm:grid-rows-1">
+      <div className=" order-1 col-span-2 sm:order-3 sm:col-span-1 ">
+        <Indicator value={0.4} className="m-auto" />
+      </div>
+      <HomeInfo title="Total borrowed" value="$130k " className="order-1" />
+      <HomeInfo title="Total supply" value="$300k" className="order-4" />
+    </section>
+  );
+}
+
 export default function HomePage() {
   const disableClose = useAssetDialogStore.useDisableClose();
   const tokenAddress = useAssetDialogStore.useTokenAddress();
@@ -200,14 +212,9 @@ export default function HomePage() {
       <Seo />
       {dialog}
       {createMarketDialog}
+
       <main className="flex justify-center  text-white">
-        <section className="mt-14 grid w-full max-w-screen-xl grid-cols-2 grid-rows-2 items-center justify-around sm:grid-cols-3 sm:grid-rows-1">
-          <div className=" order-1 col-span-2 sm:order-3 sm:col-span-1 ">
-            <Indicator value={0.4} className="m-auto" />
-          </div>
-          <HomeInfo title="Total borrowed" value="$130k " className="order-1" />
-          <HomeInfo title="Total supply" value="$300k" className="order-4" />
-        </section>
+        <DashboardInfoSection />
       </main>
       <div className="mt-[150px] flex justify-center bg-gray-100 pb-24">
         <div className="mx-2 -mt-[100px] w-full  max-w-screen-xl flex-1 shrink rounded-lg bg-white p-2 text-black sm:p-10">

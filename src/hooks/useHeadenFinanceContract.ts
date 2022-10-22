@@ -1,9 +1,9 @@
-import { GetContractResult } from '@wagmi/core';
-import { useContract, useProvider, useSigner } from 'wagmi';
+import { GetContractResult } from "@wagmi/core";
+import { useContract, useProvider, useSigner } from "wagmi";
 
-import { useHeadenFinanceAddress } from '@/hooks/useHeadenFinanceAddress';
+import { useHeadenFinanceAddress } from "@/hooks/useHeadenFinanceAddress";
 
-import { headenFinanceAbi } from '@/constant/env';
+import { headenFinanceAbi } from "@/constant/env";
 
 export function useHeadenFinance(): GetContractResult | null {
   const address = useHeadenFinanceAddress();
@@ -14,7 +14,7 @@ export function useHeadenFinance(): GetContractResult | null {
   });
 }
 
-export function useHeadenFinanceWrite(): GetContractResult | null {
+export function useHeadenFinanceWrite(): null {
   const address = useHeadenFinanceAddress();
   const { data: signer } = useSigner();
   return useContract({

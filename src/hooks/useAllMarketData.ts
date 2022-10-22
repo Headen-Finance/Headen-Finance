@@ -1,9 +1,9 @@
-import { AddressZero } from '@ethersproject/constants';
-import { useCallback, useEffect, useState } from 'react';
-import { Address } from 'wagmi';
+import { AddressZero } from "@ethersproject/constants";
+import { useCallback, useEffect, useState } from "react";
+import { Address } from "wagmi";
 
-import { useHeadenFinance } from '@/hooks/useHeadenFinanceContract';
-import useIsMounted from '@/hooks/useIsMounted';
+import { useHeadenFinance } from "@/hooks/useHeadenFinanceContract";
+import useIsMounted from "@/hooks/useIsMounted";
 
 export interface MarketsResponseDisplay {
   tokenAddress: Address;
@@ -15,11 +15,12 @@ export interface MarketsResponseDisplay {
   collateral: string;
 }
 
-const USDC: Address = '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174';
-const USDT: Address = '0xc2132D05D31c914a87C6611C10748AEb04B58e8F';
+const USDC: Address = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+const USDT: Address = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
 
 export function useAllMarketData() {
   const hf = useHeadenFinance();
+
   const [markets, setMarkets] = useState<Array<MarketsResponseDisplay>>([]);
   const mounted = useIsMounted();
   // const {data: marketPools} = useContractRead({
@@ -50,7 +51,7 @@ export function useAllMarketData() {
                 market.amountStaked.sub(market.amountBorrowed).toNumber() /
                 10 ** 6
               ).toFixed(5),
-              collateral: ' - ',
+              collateral: " - ",
             } as MarketsResponseDisplay);
           } else {
             // avoid overflow error
@@ -69,7 +70,7 @@ export function useAllMarketData() {
                 Number(market.amountStaked.sub(market.amountBorrowed)) /
                 10 ** 18
               ).toFixed(5),
-              collateral: ' - ',
+              collateral: " - ",
             } as MarketsResponseDisplay);
           }
         }
