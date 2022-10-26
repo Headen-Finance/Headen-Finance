@@ -14,7 +14,7 @@ export function useHeadenFinance(): GetContractResult | null {
   });
 }
 
-export function useHeadenFinanceWrite(): null {
+export function useHeadenFinanceWrite(): GetContractResult | null {
   const address = useHeadenFinanceAddress();
   const { data: signer } = useSigner();
   return useContract({
