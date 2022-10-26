@@ -1,7 +1,8 @@
 import { AddressZero } from "@ethersproject/constants";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 import { Address } from "wagmi";
 
+import { Action } from "@/lib/Action";
 import { useHeadenFinance } from "@/hooks/useHeadenFinanceContract";
 import useIsMounted from "@/hooks/useIsMounted";
 
@@ -21,7 +22,8 @@ const USDT: Address = "0xc2132D05D31c914a87C6611C10748AEb04B58e8F";
 export function useAllMarketData() {
   const hf = useHeadenFinance();
 
-  const [markets, setMarkets] = useState<Array<MarketsResponseDisplay>>([]);
+  const [state, dispose] = useReducer(reducer, { loading: false, markets: [] });
+
   const mounted = useIsMounted();
   // const {data: marketPools} = useContractRead({
   //   address: address,
@@ -31,6 +33,8 @@ export function useAllMarketData() {
   // console.log("market pools:", marketPools)
   const refresh = useCallback(async () => {
     const data: MarketsResponseDisplay[] = [];
+    dispose({ type: ActionType.LOADING, payload: {} });
+    //todo market_pools
     for (let index = 1; index < 5; index++) {
       try {
         const market = await hf?.markets(index);
@@ -78,7 +82,7 @@ export function useAllMarketData() {
         //market doesnt exist
       }
     }
-    setMarkets(data);
+    dispose({ type: ActionType.LOADED, payload: { markets: data } });
   }, [hf]);
 
   useEffect(() => {
@@ -88,5 +92,36 @@ export function useAllMarketData() {
     });
   }, [refresh, mounted]);
 
-  return { markets, refresh };
+  return { ...state, refresh };
+}
+
+type AllMarketDataState = {
+  loading: boolean;
+  markets: Array<MarketsResponseDisplay>;
+  error?: string;
+};
+
+enum ActionType {
+  LOADING,
+  LOADED,
+  ERROR,
+}
+
+export type AllMarketDataActions =
+  | Action<ActionType.LOADING, Record<string, never>>
+  | Action<ActionType.LOADED, { markets: Array<MarketsResponseDisplay> }>
+  | Action<ActionType.ERROR, { error: string }>;
+
+function reducer(
+  state: AllMarketDataState,
+  action: AllMarketDataActions
+): AllMarketDataState {
+  switch (action.type) {
+    case ActionType.LOADING:
+      return { loading: true, markets: [] };
+    case ActionType.LOADED:
+      return { loading: false, markets: action.payload.markets };
+    case ActionType.ERROR:
+      return { loading: false, markets: [], error: action.payload.error };
+  }
 }

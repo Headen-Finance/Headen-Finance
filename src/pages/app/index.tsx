@@ -17,6 +17,7 @@ import HomeInfo from "@/components/home/HomeInfo";
 import Indicator from "@/components/home/Indicator";
 import Input from "@/components/inputs/Input";
 import Layout from "@/components/layout/Layout";
+import { Loading } from "@/components/Loading";
 import Seo from "@/components/Seo";
 
 import useAssetDialogStore from "@/store/useAssetDialogStore";
@@ -97,7 +98,14 @@ function PoolsRow({ item }: PoolsRowData) {
 }
 
 function PoolsTable() {
-  const { markets } = useAllMarketData();
+  const { markets, loading } = useAllMarketData();
+  if (loading) {
+    return (
+      <div className="w-full">
+        <Loading className="mx-auto min-h-[40vh]" />
+      </div>
+    );
+  }
   return (
     <table className="w-full text-left text-sm text-xs">
       <thead className="text-xs uppercase text-black">
@@ -129,8 +137,8 @@ function PoolsTable() {
         </tr>
       </thead>
       <tbody>
-        {markets.map((value: MarketsResponseDisplay, index: number) => (
-          <PoolsRow key={index} item={value} />
+        {markets.map((value: MarketsResponseDisplay) => (
+          <PoolsRow key={value.tokenAddress} item={value} />
         ))}
       </tbody>
     </table>
