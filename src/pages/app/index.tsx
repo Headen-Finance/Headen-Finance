@@ -2,7 +2,7 @@ import * as React from "react";
 import { useMemo, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { IoIosAdd } from "react-icons/io";
-import { erc20ABI, useAccount, useBalance, useContractRead } from "wagmi";
+import { useAccount, useBalance, useContract, useToken } from "wagmi";
 
 import {
   MarketsResponseDisplay,
@@ -42,36 +42,12 @@ function PoolsRow({ item }: PoolsRowData) {
   const acc = useAccount();
   const { data: balance } = useBalance({
     addressOrName: acc.address,
-    cacheTime: 100,
+    cacheTime: 2_000,
     token: item.tokenAddress,
   });
-  const { data: tokenName } = useContractRead({
+  const { data: tokenInfo } = useToken({
     address: item.tokenAddress,
-    abi: erc20ABI,
-    functionName: "name",
   });
-  const { data: tokenSymbol } = useContractRead({
-    address: item.tokenAddress,
-    abi: erc20ABI,
-    functionName: "symbol",
-  });
-
-  // const {
-  //   data,
-  // } = useContractReads({
-  //   contracts: [
-  //     {
-  //       address: item.tokenAddress,
-  //       abi: erc20ABI,
-  //       functionName: 'name',
-  //     },
-  //     {
-  //       address: item.tokenAddress,
-  //       abi: erc20ABI,
-  //       functionName: 'symbol',
-  //     },
-  //   ],
-  // });
   const openDialog = useAssetDialogStore.useOpenDialog();
   return (
     <tr
@@ -80,9 +56,9 @@ function PoolsRow({ item }: PoolsRowData) {
       onClick={() => openDialog(item.tokenAddress)}
     >
       <th scope="row" className="whitespace-nowrap py-4 px-6 font-medium">
-        <span>{tokenSymbol} token</span>
+        <span>{tokenInfo?.symbol} token</span>
       </th>
-      <td className="py-4 px-6">{tokenName} detail</td>
+      <td className="py-4 px-6">{tokenInfo?.name} detail</td>
       <td className="py-4 px-6">{item.liquidity}</td>
       <td className="py-4 px-6">{item.supplyRate}%</td>
       <td className="py-4 px-6">{item.borrowRate}%</td>
@@ -99,6 +75,7 @@ function PoolsRow({ item }: PoolsRowData) {
 
 function PoolsTable() {
   const { markets, loading } = useAllMarketData();
+
   if (loading) {
     return (
       <div className="w-full">
@@ -162,7 +139,9 @@ export default function HomePage() {
   const tokenAddress = useAssetDialogStore.useTokenAddress();
 
   const closeModal = useAssetDialogStore.useHandleClose();
+  useContract();
   const [showCreateMarketDialog, setShowCreateMarketDialog] = useState(false);
+  // useAvgPriceForTokensTest()
   const dialog = useMemo(
     () => (
       <DialogFrame
