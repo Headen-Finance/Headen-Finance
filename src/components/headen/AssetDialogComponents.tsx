@@ -33,8 +33,8 @@ export function AssetParameters({ className, items }: ParametersProps) {
   return (
     <div className={clsxm("flex flex-col gap-1", className)}>
       {items &&
-        items.map((item) => (
-          <div className="flex justify-between" key={item.title}>
+        items.map((item, index) => (
+          <div className="flex justify-between" key={index}>
             <span>{item.title}</span>
             <span>{item.value}</span>
           </div>
@@ -69,8 +69,8 @@ export function MoreParametersDisclosure({
         <Disclosure.Panel>
           <div className="flex flex-col gap-1 pb-4">
             {items &&
-              items.map((item) => (
-                <div className="flex justify-between" key={item.title}>
+              items.map((item, index) => (
+                <div className="flex justify-between" key={index}>
                   <span>{item.title}</span>
                   <span>{item.value}</span>
                 </div>
@@ -84,8 +84,8 @@ export function MoreParametersDisclosure({
 
 export type AssetAmountInput = {
   percent: number;
-  onPercentChanged: (number) => void;
-  maxText: string;
+  onPercentChanged: (percent: number) => void;
+  maxText?: string;
   className?: string;
 };
 
