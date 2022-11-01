@@ -1,23 +1,25 @@
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import React from 'react';
-import { chain, configureChains, createClient, WagmiConfig } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import React from "react";
+import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
+import { alchemyProvider } from "wagmi/providers/alchemy";
+import { publicProvider } from "wagmi/providers/public";
 
-import '@rainbow-me/rainbowkit/styles.css';
+import "@rainbow-me/rainbowkit/styles.css";
 
 // const chains = [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum];
 
 const { chains, provider } = configureChains(
   [chain.polygonMumbai, chain.arbitrumGoerli, chain.polygon],
   [
-    // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
+    //mumbai
+    alchemyProvider({ apiKey: "9DizSY0FRxqv935mOTRSx5COsF7i1Yx6" }),
 
     publicProvider(),
   ]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'HeadenFinance',
+  appName: "HeadenFinance",
   chains,
 });
 
