@@ -65,7 +65,7 @@ export function useChainlinkFeedData() {
     address: addr,
     abi: aggregatorV3InterfaceABI,
     functionName: "latestRoundData",
-    cacheTime: 10000,
+    staleTime: 10000,
   });
   return latestRoundData?.data?.answer;
 }
