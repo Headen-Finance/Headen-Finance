@@ -42,7 +42,7 @@ function PoolsRow({ item }: PoolsRowData) {
   const acc = useAccount();
   const { data: balance } = useBalance({
     addressOrName: acc.address,
-    cacheTime: 2_000,
+    staleTime: 10_000,
     token: item.tokenAddress,
   });
   const { data: tokenInfo } = useToken({
