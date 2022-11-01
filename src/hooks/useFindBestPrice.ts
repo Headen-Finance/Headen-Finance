@@ -1,6 +1,6 @@
 import { Provider } from "@wagmi/core";
 import { BigNumber, ethers } from "ethers";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Address, erc20ABI, useProvider } from "wagmi";
 
 import { useChainlinkFeedData } from "@/hooks/useChainlinkFeed";
@@ -88,12 +88,16 @@ export async function findBestPriceInUsdc(
   return BigNumber.from(0);
 }
 
-export function useGetValueOfToken8dec(
-  token: Address,
-  amount: BigNumber,
-  router: Address,
-  provider: Provider
-): BigNumber | undefined {
+export function useGetValueOfToken8dec({
+  token,
+  router,
+  provider,
+}: {
+  token: Address;
+  amount?: BigNumber;
+  router: Address;
+  provider: Provider;
+}): (amount?: BigNumber) => BigNumber | undefined {
   const usdcPrice = useChainlinkFeedData();
   const [value, setValue] = useState<BigNumber>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(usdcDecimals);
@@ -101,7 +105,9 @@ export function useGetValueOfToken8dec(
     if (token != getUsdcAddress()) {
       getDecimalsOfToken(token, provider).then(async (tokenDecimals) => {
         setTokenDecimals(tokenDecimals);
-        if (!tokenDecimals) return 0;
+        if (!tokenDecimals) {
+          setValue(BigNumber.from(0));
+        }
         const value = await findBestPriceInUsdc(
           token,
           router,
@@ -115,19 +121,22 @@ export function useGetValueOfToken8dec(
     }
   }, [token, router, provider]);
 
-  return useMemo(() => {
-    if (usdcPrice === undefined || value === undefined) {
-      return undefined;
-    }
-    return usdcPrice
-      .mul(value)
-      .div(BigNumber.from(10).pow(usdcDecimals))
-      .mul(amount)
-      .div(BigNumber.from(10).pow(tokenDecimals));
-  }, [amount, tokenDecimals, usdcPrice, value]);
+  return useCallback(
+    (amount?: BigNumber) => {
+      if (usdcPrice === undefined || value === undefined) {
+        return undefined;
+      }
+      return usdcPrice
+        .mul(value)
+        .div(BigNumber.from(10).pow(usdcDecimals))
+        .mul(amount ?? 0)
+        .div(BigNumber.from(10).pow(tokenDecimals));
+    },
+    [tokenDecimals, usdcPrice, value]
+  );
 }
 
-export async function useGetValueOfToken(token: Address, amount: BigNumber) {
+export function useGetValueOfToken({ token }: { token: Address }) {
   // const uni = '0xb33EaAd8d922B1083446DC23f610c2567fB5180f' //UNI polygon
   // const USDCPoly = getUsdcAddress()
   // const DAIPoly = getDaiAddress()
@@ -135,10 +144,15 @@ export async function useGetValueOfToken(token: Address, amount: BigNumber) {
   const provider = useProvider();
   //TODO router extract to chain config
   const router = "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff";
-  const priceDecimals = 8;
-  const value = useGetValueOfToken8dec(token, amount, router, provider);
-  if (value === undefined) {
-    return undefined;
-  }
-  return value.toNumber() / 10 ** priceDecimals;
+  const priceDecimals = 6;
+  const valueCb = useGetValueOfToken8dec({ token, router, provider });
+
+  return useCallback(
+    (amount?: BigNumber) => {
+      const value = valueCb(amount);
+      if (value === undefined) return undefined;
+      return value.div(100).toNumber() / 10 ** priceDecimals;
+    },
+    [valueCb]
+  );
 }

@@ -1,3 +1,4 @@
+import { AddressZero } from "@ethersproject/constants";
 import { useAccount, useContractRead } from "wagmi";
 
 import { useHeadenFinanceAddress } from "@/hooks/useHeadenFinanceAddress";
@@ -12,8 +13,8 @@ export function useUserData() {
     address: hfAddress,
     abi: headenFinanceAbi,
     functionName: "users",
-    args: [address],
-    enabled: isConnected,
+    args: [address ?? AddressZero],
+    enabled: Boolean(address && isConnected),
   });
   return data;
 }

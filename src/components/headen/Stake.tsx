@@ -1,8 +1,10 @@
+import { BigNumber } from "ethers";
 import { FC, useCallback, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 import { MdInfoOutline } from "react-icons/md";
 import { Address, RpcError } from "wagmi";
 
+import { useGetValueOfToken } from "@/hooks/useFindBestPrice";
 import { useHeadenFinanceWrite } from "@/hooks/useHeadenFinanceContract";
 import { usePercentDisplayBalance } from "@/hooks/usePercentDisplayBalance";
 
@@ -15,6 +17,7 @@ import {
   MoreParametersDisclosure,
   WaitingForTx,
 } from "@/components/headen/AssetDialogComponents";
+import Skeleton from "@/components/Skeleton";
 import { ConnectApproveAction } from "@/components/web3/ConnectWallet";
 import { WhenWallet } from "@/components/web3/WhenAccount";
 
@@ -23,18 +26,28 @@ type ActionProp = {
 };
 
 export const Stake: FC<ActionProp> = ({ tokenAddress }) => {
-  const { balance, amount, displayAmount, percent, setPercent } =
+  const { balance, amount, displayAmount, percent, setPercent, decimals } =
     usePercentDisplayBalance(tokenAddress);
 
+  const valueCb = useGetValueOfToken({ token: tokenAddress });
   const hf = useHeadenFinanceWrite();
   const [loading, setLoading] = useState(false);
+  const price = valueCb(BigNumber.from(10).pow(decimals));
+
   const parameters = useMemo(
     () => [
-      { title: "User Borrow Limit", value: "$0.00" },
+      {
+        title: "Price",
+        value: price ? (
+          `$${price}`
+        ) : (
+          <Skeleton className="h-5 w-14 rounded"></Skeleton>
+        ),
+      },
       { title: "Utilization", value: "$0.00" },
       { title: "Supply APR", value: "$0.00" },
     ],
-    []
+    [price]
   );
   const moreParameters = useMemo(
     () => [

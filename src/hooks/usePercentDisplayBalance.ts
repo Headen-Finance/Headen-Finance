@@ -25,6 +25,7 @@ export function usePercentDisplayBalance(tokenAddress: Address | null) {
     setPercent,
     amount,
     displayAmount,
+    decimals,
   };
 }
 
