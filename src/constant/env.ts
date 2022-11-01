@@ -1,3 +1,5 @@
+import { AddressZero } from "@ethersproject/constants";
+
 export const isProd = process.env.NODE_ENV === "production";
 export const isLocal = process.env.NODE_ENV === "development";
 import { Address, chain } from "wagmi";
@@ -7,6 +9,67 @@ export const showLogger = isLocal
   : process.env.NEXT_PUBLIC_SHOW_LOGGER === "true" ?? false;
 
 export const HASH_SALT = "asd";
+
+type ChainConfig = {
+  contractAddress: Address;
+  routerAddress: Address;
+  usdcAddress: Address;
+  maticAddress: Address;
+  daiAddress: Address;
+};
+
+export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
+  [-1]: {
+    contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
+    maticAddress: AddressZero,
+    usdcAddress: AddressZero,
+    daiAddress: AddressZero,
+    routerAddress: AddressZero,
+  }, //no connected wallet
+  [chain.mainnet.id]: {
+    contractAddress: AddressZero,
+    maticAddress: AddressZero,
+    usdcAddress: AddressZero,
+    daiAddress: AddressZero,
+    routerAddress: AddressZero,
+  },
+  [chain.polygon.id]: {
+    contractAddress: "0x76A1ee1738818566D6663db22b0061ae0A57C9fd",
+    maticAddress: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+    usdcAddress: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
+    daiAddress: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
+    routerAddress: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+  }, //no c
+  [chain.arbitrum.id]: {
+    contractAddress: AddressZero,
+    maticAddress: AddressZero,
+    usdcAddress: AddressZero,
+    daiAddress: AddressZero,
+    routerAddress: AddressZero,
+  },
+  //testnets
+  [chain.arbitrumGoerli.id]: {
+    contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
+    maticAddress: AddressZero,
+    usdcAddress: AddressZero,
+    daiAddress: AddressZero,
+    routerAddress: AddressZero,
+  },
+  [chain.polygonMumbai.id]: {
+    contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
+    maticAddress: AddressZero,
+    usdcAddress: AddressZero,
+    daiAddress: AddressZero,
+    routerAddress: AddressZero,
+  },
+  [chain.goerli.id]: {
+    contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
+    maticAddress: AddressZero,
+    usdcAddress: AddressZero,
+    daiAddress: AddressZero,
+    routerAddress: AddressZero,
+  },
+};
 
 export const CONTRACT_ADDRESS: { [p: number]: Address } = {
   [-1]: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6", //no connected wallet
