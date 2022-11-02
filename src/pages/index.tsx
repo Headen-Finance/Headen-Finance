@@ -35,12 +35,11 @@ function MainSection() {
   return (
     <section className="relative flex min-h-screen w-full items-center justify-center bg-black bg-cover bg-center">
       <NextImage
-        className="absolute inset-0"
+        fill={true}
+        imgClassName="object-cover"
+        className="absolute inset-0 object-cover"
         alt="Headen Finance Background"
-        layout="fill"
-        objectFit="cover"
         src={Background}
-        width="100%"
       />
       <React.Suspense fallback="nothing">
         <ParticlesBackground />
