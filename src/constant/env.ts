@@ -10,7 +10,7 @@ export const showLogger = isLocal
 
 export const HASH_SALT = "asd";
 
-type ChainConfig = {
+export type ChainConfig = {
   contractAddress: Address;
   routerAddress: Address;
   usdcAddress: Address;
@@ -69,17 +69,6 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     daiAddress: AddressZero,
     routerAddress: AddressZero,
   },
-};
-
-export const CONTRACT_ADDRESS: { [p: number]: Address } = {
-  [-1]: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6", //no connected wallet
-  [chain.mainnet.id]: "0x0",
-  [chain.polygon.id]: "0x76A1ee1738818566D6663db22b0061ae0A57C9fd",
-  [chain.arbitrum.id]: "0x0",
-  //testnets
-  [chain.arbitrumGoerli.id]: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
-  [chain.polygonMumbai.id]: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
-  [chain.goerli.id]: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
 };
 
 export const headenFinanceAbi = [

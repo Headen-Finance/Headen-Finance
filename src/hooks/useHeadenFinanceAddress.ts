@@ -1,9 +1,5 @@
-import { useMemo } from 'react';
-import { useNetwork } from 'wagmi';
-
-import { CONTRACT_ADDRESS } from '@/constant/env';
+import { useChainData } from "@/hooks/useChainData";
 
 export function useHeadenFinanceAddress() {
-  const { chain } = useNetwork();
-  return useMemo(() => CONTRACT_ADDRESS[chain?.id ?? -1], [chain]);
+  return useChainData().contractAddress;
 }

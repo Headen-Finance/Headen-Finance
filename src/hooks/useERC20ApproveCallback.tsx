@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
-import { BigNumber } from 'ethers';
-import { useCallback, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
+import { BigNumber } from "ethers";
+import { useCallback, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 import {
   Address,
   erc20ABI,
@@ -12,21 +12,21 @@ import {
   UserRejectedRequestError,
   useSendTransaction,
   useSigner,
-} from 'wagmi';
+} from "wagmi";
 
-import { CONTRACT_ADDRESS } from '@/constant/env';
+import { CHAIN_CONFIG } from "@/constant/env";
 
-import { useERC20Allowance } from './useERC20Allowance';
+import { useERC20Allowance } from "./useERC20Allowance";
 
 export function calculateGasMargin(value: BigNumber): BigNumber {
   return value.mul(BigNumber.from(10000 + 2000)).div(BigNumber.from(10000));
 }
 
 export enum ApprovalState {
-  UNKNOWN = 'UNKNOWN',
-  NOT_APPROVED = 'NOT_APPROVED',
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
+  UNKNOWN = "UNKNOWN",
+  NOT_APPROVED = "NOT_APPROVED",
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
 }
 
 // returns a variable indicating the state of the approval and a function which approves if necessary or early returns
@@ -37,7 +37,8 @@ export function useERC20ApproveCallback(
   spender?: Address
 ): [ApprovalState, () => Promise<void>] {
   const { chain } = useNetwork();
-  const _spender: Address = spender ?? CONTRACT_ADDRESS[chain?.id ?? -1];
+  const _spender: Address =
+    spender ?? CHAIN_CONFIG[chain?.id ?? -1].contractAddress;
 
   const { address } = useAccount();
   const { data: signer } = useSigner();
@@ -46,7 +47,7 @@ export function useERC20ApproveCallback(
   const { config } = usePrepareContractWrite({
     address: tokenAddress,
     abi: erc20ABI,
-    functionName: 'approve',
+    functionName: "approve",
     signer,
     args: [_spender, amountToApprove],
   });
@@ -86,22 +87,22 @@ export function useERC20ApproveCallback(
       approvalState !== ApprovalState.NOT_APPROVED &&
       !amountToApprove?.eq(0)
     ) {
-      console.error('approve was called unnecessarily');
+      console.error("approve was called unnecessarily");
       return;
     }
 
     if (!tokenContract) {
-      console.error('tokenContract is null');
+      console.error("tokenContract is null");
       return;
     }
 
     if (!amountToApprove) {
-      console.error('missing amount to approve');
+      console.error("missing amount to approve");
       return;
     }
 
     if (!_spender) {
-      console.error('no spender');
+      console.error("no spender");
       return;
     }
 
@@ -117,10 +118,10 @@ export function useERC20ApproveCallback(
         const data = await sendTransactionAsync();
         setLoading(true);
         await toast.promise(data.wait(), {
-          success: 'Successfully approved',
-          error: 'Ooops, something went wrong',
+          success: "Successfully approved",
+          error: "Ooops, something went wrong",
           loading: (
-            <p className='flex flex-col'>
+            <p className="flex flex-col">
               <span>Waiting for confirmation</span>
               <span>tx: {data.hash}</span>
             </p>

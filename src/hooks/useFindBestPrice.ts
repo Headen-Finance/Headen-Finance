@@ -3,7 +3,10 @@ import { BigNumber, ethers } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import { Address, erc20ABI, useProvider } from "wagmi";
 
+import { useChainData } from "@/hooks/useChainData";
 import { useChainlinkFeedData } from "@/hooks/useChainlinkFeed";
+
+import { ChainConfig } from "@/constant/env";
 
 const UniswapV2ROuter02ABI = [
   "function getAmountsOut(uint amountIn, address[] memory path) public view returns (uint[] memory amounts)",
@@ -15,18 +18,6 @@ const usdcMultiplier = BigNumber.from(10).pow(usdcDecimals);
 const daiDecimals = 18;
 // eslint-disable-next-line unused-imports/no-unused-vars
 const daiMultiplier = BigNumber.from(10).pow(daiDecimals);
-
-function getUsdcAddress(): Address {
-  return "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
-}
-
-function getDaiAddress(): Address {
-  return "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063";
-}
-
-function getMaticAddress(): Address {
-  return "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270";
-}
 
 export async function getAvgPriceForTokens(
   amountIn: BigNumber,
@@ -53,14 +44,15 @@ export async function getDecimalsOfToken(
 
 export async function findBestPriceInUsdc(
   token: Address,
-  router: Address,
+  chainConfig: ChainConfig,
   provider: Provider,
   tokenDecimals: number
 ): Promise<BigNumber> {
   const tokenMultiplier = BigNumber.from(10).pow(tokenDecimals);
-  const usdcAddress = getUsdcAddress();
-  const daiAddress = getDaiAddress();
-  const maticAddress = getMaticAddress();
+  const usdcAddress = chainConfig.usdcAddress;
+  const daiAddress = chainConfig.daiAddress;
+  const maticAddress = chainConfig.maticAddress;
+  const router = chainConfig.routerAddress;
   // try direct pair
   let path = [token, usdcAddress];
   let result: BigNumber = await getAvgPriceForTokens(
@@ -90,19 +82,19 @@ export async function findBestPriceInUsdc(
 
 export function useGetValueOfToken8dec({
   token,
-  router,
   provider,
 }: {
   token: Address;
   amount?: BigNumber;
-  router: Address;
   provider: Provider;
 }): (amount?: BigNumber) => BigNumber | undefined {
   const usdcPrice = useChainlinkFeedData();
+  const chainConfig = useChainData();
   const [value, setValue] = useState<BigNumber>();
   const [tokenDecimals, setTokenDecimals] = useState<number>(usdcDecimals);
+  //TODO use useQuery to cache data
   useEffect(() => {
-    if (token != getUsdcAddress()) {
+    if (token != chainConfig.usdcAddress) {
       getDecimalsOfToken(token, provider).then(async (tokenDecimals) => {
         setTokenDecimals(tokenDecimals);
         if (!tokenDecimals) {
@@ -110,7 +102,7 @@ export function useGetValueOfToken8dec({
         }
         const value = await findBestPriceInUsdc(
           token,
-          router,
+          chainConfig,
           provider,
           tokenDecimals
         );
@@ -119,7 +111,7 @@ export function useGetValueOfToken8dec({
     } else {
       setValue(usdcMultiplier);
     }
-  }, [token, router, provider]);
+  }, [token, chainConfig, provider]);
 
   return useCallback(
     (amount?: BigNumber) => {
@@ -142,10 +134,8 @@ export function useGetValueOfToken({ token }: { token: Address }) {
   // const DAIPoly = getDaiAddress()
   // const wmatic = getMaticAddress()
   const provider = useProvider();
-  //TODO router extract to chain config
-  const router = "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff";
   const priceDecimals = 6;
-  const valueCb = useGetValueOfToken8dec({ token, router, provider });
+  const valueCb = useGetValueOfToken8dec({ token, provider });
 
   return useCallback(
     (amount?: BigNumber) => {
