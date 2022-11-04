@@ -235,7 +235,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     event Staked(uint _amount, address tokenAddress);
     event Borrowed(uint _amount, address tokenAddress);
     event Withdrawn(uint _amount, address tokenAddress);
-    event Repayed(uint _amount, address tokenAddress);
+    event Repaid(uint _amount, address tokenAddress);
     event FullChainSyncRequired();
     event UpdateChildChains(User user);
 
@@ -490,7 +490,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
          //child
         emit UpdateChildChains(users[chainId][msg.sender]); //child chain
-        emit Repayed(_amount, _tokenAddress);
+        emit Repaid(_amount, _tokenAddress);
         dispatch(msg.sender);
     }
 
