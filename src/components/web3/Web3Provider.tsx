@@ -45,7 +45,9 @@ type Web3ProviderProps = {
 const Web3Provider = ({ children }: Web3ProviderProps) => {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>{children}</RainbowKitProvider>
+      <RainbowKitProvider chains={chains} initialChain={chain.polygonMumbai}>
+        {children}
+      </RainbowKitProvider>
     </WagmiConfig>
   );
 };
