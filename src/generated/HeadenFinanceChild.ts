@@ -64,6 +64,7 @@ export type HeadenFinanceChildEvents =
   | "LockUntilUpdateFromParentChain"
   | "OwnershipTransferred"
   | "RemoteRouterEnrolled"
+  | "Repaid"
   | "Staked"
   | "UpdateParentChain"
   | "Withdrawn";
@@ -77,6 +78,7 @@ export interface HeadenFinanceChildEventsContext {
   LockUntilUpdateFromParentChain(...parameters: any): EventFilter;
   OwnershipTransferred(...parameters: any): EventFilter;
   RemoteRouterEnrolled(...parameters: any): EventFilter;
+  Repaid(...parameters: any): EventFilter;
   Staked(...parameters: any): EventFilter;
   UpdateParentChain(...parameters: any): EventFilter;
   Withdrawn(...parameters: any): EventFilter;
@@ -105,7 +107,6 @@ export type HeadenFinanceChildMethodNames =
   | "interval"
   | "lastAPRUpdate"
   | "lastTimeStamp"
-  | "lockThisUserUntilParentUpdate"
   | "marketTokens"
   | "market_pools"
   | "markets"
@@ -150,6 +151,10 @@ export interface undefinedRequest {
 export interface AbacusConnectionManagerSetEventEmittedResponse {
   abacusConnectionManager: string;
 }
+export interface BorrowedEventEmittedResponse {
+  _amount: BigNumberish;
+  tokenAddress: string;
+}
 export interface ChainSyncRequiredEventEmittedResponse {
   user: string;
 }
@@ -170,8 +175,17 @@ export interface RemoteRouterEnrolledEventEmittedResponse {
   domain: BigNumberish;
   router: Arrayish;
 }
-export interface UpdateParentChainEventEmittedResponse {
-  user: UserRequest;
+export interface RepaidEventEmittedResponse {
+  _amount: BigNumberish;
+  tokenAddress: string;
+}
+export interface StakedEventEmittedResponse {
+  _amount: BigNumberish;
+  tokenAddress: string;
+}
+export interface WithdrawnEventEmittedResponse {
+  _amount: BigNumberish;
+  tokenAddress: string;
 }
 export interface CheckUpkeepResponse {
   upkeepNeeded: boolean;
@@ -500,17 +514,6 @@ export interface HeadenFinanceChild {
    * Type: function
    */
   lastTimeStamp(overrides?: ContractCallOverrides): Promise<BigNumber>;
-  /**
-   * Payable: false
-   * Constant: false
-   * StateMutability: nonpayable
-   * Type: function
-   * @param user Type: address, Indexed: false
-   */
-  lockThisUserUntilParentUpdate(
-    user: string,
-    overrides?: ContractTransactionOverrides
-  ): Promise<ContractTransaction>;
   /**
    * Payable: false
    * Constant: true
