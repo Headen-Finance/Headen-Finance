@@ -56,11 +56,11 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     routerAddress: AddressZero,
   },
   [chain.polygonMumbai.id]: {
-    contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
-    maticAddress: AddressZero,
-    usdcAddress: AddressZero,
-    daiAddress: AddressZero,
-    routerAddress: AddressZero,
+    contractAddress: "0x92378719B4E8686c149E167a9151fD8d25C843c3",
+    maticAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
+    usdcAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
+    daiAddress: "0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253",
+    routerAddress: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
   },
   [chain.goerli.id]: {
     contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
