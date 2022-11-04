@@ -164,7 +164,6 @@ function InvestorsSection() {
                 alt="ETHGlobal logo"
                 height={100}
                 width={200}
-                layout="responsive"
               />
             </div>
           ))}
