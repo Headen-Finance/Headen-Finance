@@ -1,15 +1,13 @@
 import { AddressZero } from "@ethersproject/constants";
 import { BigNumber } from "ethers";
 import * as React from "react";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
-import toast from "react-hot-toast";
+import { FC, useMemo, useState } from "react";
 import { useDebounce } from "use-debounce";
 import {
   Address,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
-  useWaitForTransaction,
 } from "wagmi";
 
 import clsxm from "@/lib/clsxm";
@@ -17,12 +15,12 @@ import { useGetValueOfToken } from "@/hooks/useFindBestPrice";
 import { useHeadenFinanceAddress } from "@/hooks/useHeadenFinanceAddress";
 import { usePercentDisplayBalance } from "@/hooks/usePercentDisplayBalance";
 import { useUniswapTokenList } from "@/hooks/useUniswapTokenList";
+import { useWaitForTransactionWithToast } from "@/hooks/useWaitForTransactionWithToast";
 
 import Button from "@/components/buttons/Button";
 import {
   AssetAmountInput,
   AssetBalance,
-  WaitingForTx,
 } from "@/components/headen/AssetDialogComponents";
 import { Loading } from "@/components/Loading";
 import { Select, SelectOption } from "@/components/selects/Select";
@@ -70,24 +68,7 @@ export const CreateMarket: FC = () => {
     enabled: Boolean(tokenAddress && debouncedAmount),
   });
   const { data, write } = useContractWrite(config);
-
-  const { isLoading, isSuccess, isError } = useWaitForTransaction({
-    hash: data?.hash,
-  });
-  const dialogId = useRef<string>();
-  useEffect(() => {
-    if (isLoading && !dialogId.current) {
-      dialogId.current = toast.loading(<WaitingForTx tx={data} />);
-    } else {
-      if (isSuccess) {
-        toast.success("Successfully created the pool and staked", {
-          id: dialogId.current,
-        });
-      } else if (isError) {
-        toast.error("Ooops, something went wrong", { id: dialogId.current });
-      }
-    }
-  }, [isLoading, isSuccess, isError, data]);
+  const { isLoading } = useWaitForTransactionWithToast({ data });
 
   const selectedOption = useMemo(
     () =>
