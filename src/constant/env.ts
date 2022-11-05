@@ -65,7 +65,7 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     chainlinkUsdcFeed: AddressZero,
   },
   [chain.polygonMumbai.id]: {
-    contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6", //"0x686C74f85dd4E33B76A4e8a882f09266f51cE657",
+    contractAddress: "0x686C74f85dd4E33B76A4e8a882f09266f51cE657",
     maticAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
     usdcAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
     daiAddress: "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F",
