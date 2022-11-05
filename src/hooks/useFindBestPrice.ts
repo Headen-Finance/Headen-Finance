@@ -84,7 +84,7 @@ export function useGetValueOfToken8dec({
   token,
   provider,
 }: {
-  token: Address;
+  token?: Address;
   amount?: BigNumber;
   provider: Provider;
 }): (amount?: BigNumber) => BigNumber | undefined {
@@ -94,6 +94,7 @@ export function useGetValueOfToken8dec({
   const [tokenDecimals, setTokenDecimals] = useState<number>(usdcDecimals);
   //TODO use useQuery to cache data
   useEffect(() => {
+    if (token == null) return;
     if (token != chainConfig.usdcAddress) {
       getDecimalsOfToken(token, provider).then(async (tokenDecimals) => {
         setTokenDecimals(tokenDecimals);
@@ -128,7 +129,7 @@ export function useGetValueOfToken8dec({
   );
 }
 
-export function useGetValueOfToken({ token }: { token: Address }) {
+export function useGetValueOfToken({ token }: { token?: Address }) {
   // const uni = '0xb33EaAd8d922B1083446DC23f610c2567fB5180f' //UNI polygon
   // const USDCPoly = getUsdcAddress()
   // const DAIPoly = getDaiAddress()
