@@ -6,13 +6,15 @@ import { publicProvider } from "wagmi/providers/public";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
+import { alchemyKey } from "@/constant/env";
+
 // const chains = [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum];
 
 const { chains, provider } = configureChains(
   [chain.polygonMumbai, chain.arbitrumGoerli, chain.polygon],
   [
     //mumbai
-    alchemyProvider({ apiKey: "frRKl_kbOik5UzWIaoc7PCHSmORRQDzi" }),
+    alchemyProvider({ apiKey: alchemyKey }),
 
     publicProvider(),
   ]
