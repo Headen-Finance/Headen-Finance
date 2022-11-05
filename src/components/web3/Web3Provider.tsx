@@ -12,7 +12,7 @@ const { chains, provider } = configureChains(
   [chain.polygonMumbai, chain.arbitrumGoerli, chain.polygon],
   [
     //mumbai
-    alchemyProvider({ apiKey: "9DizSY0FRxqv935mOTRSx5COsF7i1Yx6" }),
+    alchemyProvider({ apiKey: "frRKl_kbOik5UzWIaoc7PCHSmORRQDzi" }),
 
     publicProvider(),
   ]
