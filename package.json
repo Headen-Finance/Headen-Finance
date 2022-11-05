@@ -23,6 +23,7 @@
     "@headlessui/react": "^1.7.4",
     "@headlessui/tailwindcss": "^0.1.1",
     "@hyperlane-xyz/app": "^0.5.0-beta0",
+    "@next/font": "^13.0.2",
     "@openzeppelin/contracts": "^4.7.3",
     "@rainbow-me/rainbowkit": "^0.7.1",
     "@uniswap/default-token-list": "^5.2.0",
