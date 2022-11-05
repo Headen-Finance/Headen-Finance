@@ -11,11 +11,11 @@ import { Loading } from "@/components/Loading";
 import { NoWalletConnected } from "@/components/web3/NoWalletConnected";
 import { WhenWallet } from "@/components/web3/WhenAccount";
 
-export function WaitingForTx(props: { tx: { hash: string } }) {
+export function WaitingForTx(props: { tx?: { hash: Address } }) {
   return (
     <span className="flex flex-col">
       <span>Waiting for confirmation</span>
-      <span>tx: {props.tx.hash}</span>
+      <span>tx: {props.tx?.hash}</span>
     </span>
   );
 }
