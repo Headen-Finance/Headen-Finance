@@ -58,14 +58,13 @@ const aggregatorV3InterfaceABI = [
 //   ERROR = "ERROR",
 // }
 
-export function useChainlinkFeedData({ enabled }: { enabled?: boolean }) {
+export function useChainlinkFeedData() {
   const { chainlinkUsdcFeed } = useChainData();
   const latestRoundData = useContractRead({
     address: chainlinkUsdcFeed,
     abi: aggregatorV3InterfaceABI,
     functionName: "latestRoundData",
     staleTime: 10000,
-    enabled: enabled,
   });
   return latestRoundData?.data?.answer;
 }
