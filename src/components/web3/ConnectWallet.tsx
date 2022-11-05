@@ -1,29 +1,30 @@
 /* eslint-disable */
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 // import { ConnectKitButton } from 'connectkit';
-import * as React from 'react';
-import { FC, ReactNode, useCallback, useMemo } from 'react';
-import { Address, useAccount } from 'wagmi';
+import * as React from "react";
+import { FC, ReactNode, useCallback } from "react";
+import { Address, useAccount } from "wagmi";
 
-import clsxm from '@/lib/clsxm';
+import clsxm from "@/lib/clsxm";
 
-import Button, { ButtonProps } from '@/components/buttons/Button';
+import Button, { ButtonProps } from "@/components/buttons/Button";
 import {
   ApprovalState,
   useERC20ApproveCallback,
-} from '@/hooks/useERC20ApproveCallback';
-import { MaxUint256 } from '@ethersproject/constants';
+} from "@/hooks/useERC20ApproveCallback";
+import { MaxUint256 } from "@ethersproject/constants";
+import { Loading } from "@/components/Loading";
 
-type Visibility = 'always' | 'connected' | 'not_connected';
+type Visibility = "always" | "connected" | "not_connected";
 
 export const ConnectWallet: FC<{ show?: Visibility }> = ({
-  show = 'always',
+  show = "always",
 }) => {
   const { isConnected } = useAccount();
 
   if (
-    (show == 'connected' && !isConnected) ||
-    (show == 'not_connected' && isConnected)
+    (show == "connected" && !isConnected) ||
+    (show == "not_connected" && isConnected)
   )
     return null;
 
@@ -85,13 +86,20 @@ export const ConnectApproveAction: FC<
                 <Button
                   onClick={approve}
                   className={clsxm(
-                    'w-full justify-center py-3.5 sm:py-5',
+                    "w-full justify-center py-3.5 sm:py-5",
                     className
                   )}
-                  variant='primary'
+                  variant="primary"
                 >
                   Approve token
                 </Button>
+              );
+            }
+            if (approvalState == ApprovalState.PENDING) {
+              return (
+                <div className={"w-full justify-center py-3.5 sm:py-5"}>
+                  <Loading />
+                </div>
               );
             }
             return <>{children}</>;
@@ -102,11 +110,11 @@ export const ConnectApproveAction: FC<
         return (
           <div
             {...(!ready && {
-              'aria-hidden': true,
+              "aria-hidden": true,
               style: {
                 opacity: 0,
-                pointerEvents: 'none',
-                userSelect: 'none',
+                pointerEvents: "none",
+                userSelect: "none",
               },
             })}
           >
@@ -116,10 +124,10 @@ export const ConnectApproveAction: FC<
                   <Button
                     onClick={openConnectModal}
                     className={clsxm(
-                      'w-full justify-center py-3.5 sm:py-5',
+                      "w-full justify-center py-3.5 sm:py-5",
                       className
                     )}
-                    variant='light'
+                    variant="light"
                   >
                     Connect Wallet
                   </Button>
@@ -131,10 +139,10 @@ export const ConnectApproveAction: FC<
                   <Button
                     onClick={openChainModal}
                     className={clsxm(
-                      'w-full justify-center py-3.5 sm:py-5',
+                      "w-full justify-center py-3.5 sm:py-5",
                       className
                     )}
-                    variant='light'
+                    variant="light"
                   >
                     Wrong network
                   </Button>
@@ -142,7 +150,7 @@ export const ConnectApproveAction: FC<
               }
 
               return (
-                <div style={{ display: 'flex', gap: 12 }}>
+                <div style={{ display: "flex", gap: 12 }}>
                   {/*<Button*/}
                   {/*  onClick={openChainModal}*/}
                   {/*  style={{ display: 'flex', alignItems: 'center' }}*/}
