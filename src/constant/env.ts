@@ -16,6 +16,7 @@ export type ChainConfig = {
   usdcAddress: Address;
   maticAddress: Address;
   daiAddress: Address;
+  chainlinkUsdcFeed: Address;
 };
 
 export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
@@ -25,6 +26,7 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     usdcAddress: AddressZero,
     daiAddress: AddressZero,
     routerAddress: AddressZero,
+    chainlinkUsdcFeed: AddressZero,
   }, //no connected wallet
   [chain.mainnet.id]: {
     contractAddress: AddressZero,
@@ -32,6 +34,7 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     usdcAddress: AddressZero,
     daiAddress: AddressZero,
     routerAddress: AddressZero,
+    chainlinkUsdcFeed: AddressZero,
   },
   [chain.polygon.id]: {
     contractAddress: "0x76A1ee1738818566D6663db22b0061ae0A57C9fd",
@@ -39,6 +42,7 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     usdcAddress: "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
     daiAddress: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     routerAddress: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff",
+    chainlinkUsdcFeed: "0xfe4a8cc5b5b2366c1b58bea3858e81843581b2f7",
   }, //no c
   [chain.arbitrum.id]: {
     contractAddress: AddressZero,
@@ -46,6 +50,7 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     usdcAddress: AddressZero,
     daiAddress: AddressZero,
     routerAddress: AddressZero,
+    chainlinkUsdcFeed: AddressZero,
   },
   //testnets
   [chain.arbitrumGoerli.id]: {
@@ -54,13 +59,15 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     usdcAddress: AddressZero,
     daiAddress: AddressZero,
     routerAddress: AddressZero,
+    chainlinkUsdcFeed: AddressZero,
   },
   [chain.polygonMumbai.id]: {
-    contractAddress: "0x92378719B4E8686c149E167a9151fD8d25C843c3",
+    contractAddress: "0x686C74f85dd4E33B76A4e8a882f09266f51cE657",
     maticAddress: "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
     usdcAddress: "0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747",
-    daiAddress: "0xd393b1E02dA9831Ff419e22eA105aAe4c47E1253",
-    routerAddress: "0xE592427A0AEce92De3Edee1F18E0157C05861564",
+    daiAddress: "0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F",
+    routerAddress: "0x8954AfA98594b838bda56FE4C12a09D7739D179b",
+    chainlinkUsdcFeed: "0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0",
   },
   [chain.goerli.id]: {
     contractAddress: "0xc6151C174EA7F9a3013BBAF5bb3185BFc49324B6",
@@ -68,6 +75,7 @@ export const CHAIN_CONFIG: { [p: number]: ChainConfig } = {
     usdcAddress: AddressZero,
     daiAddress: AddressZero,
     routerAddress: AddressZero,
+    chainlinkUsdcFeed: AddressZero,
   },
 };
 
