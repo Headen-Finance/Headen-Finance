@@ -22,6 +22,7 @@ import Button from "@/components/buttons/Button";
 import { WaitingForTx } from "@/components/headen/AssetDialogComponents";
 import { Loading } from "@/components/Loading";
 import { Select, SelectOption } from "@/components/selects/Select";
+import Skeleton from "@/components/Skeleton";
 import { ConnectApproveAction } from "@/components/web3/ConnectWallet";
 import { NoWalletConnected } from "@/components/web3/NoWalletConnected";
 import { WhenWallet } from "@/components/web3/WhenAccount";
@@ -50,6 +51,7 @@ export const CreateMarket: FC = () => {
   const { chain } = useNetwork();
   const { balance, amount, displayAmount, percent, setPercent } =
     usePercentDisplayBalance(tokenAddress);
+  const isLoadingBalance = balance.isLoading;
   const [debouncedAmount] = useDebounce(amount, 500);
 
   const {
@@ -102,12 +104,18 @@ export const CreateMarket: FC = () => {
                 onChanged={(it) => setTokenAddress(it.value.address)}
               />
 
-              {tokenAddress && (
-                <span className="text-2xl sm:text-5xl ">
-                  {displayAmount}
-                  {balance.data?.symbol}
-                </span>
-              )}
+              {tokenAddress &&
+                (isLoadingBalance ? (
+                  <Skeleton className="mx-auto h-[5rem] w-[9rem]" />
+                ) : (
+                  <div>
+                    <div className="text-2xl sm:text-5xl ">
+                      {displayAmount}
+                      {balance.data?.symbol}
+                    </div>
+                    <div>~${valueCb(amount)}</div>
+                  </div>
+                ))}
             </div>
             {/*<h6>=$0</h6>*/}
           </div>
@@ -119,6 +127,8 @@ export const CreateMarket: FC = () => {
               Ooops, it looks like that you do not have any{" "}
               {balance.data?.symbol}
             </div>
+          ) : isLoadingBalance ? (
+            <Skeleton className="mx-auto mb-8 h-[2rem] w-[80%]" />
           ) : (
             <div className="relative py-5 sm:py-10 ">
               <input
@@ -135,7 +145,6 @@ export const CreateMarket: FC = () => {
                 <span> 0</span>
                 <span> {balance.data?.formatted}</span>
               </div>
-              <div>value: {valueCb(amount)}</div>
             </div>
           )}
         </WhenWallet>
