@@ -1,9 +1,11 @@
+import { BigNumber } from "ethers";
 import * as React from "react";
-import { useMemo, useState } from "react";
+import { ReactNode, useCallback, useMemo, useState } from "react";
 import { AiOutlineSearch } from "react-icons/ai";
 import { IoIosAdd } from "react-icons/io";
-import { useAccount, useBalance, useContract, useToken } from "wagmi";
+import { useAccount, useBalance, useToken } from "wagmi";
 
+import clsxm from "@/lib/clsxm";
 import {
   MarketsResponseDisplay,
   useAllMarketData,
@@ -19,6 +21,7 @@ import Input from "@/components/inputs/Input";
 import Layout from "@/components/layout/Layout";
 import { Loading } from "@/components/Loading";
 import Seo from "@/components/Seo";
+import Skeleton from "@/components/Skeleton";
 
 import useAssetDialogStore from "@/store/useAssetDialogStore";
 
@@ -38,17 +41,45 @@ type PoolsRowData = {
   item: MarketsResponseDisplay;
 };
 
+function LoadingText({
+  isLoading,
+  children,
+  className,
+}: {
+  isLoading: boolean;
+  children: ReactNode;
+  className?: string;
+}) {
+  if (isLoading) {
+    return <Skeleton className={clsxm("h-5 w-20 rounded", className)} />;
+  }
+  return <>{children}</>;
+}
+
 function PoolsRow({ item }: PoolsRowData) {
   const acc = useAccount();
-  const { data: balance } = useBalance({
+  const { data: balance, isLoading: isLoadingBalance } = useBalance({
     addressOrName: acc.address,
     staleTime: 10_000,
     token: item.tokenAddress,
   });
-  const { data: tokenInfo } = useToken({
+  const { data: tokenInfo, isLoading } = useToken({
     address: item.tokenAddress,
   });
   const openDialog = useAssetDialogStore.useOpenDialog();
+  const getDisplayValue = useCallback(
+    (value: BigNumber) => {
+      if (tokenInfo?.decimals == undefined) return 0;
+      if (tokenInfo.decimals < 6) return value.toNumber() / tokenInfo.decimals;
+      const fixedDigits = 5;
+      const diff = tokenInfo.decimals - fixedDigits;
+      return (
+        value.div(BigNumber.from(10).pow(diff)).toNumber() /
+        10 ** fixedDigits
+      ).toFixed(fixedDigits);
+    },
+    [tokenInfo]
+  );
   return (
     <tr
       // key={index}
@@ -56,17 +87,33 @@ function PoolsRow({ item }: PoolsRowData) {
       onClick={() => openDialog(item.tokenAddress)}
     >
       <th scope="row" className="whitespace-nowrap py-4 px-6 font-medium">
-        <span>{tokenInfo?.symbol} token</span>
+        <LoadingText isLoading={isLoading}>
+          <span>{tokenInfo?.symbol} token</span>
+        </LoadingText>
       </th>
-      <td className="py-4 px-6">{tokenInfo?.name} detail</td>
-      <td className="py-4 px-6">{item.liquidity}</td>
+      <td className="py-4 px-6">
+        <LoadingText isLoading={isLoading}>
+          <span>{tokenInfo?.name} detail</span>
+        </LoadingText>
+      </td>
+      <td className="py-4 px-6">
+        <LoadingText isLoading={isLoading}>
+          {getDisplayValue(item.liquidity)}
+        </LoadingText>
+      </td>
       <td className="py-4 px-6">{item.supplyRate}%</td>
       <td className="py-4 px-6">{item.borrowRate}%</td>
-      <td className="py-4 px-6">{item.amountStaked}</td>
+      <td className="py-4 px-6">
+        <LoadingText isLoading={isLoading}>
+          {getDisplayValue(item.amountStaked)}
+        </LoadingText>
+      </td>
       <td className="py-4 px-6">4.08%</td>
       <td className="py-4 px-6">
-        {balance?.formatted}
-        {balance?.symbol}
+        <LoadingText isLoading={isLoadingBalance}>
+          {balance?.formatted}
+          {balance?.symbol}
+        </LoadingText>
       </td>
     </tr>
   );
@@ -139,7 +186,6 @@ export default function HomePage() {
   const tokenAddress = useAssetDialogStore.useTokenAddress();
 
   const closeModal = useAssetDialogStore.useHandleClose();
-  useContract();
   const [showCreateMarketDialog, setShowCreateMarketDialog] = useState(false);
   // useAvgPriceForTokensTest()
   const dialog = useMemo(
