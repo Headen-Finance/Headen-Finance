@@ -120,9 +120,29 @@ function PoolsRow({ item }: PoolsRowData) {
   //todo item.amountStaked should be how much the user has staked
 }
 
+type TableColumn = {
+  className?: string;
+  title: string;
+};
+
 function PoolsTable() {
   const { markets, loading } = useAllMarketData();
-
+  const columns = useMemo<TableColumn[]>(
+    () => [
+      {
+        title: "Asset",
+        className: "w-1/4",
+      },
+      { title: "Detail" },
+      { title: "Available liquidity" },
+      { title: "Deposit rate" },
+      { title: "Borrow rate" },
+      { title: "Collateral" },
+      { title: "APY" },
+      { title: "Wallet" },
+    ],
+    []
+  );
   if (loading) {
     return (
       <div className="w-full">
@@ -134,30 +154,15 @@ function PoolsTable() {
     <table className="w-full text-left text-sm text-xs">
       <thead className="text-xs uppercase text-black">
         <tr className="bg-gray-300">
-          <th scope="col" className="w-1/4 py-3 px-6">
-            Asset
-          </th>
-          <th scope="col" className="py-3 px-6">
-            Detail
-          </th>
-          <th scope="col" className="py-3 px-6">
-            Available liquidity
-          </th>
-          <th scope="col" className="py-3 px-6">
-            Deposit rate
-          </th>
-          <th scope="col" className="py-3 px-6">
-            Borrow rate
-          </th>
-          <th scope="col" className="py-3 px-6">
-            Collateral
-          </th>
-          <th scope="col" className="py-3 px-6">
-            APY
-          </th>
-          <th scope="col" className="py-3 px-6">
-            Wallet
-          </th>
+          {columns.map((value) => (
+            <th
+              key={value.title}
+              scope="col"
+              className={clsxm(" py-3 px-6", value.className)}
+            >
+              {value.title}
+            </th>
+          ))}
         </tr>
       </thead>
       <tbody>
