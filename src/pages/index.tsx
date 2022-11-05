@@ -1,7 +1,7 @@
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import Background from "public/images/landing/landing_bg.png";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MdOutlineBuild } from "react-icons/md";
 
 import LandingLayout from "@/components/layout/LandingLayout";
@@ -32,6 +32,10 @@ export default function LandingPage() {
 }
 
 function MainSection() {
+  const [showParticles, setShowParticles] = useState(false);
+  useEffect(() => {
+    setTimeout(() => setShowParticles(true), 500);
+  }, []);
   return (
     <section className="relative flex min-h-screen w-full items-center justify-center bg-black bg-cover bg-center">
       <NextImage
@@ -39,10 +43,11 @@ function MainSection() {
         imgClassName="object-cover"
         className="absolute inset-0 object-cover"
         alt="Headen Finance Background"
+        placeholder="blur"
         src={Background}
       />
-      <React.Suspense fallback="nothing">
-        <ParticlesBackground />
+      <React.Suspense>
+        {showParticles && <ParticlesBackground />}
       </React.Suspense>
 
       <div className="z-10 mx-12 flex w-full max-w-7xl flex-col items-center">
