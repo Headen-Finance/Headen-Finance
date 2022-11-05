@@ -1,14 +1,26 @@
+import { AddressZero } from "@ethersproject/constants";
+import { BigNumber } from "ethers";
 import * as React from "react";
-import { FC, useCallback, useMemo, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { Address, RpcError, useNetwork } from "wagmi";
+import { useDebounce } from "use-debounce";
+import {
+  Address,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+  useWaitForTransaction,
+} from "wagmi";
 
 import clsxm from "@/lib/clsxm";
-import { useHeadenFinanceWrite } from "@/hooks/useHeadenFinanceContract";
+import { useGetValueOfToken } from "@/hooks/useFindBestPrice";
+import { useHeadenFinanceAddress } from "@/hooks/useHeadenFinanceAddress";
 import { usePercentDisplayBalance } from "@/hooks/usePercentDisplayBalance";
 import { useUniswapTokenList } from "@/hooks/useUniswapTokenList";
 
 import Button from "@/components/buttons/Button";
+import { WaitingForTx } from "@/components/headen/AssetDialogComponents";
+import { Loading } from "@/components/Loading";
 import { Select, SelectOption } from "@/components/selects/Select";
 import { ConnectApproveAction } from "@/components/web3/ConnectWallet";
 import { NoWalletConnected } from "@/components/web3/NoWalletConnected";
@@ -16,12 +28,12 @@ import { WhenWallet } from "@/components/web3/WhenAccount";
 
 import { TokenResponse } from "@/store/useUniswapTokensStore";
 
-export const CreateMarket: FC = () => {
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  const [tokenAddress, setTokenAddress] = useState<Address | null>(null);
+import { headenFinanceAbi } from "@/constant/env";
 
-  // eslint-disable-next-line unused-imports/no-unused-vars
+export const CreateMarket: FC = () => {
+  const [tokenAddress, setTokenAddress] = useState<Address | null>(null);
   const availableTokens = useUniswapTokenList();
+  const valueCb = useGetValueOfToken({ token: tokenAddress ?? undefined });
 
   const options = useMemo(
     () =>
@@ -38,43 +50,38 @@ export const CreateMarket: FC = () => {
   const { chain } = useNetwork();
   const { balance, amount, displayAmount, percent, setPercent } =
     usePercentDisplayBalance(tokenAddress);
+  const [debouncedAmount] = useDebounce(amount, 500);
 
-  const hf = useHeadenFinanceWrite();
-  const [loading, setLoading] = useState(false);
+  const {
+    config,
+    isError: isErrorGasCost,
+    isLoading: isLoadingGasCost,
+  } = usePrepareContractWrite({
+    address: useHeadenFinanceAddress(),
+    abi: headenFinanceAbi,
+    functionName: "createMarketPool",
+    args: [tokenAddress ?? AddressZero, debouncedAmount ?? BigNumber.from(0)],
+    enabled: Boolean(tokenAddress && debouncedAmount),
+  });
+  const { data, write } = useContractWrite(config);
 
-  const createMarket = useCallback(async () => {
-    if (amount == undefined) {
-      // eslint-disable-next-line no-console
-      console.error("amount was undefined");
-      return;
+  const { isLoading, isSuccess, isError } = useWaitForTransaction({
+    hash: data?.hash,
+  });
+  const dialogId = useRef<string>();
+  useEffect(() => {
+    if (isLoading && !dialogId.current) {
+      dialogId.current = toast.loading(<WaitingForTx tx={data} />);
+    } else {
+      if (isSuccess) {
+        toast.success("Successfully created the pool and staked", {
+          id: dialogId.current,
+        });
+      } else if (isError) {
+        toast.error("Ooops, something went wrong", { id: dialogId.current });
+      }
     }
-    if (tokenAddress == null) {
-      // eslint-disable-next-line no-console
-      console.error("no token is selected");
-      return;
-    }
-    try {
-      setLoading(true);
-      const tx = await hf?.createMarketPool(tokenAddress, amount);
-      await toast.promise(tx.wait(), {
-        success: "Successfully created the pool and staked",
-        error: "Ooops, something went wrong",
-        loading: (
-          <span className="flex flex-col">
-            <span>Waiting for confirmation</span>
-            <span>tx: {tx.hash}</span>
-          </span>
-        ),
-      });
-      setLoading(false);
-    } catch ({ error }) {
-      // eslint-disable-next-line no-console
-      console.error();
-
-      toast.error(`${(error as RpcError<RpcError>).data?.message}`);
-      setLoading(false);
-    }
-  }, [amount, hf, tokenAddress]);
+  }, [isLoading, isSuccess, isError, data]);
 
   return (
     <>
@@ -128,6 +135,7 @@ export const CreateMarket: FC = () => {
                 <span> 0</span>
                 <span> {balance.data?.formatted}</span>
               </div>
+              <div>value: {valueCb(amount)}</div>
             </div>
           )}
         </WhenWallet>
@@ -138,16 +146,23 @@ export const CreateMarket: FC = () => {
         >
           {tokenAddress ? (
             <Button
-              onClick={createMarket}
+              onClick={() => (write ? write() : null)}
               type="button"
-              isLoading={loading}
+              isLoading={isLoading}
+              disabled={!write || isLoadingGasCost || isErrorGasCost}
               className={clsxm(
                 "w-full justify-center py-5",
                 "w-full justify-center py-5"
               )}
               variant="light"
             >
-              Create market and stake
+              {isLoadingGasCost ? (
+                <Loading />
+              ) : isErrorGasCost ? (
+                "Could not estimate gas price"
+              ) : (
+                "Create market and stake"
+              )}
             </Button>
           ) : (
             <Button
