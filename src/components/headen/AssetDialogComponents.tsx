@@ -119,12 +119,14 @@ export type AssetBalanceProps = {
   displayAmount: number;
   symbol?: string | null;
   setMax?: () => void;
+  usdValue?: string;
 };
 
 export function AssetBalance({
   displayAmount,
   symbol,
   setMax,
+  usdValue,
 }: AssetBalanceProps) {
   return (
     <div className="py-3.5 sm:py-5 md:py-10">
@@ -132,6 +134,7 @@ export function AssetBalance({
         <span className="text-2xl sm:text-3xl md:text-5xl">
           {displayAmount}
           {symbol}
+          {usdValue && <div className="text-xs">~${usdValue}</div>}
         </span>
         {setMax && (
           <Button

@@ -19,7 +19,11 @@ import { usePercentDisplayBalance } from "@/hooks/usePercentDisplayBalance";
 import { useUniswapTokenList } from "@/hooks/useUniswapTokenList";
 
 import Button from "@/components/buttons/Button";
-import { WaitingForTx } from "@/components/headen/AssetDialogComponents";
+import {
+  AssetAmountInput,
+  AssetBalance,
+  WaitingForTx,
+} from "@/components/headen/AssetDialogComponents";
 import { Loading } from "@/components/Loading";
 import { Select, SelectOption } from "@/components/selects/Select";
 import Skeleton from "@/components/Skeleton";
@@ -85,36 +89,42 @@ export const CreateMarket: FC = () => {
     }
   }, [isLoading, isSuccess, isError, data]);
 
+  const selectedOption = useMemo(
+    () =>
+      options.find(
+        (value) =>
+          value.value.address == tokenAddress &&
+          value.value.chainId == (chain?.id ?? 1)
+      ),
+    [chain, options, tokenAddress]
+  );
+
   return (
     <>
       <div className="p-2.5 sm:p-5 md:p-10">
         <NoWalletConnected />
         <WhenWallet status="connected">
-          <div className="md:py-10">
+          <div className="md:pt-10">
             <div className="relative">
               {!tokenAddress && <span> Select token address</span>}
               <Select
                 options={options}
-                className={clsxm("mb-8", tokenAddress ? "" : "mb-40 sm:mb-24 ")}
-                selectedOption={options.find(
-                  (value) =>
-                    value.value.address == tokenAddress &&
-                    value.value.chainId == (chain?.id ?? 1)
+                className={clsxm(
+                  "mb-8",
+                  tokenAddress ? "" : "mt-20 mb-40 sm:mb-40 sm:mt-0 "
                 )}
+                selectedOption={selectedOption}
                 onChanged={(it) => setTokenAddress(it.value.address)}
               />
-
               {tokenAddress &&
                 (isLoadingBalance ? (
                   <Skeleton className="mx-auto h-[5rem] w-[9rem]" />
                 ) : (
-                  <div>
-                    <div className="text-2xl sm:text-5xl ">
-                      {displayAmount}
-                      {balance.data?.symbol}
-                    </div>
-                    <div>~${valueCb(amount)}</div>
-                  </div>
+                  <AssetBalance
+                    displayAmount={displayAmount}
+                    symbol={balance.data?.symbol}
+                    usdValue={valueCb(amount)?.toFixed(2) ?? ""}
+                  />
                 ))}
             </div>
             {/*<h6>=$0</h6>*/}
@@ -130,22 +140,11 @@ export const CreateMarket: FC = () => {
           ) : isLoadingBalance ? (
             <Skeleton className="mx-auto mb-8 h-[2rem] w-[80%]" />
           ) : (
-            <div className="relative py-5 sm:py-10 ">
-              <input
-                type="range"
-                className="range-input h-1.5 w-full cursor-pointer appearance-none  rounded-lg bg-gray-200 accent-amber-900 dark:bg-gray-100"
-                min={1}
-                max={100}
-                step={1}
-                value={percent}
-                onChange={(event) => setPercent(parseInt(event.target.value))}
-                id="customRange1"
-              />
-              <div className="flex justify-between">
-                <span> 0</span>
-                <span> {balance.data?.formatted}</span>
-              </div>
-            </div>
+            <AssetAmountInput
+              percent={percent}
+              onPercentChanged={(p) => setPercent(p)}
+              maxText={balance.data?.formatted}
+            />
           )}
         </WhenWallet>
 
