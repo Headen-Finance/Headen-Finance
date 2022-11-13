@@ -6,7 +6,7 @@ import { Address, useAccount, useBalance } from "wagmi";
 export function usePercentDisplayBalance(tokenAddress: Address | null) {
   const acc = useAccount();
   const balance = useBalance({
-    addressOrName: acc.address,
+    address: acc.address,
     token: tokenAddress ?? AddressZero,
     enabled: !!tokenAddress,
     staleTime: 10_000,

@@ -59,7 +59,7 @@ function LoadingText({
 function PoolsRow({ item }: PoolsRowData) {
   const acc = useAccount();
   const { data: balance, isLoading: isLoadingBalance } = useBalance({
-    addressOrName: acc.address,
+    address: acc.address,
     staleTime: 10_000,
     token: item.tokenAddress,
   });

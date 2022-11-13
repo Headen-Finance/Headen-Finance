@@ -108,7 +108,6 @@ export const CreateMarket: FC = () => {
                   />
                 ))}
             </div>
-            {/*<h6>=$0</h6>*/}
           </div>
 
           {!tokenAddress ? (

@@ -18,7 +18,7 @@ type ActionProp = {
 export const Repay: FC<ActionProp> = ({ tokenAddress }) => {
   const acc = useAccount();
   const balance = useBalance({
-    addressOrName: acc.address,
+    address: acc.address,
     token: AddressZero, //tokenAddress,
   });
 
