@@ -32,7 +32,7 @@ interface IMultiChain {
 }
 
 contract chainLinkFeedUSDC {
-    ChainLinkAggregatorInterface chainLink = ChainLinkAggregatorInterface(0x103a2d37Ea6b3b4dA2F5bb44E001001729E74354);
+    ChainLinkAggregatorInterface chainLink = ChainLinkAggregatorInterface(0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0);
 }
 
 contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
@@ -227,6 +227,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     uint32 public hlParentId;
     address public parentAddress;
     uint public parentChainId;
+    uint public minAmount = 0;
     //uint[] hlChainIds;
 
     event Staked(uint _amount, address tokenAddress);
@@ -247,17 +248,21 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         parentChainId = _parent._parentChainId;
     }
 
-    function updateSettings (Configuration calldata config, address _relayer) external onlyOwner{
-        relayers[_relayer] = true;
-        unchecked {
-            supplyKink = config.supplyKink;
-            supplyPerSecondInterestRateSlopeLow = config.supplyPerYearInterestRateSlopeLow / SECONDS_PER_YEAR;
-            supplyPerSecondInterestRateSlopeHigh = config.supplyPerYearInterestRateSlopeHigh / SECONDS_PER_YEAR;
-            supplyPerSecondInterestRateBase = config.supplyPerYearInterestRateBase / SECONDS_PER_YEAR;
-            borrowKink = config.borrowKink;
-            borrowPerSecondInterestRateSlopeLow = config.borrowPerYearInterestRateSlopeLow / SECONDS_PER_YEAR;
-            borrowPerSecondInterestRateSlopeHigh = config.borrowPerYearInterestRateSlopeHigh / SECONDS_PER_YEAR;
-            borrowPerSecondInterestRateBase = config.borrowPerYearInterestRateBase / SECONDS_PER_YEAR;
+    function updateSettings (Configuration calldata config, address _relayer, uint _minAmount, bool light) external onlyRelayers{
+        if(light){
+            minAmount = _minAmount;
+        }else{
+            relayers[_relayer] = true;
+            unchecked {
+                supplyKink = config.supplyKink;
+                supplyPerSecondInterestRateSlopeLow = config.supplyPerYearInterestRateSlopeLow / SECONDS_PER_YEAR;
+                supplyPerSecondInterestRateSlopeHigh = config.supplyPerYearInterestRateSlopeHigh / SECONDS_PER_YEAR;
+                supplyPerSecondInterestRateBase = config.supplyPerYearInterestRateBase / SECONDS_PER_YEAR;
+                borrowKink = config.borrowKink;
+                borrowPerSecondInterestRateSlopeLow = config.borrowPerYearInterestRateSlopeLow / SECONDS_PER_YEAR;
+                borrowPerSecondInterestRateSlopeHigh = config.borrowPerYearInterestRateSlopeHigh / SECONDS_PER_YEAR;
+                borrowPerSecondInterestRateBase = config.borrowPerYearInterestRateBase / SECONDS_PER_YEAR;
+            }
         }
     }
 
@@ -311,7 +316,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint fee = (tax * _amountToStake) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToStake-fee);
-        require(valueOfTokens > 5, "Amount too low, enter an input greater than 5 USD value");
+        require(valueOfTokens > minAmount, "Amount too low, enter an input greater than 5 USD value");
         updateUserTotalValueInUSD(msg.sender);
 
         if(userstakes[_hash].available){
@@ -343,7 +348,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         uint fee = (tax * _amountToWithdraw) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToWithdraw-fee);
 
-        require(valueOfTokens > 10, "Amount too low");
+        require(valueOfTokens > minAmount, "Amount too low");
         require(userstakes[_hash].amountStaked > _amountToWithdraw, "Not enough liquidity");
         updateUserTotalValueInUSD(msg.sender);
         require(((users[msg.sender].totalAmountBorrowed) * 10000)/(users[msg.sender].totalAmountStaked - valueOfTokens) < maxLTV , "Amount greater than allowed amount");
@@ -380,7 +385,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint fee = (tax * _amountToBorrow) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToBorrow);
-        require(valueOfTokens > 5, "Amount too low to repay with, input at least 5 USD value");
+        require(valueOfTokens > minAmount, "Amount too low to repay with, input at least 5 USD value");
         updateUserTotalValueInUSD(msg.sender);
         require(((users[msg.sender].totalAmountBorrowed + valueOfTokens) * 10000)/users[msg.sender].totalAmountStaked < maxLTV , "Amount greater than allowed amount");
 
@@ -414,8 +419,8 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         uint fee = (tax * _amountToBorrow) / 10000;
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amountToBorrow);
         uint valueOfCollateral = getValueOfToken(_collateralAddress, _collateralAmount);
-        require(valueOfTokens > 5, "Amount too low");
-        require(valueOfCollateral > 5, "Input amount too low");
+        require(valueOfTokens > minAmount, "Amount too low");
+        require(valueOfCollateral > minAmount, "Input amount too low");
         updateUserTotalValueInUSD(msg.sender);
         require(((users[msg.sender].totalAmountBorrowed + valueOfTokens) * 10000)/(users[msg.sender].totalAmountStaked+valueOfCollateral) < maxLTV , "Amount greater than allowed amount");
 
@@ -458,7 +463,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         require(marketTokens[_tokenAddress].available, "market not available");
         bytes32 _hash = keccak256(abi.encodePacked(msg.sender, _tokenAddress, hashSalt));
         uint valueOfTokens = getValueOfToken(_tokenAddress, _amount);
-        require(valueOfTokens > 5, "Input Amount too low");
+        require(valueOfTokens > minAmount, "Input Amount too low");
         updateUserTotalValueInUSD(msg.sender);
 
         usersborrows[_hash].amountBorrowed -= _amount;  
@@ -488,8 +493,8 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         }
         
         bytes32 _hash = keccak256(abi.encodePacked(user, token, hashSalt));
-        uint borrowRate = borrowInterestRates(marketTokens[token]._id) * timeSpent;
-        uint supplyRate = supplyInterestRates(marketTokens[token]._id) * timeSpent;
+        uint borrowRate = interestRates(marketTokens[token]._id, true) * timeSpent;
+        uint supplyRate = interestRates(marketTokens[token]._id, false) * timeSpent;
         uint fee = (tax * 2 * users[user].totalAmountStaked) / 10000;
 
         userstakes[_hash].amountStaked += (supplyRate * userstakes[_hash].amountStaked) / 10000; 
@@ -577,32 +582,32 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         _stakeToken(_token, amount);
     }
 
-    function borrowInterestRates(uint128 _id) public view returns(uint){
-        uint utilization = per_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked; // same decimals as utilization 8d
-        if (utilization <= borrowKink) {
-            // interestRateBase + interestRateSlopeLow * utilization
-            return borrowPerSecondInterestRateBase + borrowPerSecondInterestRateSlopeLow * utilization;
-        } else {
-            // interestRateBase + interestRateSlopeLow * kink + interestRateSlopeHigh * (utilization - kink)
-            return borrowPerSecondInterestRateBase + (borrowPerSecondInterestRateSlopeLow * borrowKink) + (borrowPerSecondInterestRateSlopeHigh * (utilization - borrowKink));
-        }
-    }
-
-    function supplyInterestRates(uint128 _id) public view returns (uint){
+    function interestRates(uint128 _id, bool borrow) public view returns(uint){
         uint utilization = per_amount(markets[_id].amountBorrowed) / markets[_id].amountStaked;
-        if (utilization <= supplyKink) {
-            // interestRateBase + interestRateSlopeLow * utilization
-            return supplyPerSecondInterestRateBase + (supplyPerSecondInterestRateSlopeLow * utilization);
-        } else {
-            // interestRateBase + interestRateSlopeLow * kink + interestRateSlopeHigh * (utilization - kink)
-            return supplyPerSecondInterestRateBase + (supplyPerSecondInterestRateSlopeLow * supplyKink) + (supplyPerSecondInterestRateSlopeHigh * (utilization - supplyKink));
+        if(borrow){
+            // same decimals as utilization 8d
+            if (utilization <= borrowKink) {
+                // interestRateBase + interestRateSlopeLow * utilization
+                return borrowPerSecondInterestRateBase + borrowPerSecondInterestRateSlopeLow * utilization;
+            } else {
+                // interestRateBase + interestRateSlopeLow * kink + interestRateSlopeHigh * (utilization - kink)
+                return borrowPerSecondInterestRateBase + (borrowPerSecondInterestRateSlopeLow * borrowKink) + (borrowPerSecondInterestRateSlopeHigh * (utilization - borrowKink));
+            }
+        }else{
+            if (utilization <= supplyKink) {
+                // interestRateBase + interestRateSlopeLow * utilization
+                return supplyPerSecondInterestRateBase + (supplyPerSecondInterestRateSlopeLow * utilization);
+            } else {
+                // interestRateBase + interestRateSlopeLow * kink + interestRateSlopeHigh * (utilization - kink)
+                return supplyPerSecondInterestRateBase + (supplyPerSecondInterestRateSlopeLow * supplyKink) + (supplyPerSecondInterestRateSlopeHigh * (utilization - supplyKink));
+            }
         }
     }
 
     function updateMarket(uint128 _id) private {
         if(markets[_id].available){
-            markets[_id].borrowRate = borrowInterestRates(_id);
-            markets[_id].supplyRate = supplyInterestRates(_id);
+            markets[_id].borrowRate = interestRates(_id, true);
+            markets[_id].supplyRate = interestRates(_id, false);
         }
     }
 
