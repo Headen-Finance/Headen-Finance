@@ -5,6 +5,7 @@ pragma abicoder v2;
 import "@uniswap/v2-periphery/contracts/interfaces/IUniswapV2Router02.sol";
 import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Factory.sol";
 import "@uniswap/v2-periphery/contracts/interfaces/IERC20.sol";
+//import "@uniswap/swap-router-contracts/contracts/interfaces/ISwapRouter02.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
@@ -31,18 +32,17 @@ interface IMultiChain {
     function anySwapOut(address[] calldata tokens, address[] calldata to, uint[] calldata amounts, uint[] calldata toChainIDs) external;
 }
 
-contract chainLinkFeedUSDC {
-    ChainLinkAggregatorInterface chainLink = ChainLinkAggregatorInterface(0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0);
-}
+// contract chainLinkFeedUSDC {
+//     ChainLinkAggregatorInterface chainLink = ChainLinkAggregatorInterface(0x572dDec9087154dC5dfBB1546Bb62713147e0Ab0);
+// }
 
-contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
+contract HeadenUtils is ReentrancyGuard {
     address swapRouter;
     string  hashSalt;
+    ChainLinkAggregatorInterface public chainLink;
     uint public tax = 350; //3.5%
     address public multichainRouter;
     address public usdc;
-    address public dai;
-    address public matic;
     uint multiplier = 10**18;
     uint public SECONDS_PER_YEAR = 3600 * 24 * 365;
     uint public immutable interval;
@@ -71,16 +71,15 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
         uint64 borrowPerYearInterestRateBase;
     }
 
-    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, uint _chainId, Configuration memory config){
+    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _chainLink, uint _chainId, Configuration memory config){
         multichainRouter=_multichainRouter;
         hashSalt =_hashSalt;
         swapRouter=_swapRouter;
-        dai = _dai;
         usdc = _usdc;
-        matic = _matic;
         interval = _interval;
         lastTimeStamp = block.timestamp;
         chainId = _chainId;
+        chainLink = ChainLinkAggregatorInterface(_chainLink);
 
         // Set interest rate model configs
         unchecked {
@@ -104,38 +103,6 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
         return 10**_decimals;
     }
 
-    function findBestPrice  (address token) internal view returns (uint){
-        uint _multiplier = multiply(IERC20(token).decimals());
-        address[] memory path = new address[](2);
-        path[0] = token;
-        path[1] = usdc;
-        
-        // try direct pair
-        uint result = getAvgPriceForTokens(1*_multiplier, swapRouter, path);
-        if(result > 0){
-            return result;
-        }
-        path = new address[](3);
-        
-        path[0] = token;
-        path[1] = dai;
-        path[2] = usdc;
-        result = getAvgPriceForTokens(1*_multiplier, swapRouter, path);
-        if(result >0){
-            return result;
-        }         
-        
-        //try matic in between
-        path[1] = matic;
-        path[2] = usdc;
-        result = getAvgPriceForTokens(1*_multiplier, swapRouter, path);
-        if(result >0){
-            return result;
-        }
-        
-        return 0;
-    }
-
     function per_amount(uint amount) public pure returns(uint){
         return amount * 10000;
     }
@@ -143,8 +110,14 @@ contract HeadenUtils is chainLinkFeedUSDC, ReentrancyGuard {
     function getValueOfToken(address token, uint amount)internal view returns(uint){
          //value of pool
          uint value = multiply(IERC20(usdc).decimals());
-         if(token != usdc){            
-            value = findBestPrice(token); 
+         if(token != usdc){   
+            uint _multiplier = multiply(IERC20(token).decimals());
+            address[] memory path = new address[](2);
+            path[0] = token;
+            path[1] = usdc;
+            
+            // only direct pair
+            value = getAvgPriceForTokens(1*_multiplier, swapRouter, path);       
             require(value > 0,"price output must be greater than zero");
          }
         
@@ -160,7 +133,6 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         bool available;
         uint totalAmountBorrowed; //in usd up to 8 decimal places
         uint totalAmountStaked; //in usd
-        uint ltv;
         bool lock;
         uint lastAPRUpdated;
     }
@@ -233,13 +205,13 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     event Staked(uint _amount, address tokenAddress);
     event Borrowed(uint _amount, address tokenAddress);
     event Withdrawn(uint _amount, address tokenAddress);
-    event Repaid(uint _amount, address tokenAddress);
+    event Repayed(uint _amount, address tokenAddress);
     event LockUntilUpdateFromParentChain(address user);
     event FullChainSyncRequired();
     event ChainSyncRequired(address user);
     event UpdateParentChain(User user);
 
-    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _dai, address _matic, Abacus memory _abacus, Parent memory _parent, uint _chainId, Configuration memory config) HeadenUtils (_interval,_multichainRouter, _hashSalt, _swapRouter, _usdc, _dai, _matic, _chainId, config) {
+    constructor(uint _interval, address _multichainRouter, string memory _hashSalt, address _swapRouter, address _usdc, address _chainLink, Abacus memory _abacus, Parent memory _parent, uint _chainId, Configuration memory config) HeadenUtils (_interval,_multichainRouter, _hashSalt, _swapRouter, _usdc, _chainLink, _chainId, config) {
         relayers[msg.sender] = true;
         _setAbacusConnectionManager(_abacus._abacusManager);
         _setInterchainGasPaymaster(_abacus._abacusPay);
@@ -279,11 +251,6 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
         users[user].totalAmountBorrowed = totalBorrowValue;
         users[user].totalAmountStaked = totalStakeValue;
-        if(users[user].totalAmountStaked > 0){
-            users[user].ltv = per_amount(users[user].totalAmountBorrowed) / users[user].totalAmountStaked;
-        }else{
-            users[user].ltv = 0;
-        }
     }
 
     // for input: true is for addition and false is for subtraction. SO stake will be true and withdraw will be false
@@ -475,7 +442,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
          //child
         emit LockUntilUpdateFromParentChain(msg.sender); //other children
         emit UpdateParentChain(users[msg.sender]); //parent chain
-        emit Repaid(_amount, _tokenAddress);
+        emit Repayed(_amount, _tokenAddress);
         dispatch(msg.sender);
     }
 
@@ -483,7 +450,11 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     function getRiskLevel() public view returns(uint){
         require(users[msg.sender].available, "User not found");
-        return users[msg.sender].ltv;
+        if(users[msg.sender].totalAmountStaked > 0){
+            return per_amount(users[msg.sender].totalAmountBorrowed) / users[msg.sender].totalAmountStaked;
+        }else{
+           return 0;
+        }
     }
 
     function collateAPR(address user, address token) private returns(bool) { //every 1 month
@@ -502,18 +473,15 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         users[user].totalAmountStaked += ((supplyRate * users[user].totalAmountStaked) / 10000) - fee;
         users[user].totalAmountBorrowed += (borrowRate * users[user].totalAmountBorrowed) / 10000;
         users[user].lastAPRUpdated = block.timestamp;
-
-        if(users[user].totalAmountStaked > 0){
-            users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
-        }else{
-            users[user].ltv = 0;
-        }
         lastAPRUpdate = block.timestamp;
         return true;
     }
 
     function liquidateUser(address user, address token) private {
-        require(users[user].ltv < maxLTV, "Liquidation not possible");
+        if(users[user].totalAmountStaked > 0){
+            uint ltv = per_amount(users[user].totalAmountBorrowed) / users[user].totalAmountStaked;
+            require(ltv >= maxLTV, "Liquidation not possible");
+        }
         updateUserTotalValueInUSD(user);
         
         bytes32 _hash = keccak256(abi.encodePacked(user, token, hashSalt));
@@ -522,13 +490,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         uint fee = (tax * 5 * valueOfTokens) / 10000;
         userstakes[_hash].amountStaked = 0; 
         users[user].totalAmountStaked -= valueOfTokens - fee;
-        users[user].totalAmountBorrowed -= valueOfTokens;
-        if(users[user].totalAmountStaked > 0){
-            users[user].ltv = per_amount(users[user].totalAmountBorrowed)/ users[user].totalAmountStaked;
-        }else{
-            users[user].ltv = 0;
-        }
-        
+        users[user].totalAmountBorrowed -= valueOfTokens; 
     }
 
     function validateUsers() public onlyRelayers {
@@ -541,10 +503,14 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
     function validateUser(address user) public onlyRelayers {
         for(uint128 j=0; j<= market_pools; j++){
             collateAPR(user, markets[j].tokenAddress);
-            if(users[user].ltv >= maxLTV){
-                liquidateUser(user, markets[j].tokenAddress);
-                updateUserTotalValueInUSD(user);
+            if(users[user].totalAmountStaked > 0){
+                uint ltv = per_amount(users[user].totalAmountBorrowed) / users[user].totalAmountStaked;
+                if(ltv >= maxLTV){
+                    liquidateUser(user, markets[j].tokenAddress);
+                    updateUserTotalValueInUSD(user);
+                }
             }
+            
         }
         emit UpdateParentChain(users[user]);
         dispatch(user);
@@ -552,9 +518,12 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     function validateUser(address user, address token) public onlyRelayers {
         collateAPR(user, token);
-        if(users[user].ltv >= maxLTV){
-            liquidateUser(user, token);
-            updateUserTotalValueInUSD(user);
+        if(users[user].totalAmountStaked > 0){
+            uint ltv = per_amount(users[user].totalAmountBorrowed) / users[user].totalAmountStaked;
+            if(ltv >= maxLTV){
+                liquidateUser(user, token);
+                updateUserTotalValueInUSD(user);
+            }
         }
         
         emit UpdateParentChain(users[user]);
@@ -578,7 +547,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         marketTokens[_token] = MarketToken(true, market_pools);
 
         uint valueOfTokens = getValueOfToken(_token, amount);
-        require(valueOfTokens >= 3500 * multiply(chainLink.decimals()) , "Not enough start new pool"); // at least 3.5kUSD needed
+        require(valueOfTokens >= minAmount * 1000 , "Not enough start new pool"); 
         _stakeToken(_token, amount);
     }
 
@@ -632,11 +601,10 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         if(users[user].available){
             users[user].totalAmountStaked = totalStakes;
             users[user].totalAmountBorrowed = totalBorrows;
-            users[user].ltv = _ltv;
             users[user].lock = false;
         }else{
             userAddresses.push(user);
-            users[user] = User(user, true, totalBorrows, totalStakes, _ltv, false, block.timestamp);
+            users[user] = User(user, true, totalBorrows, totalStakes, false, block.timestamp);
         }
     }
 
@@ -704,7 +672,7 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
 
     modifier makeUser {
         if(!users[msg.sender].available){
-            users[msg.sender] = User(msg.sender, true, 0, 0, 0, false, block.timestamp);
+            users[msg.sender] = User(msg.sender, true, 0, 0, false, block.timestamp);
             userAddresses.push(msg.sender);
         }
         _;
@@ -721,3 +689,15 @@ contract HeadenFinanceChild is HeadenUtils, KeeperCompatibleInterface, Router {
         _;
     }
 }
+// rebalance liquidity logic and executed with DeBridge
+// 200
+// 0xC10Ef9F491C9B59f936957026020C321651ac078
+// nidnidjiwjdiswism
+// test:0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45  //main:0xE592427A0AEce92De3Edee1F18E0157C05861564
+// test:0xe6b8a5CF854791412c1f6EFC7CAf629f5Df1c747  main:0xb0Ad46bD50b44cBE47E2d83143E0E415d6A842F6
+// test: 0x001B3B4d0F3714Ca98ba10F6042DaEbF0B1B7b6F main:0x2f3C1B6A51A469051A22986aA0dDF98466cc8D3c
+// test: 0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889 main:0x207eD1742cc0BeBD03E50e855d3a14E41f93A461
+// ["0xb636B2c65A75d41F0dBe98fB33eb563d245a241a","0x9A27744C249A11f68B3B56f09D280599585DFBb8"]
+// ["0x92378719B4E8686c149E167a9151fD8d25C843c3",80001,80001]
+// 80001
+// [5,3,4,3,4,6,6,5]
